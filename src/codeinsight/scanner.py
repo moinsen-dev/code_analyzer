@@ -43,9 +43,9 @@ class Scanner:
     # File patterns that should be ignored (generated files, lock files, etc.)
     IGNORED_FILE_PATTERNS = {
         # Generated files
-        '*.g.dart', '*.g.py', '*.generated.*', '*_generated.*',
+        '*.g.dart', '*.freezed.dart', '*.generated.*', '*_generated.*',
         # Lock files
-        'pubspec.lock', 'package-lock.json', 'yarn.lock', 'Gemfile.lock',
+        'pubspec.lock', 'package-lock.json', '*-lock.json', 'yarn.lock', 'Gemfile.lock',
         'composer.lock', 'Cargo.lock', 'poetry.lock', 'Pipfile.lock',
         'conda-lock.yml', 'mix.lock',
         # Build/Project files

@@ -3,7 +3,7 @@ Configuration manager for Code Insight Analyzer
 """
 import yaml
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 
 from codeinsight.config.models import Config
 

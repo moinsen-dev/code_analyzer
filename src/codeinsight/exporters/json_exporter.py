@@ -1,7 +1,6 @@
 """
 JSON export functionality
 """
-import json
 from pathlib import Path
 from codeinsight.models.metrics import AnalysisReport
 

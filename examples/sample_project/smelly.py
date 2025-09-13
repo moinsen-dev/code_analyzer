@@ -1,8 +1,6 @@
 """
 Test file with code smells for demonstration
 """
-import os
-from typing import List, Dict
 
 class SmellyClass:
     """A class with various code smells"""
@@ -40,7 +38,7 @@ class SmellyClass:
         i = 12
         j = 13
         k = 14
-        l = 15
+        l_value = 15
         m = 16
         n = 17
         o = 18
@@ -51,7 +49,7 @@ class SmellyClass:
         t = 23
         u = 24
         v = 25
-        return x + y + z + a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v
+        return x + y + z + a + b + c + d + e + f + g + h + i + j + k + l_value + m + n + o + p + q + r + s + t + u + v
     
     def complex_conditional(self, a, b, c, d, e):
         """Method with complex conditional"""

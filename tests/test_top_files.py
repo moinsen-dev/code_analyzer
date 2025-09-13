@@ -1,11 +1,6 @@
 """
 Test script to verify the --top-files option
 """
-from pathlib import Path
-import tempfile
-import sys
-import io
-from contextlib import redirect_stdout
 
 from codeinsight.cli import app
 from typer.testing import CliRunner

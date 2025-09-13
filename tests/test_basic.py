@@ -1,7 +1,6 @@
 """
 Test file for Code Insight Analyzer
 """
-import os
 import tempfile
 from pathlib import Path
 

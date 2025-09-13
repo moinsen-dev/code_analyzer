@@ -2,7 +2,6 @@
 Test file for export functionality
 """
 import tempfile
-import os
 from pathlib import Path
 from datetime import datetime
 

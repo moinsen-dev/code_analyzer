@@ -1,9 +1,7 @@
 """
 GitIgnore parsing and matching utilities
 """
-import os
 from pathlib import Path
-from typing import List, Set
 try:
     import pathspec
     PATHSPEC_AVAILABLE = True

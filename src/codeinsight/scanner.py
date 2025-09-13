@@ -3,7 +3,7 @@ Code scanner for analyzing directories and files
 """
 import os
 from pathlib import Path
-from typing import List, Set
+from typing import List
 from datetime import datetime
 from fnmatch import fnmatch
 from concurrent.futures import ThreadPoolExecutor, as_completed

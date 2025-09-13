@@ -1,8 +1,7 @@
 """
 Configuration models for Code Insight Analyzer
 """
-from typing import Dict, List, Optional
-from pathlib import Path
+from typing import Dict, List
 from pydantic import BaseModel, Field
 
 

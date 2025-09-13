@@ -3,7 +3,7 @@ Code Insight Analyzer CLI
 """
 import typer
 import json
-from typing import Optional, List
+from typing import List
 from pathlib import Path
 
 from codeinsight.scanner import Scanner
@@ -119,7 +119,6 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
         from rich.console import Console
         from rich.table import Table
         from rich.panel import Panel
-        from rich.progress import Progress
         
         console = Console()
         
@@ -255,7 +254,7 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
         
     except ImportError:
         # Fallback to basic output
-        print(f"Code Insight Analyzer v1.0")
+        print("Code Insight Analyzer v1.0")
         print(f"Project: {report.project_path}")
         print("\n📊 Analysis Summary")
         print("──────────────────")
@@ -465,17 +464,17 @@ def _display_comparison_terminal(comparison: dict, report1: AnalysisReport, repo
         # Display complexity changes if any
         complexity = comparison["complexity"]
         if complexity["files_with_changes"]:
-            console.print(f"\n[bold]Complexity Changes:[/bold]")
+            console.print("\n[bold]Complexity Changes:[/bold]")
             console.print(f"  {len(complexity['files_with_changes'])} files with complexity changes")
         
     except ImportError:
         # Fallback to basic output
-        print(f"Code Insight Analysis Comparison")
+        print("Code Insight Analysis Comparison")
         print(f"Report 1: {report1.project_path} ({report1.timestamp.strftime('%Y-%m-%d %H:%M:%S')})")
         print(f"Report 2: {report2.project_path} ({report2.timestamp.strftime('%Y-%m-%d %H:%M:%S')})")
         
         summary = comparison["summary"]
-        print(f"\nSummary:")
+        print("\nSummary:")
         print(f"  Total Files: {summary['total_files']['report1']} -> {summary['total_files']['report2']} "
               f"({summary['total_files']['difference']:+d}, {summary['total_files']['percentage_change']:+.1f}%)")
         print(f"  Total Lines: {summary['total_lines']['report1']:,} -> {summary['total_lines']['report2']:,} "

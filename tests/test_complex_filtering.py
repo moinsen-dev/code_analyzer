@@ -3,7 +3,6 @@ Test script to simulate the original issue with .git files and images
 """
 from pathlib import Path
 import tempfile
-import os
 
 from codeinsight.scanner import Scanner
 

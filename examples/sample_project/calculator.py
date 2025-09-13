@@ -1,8 +1,7 @@
 """
 Sample Python module for demonstration
 """
-import os
-from typing import List, Dict
+from typing import List
 
 class Calculator:
     """A simple calculator class"""

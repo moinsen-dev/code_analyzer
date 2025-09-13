@@ -1,11 +1,9 @@
 """
 Analysis report comparison functionality
 """
-from typing import Dict, List, Tuple, Any
-from pathlib import Path
-import json
+from typing import Dict, Any
 
-from codeinsight.models.metrics import AnalysisReport, FileMetrics, ComplexityMetrics
+from codeinsight.models.metrics import AnalysisReport
 
 
 class ReportComparator:

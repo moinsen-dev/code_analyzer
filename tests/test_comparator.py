@@ -1,7 +1,6 @@
 """
 Test script for report comparator
 """
-from pathlib import Path
 import json
 
 from codeinsight.models.metrics import AnalysisReport

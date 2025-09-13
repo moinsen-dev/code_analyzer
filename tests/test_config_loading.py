@@ -72,10 +72,10 @@ def custom():
         assert config_manager.config.languages["python"].complexity_threshold == 15
         assert "custom_dir/" in config_manager.config.analysis.ignore_patterns
         assert config_manager.config.output.theme == "dark"
-        assert config_manager.config.output.show_recommendations == False
+        assert config_manager.config.output.show_recommendations is False
         
         # Test that the ignore patterns work
-        assert config_manager.should_ignore_file(temp_path / "test.custom.py") == True
+        assert config_manager.should_ignore_file(temp_path / "test.custom.py") is True
         
         # Test the scanner with the custom config
         scanner = Scanner(temp_path)

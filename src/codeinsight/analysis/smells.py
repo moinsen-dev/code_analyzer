@@ -2,7 +2,7 @@
 Code smell detection functionality
 """
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Dict
 import ast
 
 from codeinsight.models.metrics import Language
@@ -38,7 +38,6 @@ class CodeSmellDetector:
             smells.extend(self._detect_long_methods(tree))
             smells.extend(self._detect_large_classes(tree))
             smells.extend(self._detect_complex_conditionals(tree))
-            smells.extend(self._detect_duplicate_code(content))
             smells.extend(self._detect_long_parameter_lists(tree))
             smells.extend(self._detect_nested_blocks(tree))
             
@@ -119,25 +118,125 @@ class CodeSmellDetector:
             return count
     
     def _detect_duplicate_code(self, content: str) -> List[str]:
-        """Detect duplicate code blocks"""
-        # This is a simplified implementation
-        # A full implementation would use more sophisticated techniques
-        lines = content.splitlines()
+        """Detect duplicate code blocks using AST-based approach"""
+        try:
+            # Parse the AST
+            tree = ast.parse(content)
+            
+            # Extract code blocks and their hashes
+            code_blocks = self._extract_code_blocks(tree)
+            
+            # Find duplicate blocks
+            duplicates = self._find_duplicate_blocks(code_blocks)
+            
+            # Return formatted duplicate reports
+            smells = []
+            for block_hash, locations in duplicates.items():
+                if len(locations) > 1:  # Found duplicates
+                    # Get the first few lines of the duplicate block for context
+                    first_location = locations[0]
+                    smells.append(f"Found {len(locations)} duplicate code blocks (first at line {first_location['line']})")
+            
+            return smells
+        except Exception:
+            # Fallback to simple line-based detection if AST parsing fails
+            lines = content.splitlines()
+            
+            # Look for consecutive duplicate lines
+            duplicate_count = 0
+            for i in range(len(lines) - 1):
+                if lines[i].strip() and lines[i].strip() == lines[i + 1].strip():
+                    duplicate_count += 1
+                else:
+                    if duplicate_count > 2:  # Threshold for duplicate code
+                        return [f"Found {duplicate_count + 1} consecutive duplicate lines"]
+                    duplicate_count = 0
+            
+            if duplicate_count > 2:
+                return [f"Found {duplicate_count + 1} consecutive duplicate lines"]
+            
+            return []
+    
+    def _extract_code_blocks(self, tree: ast.AST) -> List[Dict]:
+        """Extract code blocks from AST with their structural information"""
+        blocks = []
         
-        # Look for consecutive duplicate lines
-        duplicate_count = 0
-        for i in range(len(lines) - 1):
-            if lines[i].strip() and lines[i].strip() == lines[i + 1].strip():
-                duplicate_count += 1
-            else:
-                if duplicate_count > 2:  # Threshold for duplicate code
-                    return [f"Found {duplicate_count + 1} consecutive duplicate lines"]
-                duplicate_count = 0
+        # Walk the AST to find function and class definitions
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                # Extract function body as a block
+                block_info = {
+                    'type': 'function',
+                    'name': node.name,
+                    'line': node.lineno,
+                    'hash': self._hash_ast_node(node),
+                    'node': node
+                }
+                blocks.append(block_info)
+            elif isinstance(node, ast.ClassDef):
+                # Extract class body as a block
+                block_info = {
+                    'type': 'class',
+                    'name': node.name,
+                    'line': node.lineno,
+                    'hash': self._hash_ast_node(node),
+                    'node': node
+                }
+                blocks.append(block_info)
+            elif isinstance(node, (ast.For, ast.While, ast.If)):
+                # Extract control structures as blocks
+                block_info = {
+                    'type': type(node).__name__.lower(),
+                    'name': f"{type(node).__name__.lower()}_block",
+                    'line': getattr(node, 'lineno', 0),
+                    'hash': self._hash_ast_node(node),
+                    'node': node
+                }
+                blocks.append(block_info)
         
-        if duplicate_count > 2:
-            return [f"Found {duplicate_count + 1} consecutive duplicate lines"]
+        return blocks
+    
+    def _hash_ast_node(self, node: ast.AST) -> str:
+        """Create a structural hash of an AST node"""
+        # Convert node to string representation and hash it
+        # This is a simplified approach - a more sophisticated implementation
+        # would normalize the AST before hashing
+        try:
+            # Get the node type and key attributes
+            node_info = []
+            node_info.append(type(node).__name__)
+            
+            # Add key attributes that affect structure
+            if hasattr(node, 'name'):
+                node_info.append(f"name:{node.name}")
+            if hasattr(node, 'args') and hasattr(node.args, 'args'):
+                node_info.append(f"params:{len(node.args.args)}")
+            if hasattr(node, 'body'):
+                node_info.append(f"body:{len(node.body) if isinstance(node.body, list) else 1}")
+            
+            # Create hash from structural info
+            import hashlib
+            structural_info = "|".join(node_info)
+            return hashlib.md5(structural_info.encode()).hexdigest()
+        except Exception:
+            # Fallback to simple hash
+            return str(hash(str(type(node))))
+    
+    def _find_duplicate_blocks(self, blocks: List[Dict]) -> Dict[str, List[Dict]]:
+        """Find duplicate code blocks by their hashes"""
+        duplicates = {}
         
-        return []
+        # Group blocks by hash
+        for block in blocks:
+            block_hash = block['hash']
+            if block_hash not in duplicates:
+                duplicates[block_hash] = []
+            duplicates[block_hash].append(block)
+        
+        # Filter to only include hashes with multiple occurrences
+        duplicates = {k: v for k, v in duplicates.items() if len(v) > 1}
+        
+        return duplicates
     
     def _detect_long_parameter_lists(self, tree: ast.AST) -> List[str]:
         """Detect functions with too many parameters"""
@@ -169,3 +268,48 @@ class CodeSmellDetector:
         
         check_nesting(tree)
         return smells
+
+    def detect_duplications(self, file_path: Path, language: Language) -> List[Dict]:
+        """
+        Detect code duplications in a file
+        
+        Args:
+            file_path: Path to the file
+            language: Language of the file
+            
+        Returns:
+            List of detected duplications
+        """
+        # Only analyze Python files for now
+        if language != Language.PYTHON:
+            return []
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            
+            # Parse the AST
+            tree = ast.parse(content)
+            
+            # Extract code blocks and find duplicates
+            code_blocks = self._extract_code_blocks(tree)
+            duplicates = self._find_duplicate_blocks(code_blocks)
+            
+            # Convert to Duplication objects
+            duplications = []
+            for block_hash, locations in duplicates.items():
+                if len(locations) > 1:  # Found duplicates
+                    duplication = {
+                        'type': locations[0]['type'],
+                        'name': locations[0]['name'],
+                        'line': locations[0]['line'],
+                        'count': len(locations),
+                        'locations': [{'line': loc['line'], 'name': loc['name']} for loc in locations]
+                    }
+                    duplications.append(duplication)
+            
+            return duplications
+            
+        except Exception as e:
+            print(f"Warning: Could not detect duplications for {file_path}: {e}")
+            return []

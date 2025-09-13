@@ -44,6 +44,16 @@ class HalsteadMetrics:
 
 
 @dataclass
+class Duplication:
+    """Code duplication information"""
+    type: str  # function, class, block, etc.
+    name: str  # Name of the duplicated element
+    line: int  # Line number where duplication starts
+    count: int  # Number of duplicates found
+    locations: List[Dict[str, Any]] = field(default_factory=list)  # Detailed locations
+
+
+@dataclass
 class FileMetrics:
     """Metrics for a single file"""
     path: Path
@@ -72,7 +82,7 @@ class CodeInsights:
     file_metrics: FileMetrics
     complexity_metrics: Optional[ComplexityMetrics] = None
     code_smells: List[str] = field(default_factory=list)
-    duplications: List[Any] = field(default_factory=list)
+    duplications: List[Duplication] = field(default_factory=list)
 
 
 @dataclass

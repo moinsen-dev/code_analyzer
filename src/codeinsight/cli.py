@@ -224,6 +224,27 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
             
             console.print(smell_table)
         
+        # Display code duplications if any
+        duplications_found = []
+        for file_insight in report.top_files:
+            if file_insight.duplications:
+                for duplication in file_insight.duplications:
+                    duplications_found.append((file_insight.file_metrics.relative_path, duplication))
+        
+        if duplications_found:
+            console.print("\n[bold]🔍 Code Duplications Detected[/bold]")
+            console.print("─" * 30)
+            
+            dup_table = Table(show_header=True)
+            dup_table.add_column("File", style="cyan")
+            dup_table.add_column("Duplication", style="yellow")
+            
+            for file_path, duplication in duplications_found[:10]:  # Show top 10 duplications
+                dup_info = f"{duplication['type']} '{duplication['name']}' ({duplication['count']} duplicates)"
+                dup_table.add_row(file_path, dup_info)
+            
+            console.print(dup_table)
+        
         # Display recommendations if any
         if report.recommendations:
             console.print("\n[bold]💡 Recommendations[/bold]")
@@ -303,6 +324,20 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
             print("───────────────────────")
             for file_path, smell in smells_found[:10]:  # Show top 10 smells
                 print(f"  • {file_path}: {smell}")
+        
+        # Display code duplications if any
+        duplications_found = []
+        for file_insight in report.top_files:
+            if file_insight.duplications:
+                for duplication in file_insight.duplications:
+                    duplications_found.append((file_insight.file_metrics.relative_path, duplication))
+        
+        if duplications_found:
+            print("\n🔍 Code Duplications Detected")
+            print("────────────────────────────")
+            for file_path, duplication in duplications_found[:10]:  # Show top 10 duplications
+                dup_info = f"{duplication['type']} '{duplication['name']}' ({duplication['count']} duplicates)"
+                print(f"  • {file_path}: {dup_info}")
         
         # Display recommendations if any
         if report.recommendations:

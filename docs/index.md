@@ -1,10 +1,11 @@
+---
+layout: default
+title: Code Insight Analyzer
+---
+
 # Code Insight Analyzer
 
-![Code Analyzer Icon](code-analyzer-icon.png)
-
 A Python-based command-line tool that provides comprehensive analysis of source code repositories. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
-
-![Code Analyzer Wallpaper](code-analyzer-wallpaper.png)
 
 ## Features
 
@@ -35,42 +36,17 @@ Then install the dependencies:
 uv sync
 ```
 
-## Usage
-
-### Basic Analysis
+## Quick Start
 
 ```bash
 # Analyze current directory
 uv run codeinsight analyze .
 
-# Analyze specific directory
-uv run codeinsight analyze /path/to/project
-
 # Include complexity analysis
 uv run codeinsight analyze . --complexity
-```
-
-### Output Formats
-
-```bash
-# Display in terminal (default)
-uv run codeinsight analyze . --output terminal
-
-# Export to JSON
-uv run codeinsight analyze . --export json --export-dir ./reports
 
 # Export to multiple formats
 uv run codeinsight analyze . --export json,html --export-dir ./reports
-```
-
-### Advanced Usage
-
-```bash
-# Compare two analysis reports
-uv run codeinsight compare reports/report1.json reports/report2.json
-
-# Initialize configuration file
-uv run codeinsight init
 ```
 
 ## Supported Languages
@@ -85,52 +61,11 @@ The Code Insight Analyzer supports 60+ programming languages:
 - **Data**: SQL, GraphQL
 - **Documentation**: Markdown, reStructuredText
 
-## Configuration
-
-Create a `.codeinsight.yml` file in your project root:
-
-```yaml
-version: 1.0
-
-# Language-specific settings
-languages:
-  python:
-    max_line_length: 88
-    complexity_threshold: 10
-  typescript:
-    max_line_length: 100
-    complexity_threshold: 15
-
-# Analysis rules
-analysis:
-  ignore_patterns:
-    - "*.generated.*"
-    - "*_pb2.py"
-    - "*.min.js"
-    - "node_modules/"
-    - ".git/"
-  
-  complexity:
-    include_docstrings: false
-    count_assertions: true
-  
-  thresholds:
-    file_too_long: 500
-    function_too_complex: 20
-    class_too_large: 1000
-
-# Output preferences
-output:
-  format: "terminal"  # terminal, json, html, csv
-  theme: "monokai"
-  show_recommendations: true
-  export_path: "./reports"
-```
-
 ## Documentation
 
-For detailed documentation, visit our [GitHub Pages site](https://yourorg.github.io/code-insight-analyzer/).
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for more information.
+- [Installation Guide](installation.md)
+- [Usage Guide](usage.md)
+- [Configuration](configuration.md)
+- [API Reference](api.md)
+- [Examples](examples.md)
+- [Contributing](contributing.md)

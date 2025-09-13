@@ -1,0 +1,3 @@
+theme: jekyll-theme-minimal
+title: Code Insight Analyzer
+description: A Python-based command-line tool that provides comprehensive analysis of source code repositories

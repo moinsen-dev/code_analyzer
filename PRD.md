@@ -58,8 +58,12 @@ The **Code Insight Analyzer** is a Python-based command-line tool that provides 
 - Historical tracking (compare analyses over time)
 
 🟡 **In Progress/Partially Implemented:**
-- Duplicate code detection (basic implementation in code smells)
-- Language-specific complexity metrics (basic implementation)
+- Integration with CI/CD pipelines
+
+✅ **Completed:**
+- Duplicate code detection (enhanced AST-based implementation)
+- Language-specific complexity metrics (multi-language support with Lizard)
+- Performance optimizations (parallel processing implementation)
 
 ⚪ **Not Yet Implemented:**
 - Integration with CI/CD pipelines
@@ -88,13 +92,13 @@ The **Code Insight Analyzer** is a Python-based command-line tool that provides 
 | Code smell detection | ✅ Complete | Detects 7+ types of code smells |
 | Historical tracking | ✅ Complete | Compare command for analyzing changes over time |
 | Language support | ✅ Complete | 20+ programming languages supported |
+| Duplicate code detection | ✅ Complete | AST-based duplicate code detection |
+| Language-specific metrics | ✅ Complete | Multi-language complexity analysis with Lizard |
+| Performance optimizations | ✅ Complete | Parallel processing for improved performance |
 
 ### 🟡 In Progress Features
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Duplicate code detection | 🟡 Partial | Basic duplicate line detection implemented |
-| Language-specific metrics | 🟡 Partial | Some language-specific settings available |
-| Performance optimizations | 🟡 Partial | Basic implementation, room for improvement |
 
 ### ⚪ Planned Features
 | Feature | Status | Notes |
@@ -575,9 +579,9 @@ ENTRYPOINT ["uv", "run", "codeinsight"]
 ### Phase 3: Advanced Features (Week 5-6)
 - [x] HTML reports with charts
 - [x] Historical comparison
-- [🟡] Duplicate detection
+- [x] Duplicate detection
 - [⚪] CI/CD integration
-- [⚪] Performance optimizations
+- [x] Performance optimizations
 
 ### Phase 4: Polish (Week 7-8)
 - [⚪] Documentation
@@ -657,6 +661,6 @@ jobs:
 
 ---
 
-**Document Version**: 1.1  
+**Document Version**: 1.2  
 **Last Updated**: September 2025  
 **Next Review**: October 2025

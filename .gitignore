@@ -1,3 +1,58 @@
-src/codeinsight.egg-info/
-**/__pycache__/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+src/codeinsight.egg-info/
+share/python-wheels/
+*.egg
+*.whl
+
+# Pytest
+.pytest_cache/
+pytest_report.html
+.pytest/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Reports
+reports/
+*.json
+*.html
+*.csv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Examples
+examples/large_project/
+
+# Cache
+.ruff_cache/

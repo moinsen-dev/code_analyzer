@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import List, Set
 from datetime import datetime
 from fnmatch import fnmatch
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import multiprocessing
 
 from codeinsight.models.metrics import (
     FileMetrics, CodeInsights, AnalysisReport, Language
@@ -98,45 +100,51 @@ class Scanner:
         # Find all files
         files = self._discover_files(path)
         
-        # Analyze each file
+        # Analyze each file using parallel processing
         insights = []
         total_lines = 0
         total_size = 0
         language_dist = {}
         
-        for file_path in files:
-            try:
-                # Get file metrics
-                file_metrics = self._analyze_file(file_path, path)
+        # Use parallel processing for better performance on large codebases
+        max_workers = min(multiprocessing.cpu_count(), 8)  # Limit to 8 workers max
+        
+        # Process files in batches to avoid memory issues
+        batch_size = 100
+        for i in range(0, len(files), batch_size):
+            batch = files[i:i + batch_size]
+            
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # Submit all file analysis tasks
+                future_to_file = {
+                    executor.submit(
+                        self._analyze_file_parallel, 
+                        file_path, 
+                        path, 
+                        include_complexity
+                    ): file_path for file_path in batch
+                }
                 
-                # Update totals
-                total_lines += file_metrics.lines_of_code
-                total_size += file_metrics.size_bytes
-                
-                # Update language distribution
-                lang = file_metrics.language
-                language_dist[lang] = language_dist.get(lang, 0) + 1
-                
-                # Create insights object
-                insight = CodeInsights(file_metrics=file_metrics)
-                
-                # Add complexity analysis if requested
-                if include_complexity:
-                    complexity = self.complexity_analyzer.analyze(file_path, lang)
-                    if complexity:
-                        insight.complexity_metrics = complexity
-                
-                # Add code smells
-                smells = self.smell_detector.detect_smells(file_path, lang)
-                if smells:
-                    insight.code_smells = smells
-                
-                insights.append(insight)
-                
-            except Exception as e:
-                # Skip files that cause errors
-                print(f"Warning: Could not analyze {file_path}: {e}")
-                continue
+                # Collect results as they complete
+                for future in as_completed(future_to_file):
+                    try:
+                        result = future.result()
+                        if result:
+                            insight, file_metrics = result
+                            
+                            # Update totals
+                            total_lines += file_metrics.lines_of_code
+                            total_size += file_metrics.size_bytes
+                            
+                            # Update language distribution
+                            lang = file_metrics.language
+                            language_dist[lang] = language_dist.get(lang, 0) + 1
+                            
+                            insights.append(insight)
+                    except Exception as e:
+                        file_path = future_to_file[future]
+                        print(f"Warning: Could not analyze {file_path}: {e}")
+                        continue
         
         # Sort by lines of code (descending)
         insights.sort(key=lambda x: x.file_metrics.lines_of_code, reverse=True)
@@ -153,6 +161,45 @@ class Scanner:
         )
         
         return report
+    
+    def _analyze_file_parallel(self, file_path: Path, root_path: Path, include_complexity: bool) -> tuple:
+        """
+        Analyze a single file in parallel processing context
+        
+        Args:
+            file_path: Path to the file
+            root_path: Root directory for relative path calculation
+            include_complexity: Whether to include complexity analysis
+            
+        Returns:
+            Tuple of (CodeInsights, FileMetrics) or None if analysis failed
+        """
+        try:
+            # Get file metrics
+            file_metrics = self._analyze_file(file_path, root_path)
+            
+            # Create insights object
+            insight = CodeInsights(file_metrics=file_metrics)
+            
+            # Add complexity analysis if requested
+            if include_complexity:
+                complexity = self.complexity_analyzer.analyze(file_path, file_metrics.language)
+                if complexity:
+                    insight.complexity_metrics = complexity
+            
+            # Add code smells
+            smells = self.smell_detector.detect_smells(file_path, file_metrics.language)
+            if smells:
+                insight.code_smells = smells
+            
+            # Add code duplications
+            duplications = self.smell_detector.detect_duplications(file_path, file_metrics.language)
+            if duplications:
+                insight.duplications = duplications
+            
+            return (insight, file_metrics)
+        except Exception as e:
+            raise e
     
     def _discover_files(self, root_path: Path) -> List[Path]:
         """

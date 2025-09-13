@@ -36,7 +36,7 @@ pathspec==0.12.1
     #   lizard
 pycodestyle==2.14.0
     # via flake8
-pydantic==2.11.8
+pydantic==2.11.9
     # via codeinsight (pyproject.toml)
 pydantic-core==2.33.2
     # via pydantic
@@ -51,6 +51,8 @@ python-dateutil==2.9.0.post0
     # via pandas
 pytz==2025.2
     # via pandas
+pyyaml==6.0.2
+    # via codeinsight (pyproject.toml)
 radon==6.0.1
     # via codeinsight (pyproject.toml)
 rich==14.1.0

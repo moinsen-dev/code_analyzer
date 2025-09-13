@@ -5,22 +5,22 @@ title: Configuration
 
 # Configuration
 
-The Code Insight Analyzer can be configured using a `.codeinsight.yml` file in your project root.
+The Code Analyzer can be configured using a `.code_analyzer.yml` file in your project root.
 
 ## Creating a Configuration File
 
 You can create a configuration file using the `init` command:
 
 ```bash
-uv run codeinsight init
+uv run code_analyzer init
 ```
 
-This will create a `.codeinsight.yml` file with default settings.
+This will create a `.code_analyzer.yml` file with default settings.
 
 To overwrite an existing configuration file:
 
 ```bash
-uv run codeinsight init --force
+uv run code_analyzer init --force
 ```
 
 ## Configuration File Structure
@@ -159,9 +159,9 @@ output:
 
 The following environment variables can be used to configure the analyzer:
 
-- `CODEINSIGHT_CONFIG_PATH`: Path to configuration file
-- `CODEINSIGHT_EXPORT_PATH`: Default export directory
-- `CODEINSIGHT_THEME`: Default terminal theme
+- `CODEANALYZER_CONFIG_PATH`: Path to configuration file
+- `CODEANALYZER_EXPORT_PATH`: Default export directory
+- `CODEANALYZER_THEME`: Default terminal theme
 
 ## Example Configurations
 

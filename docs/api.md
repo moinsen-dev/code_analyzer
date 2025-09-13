@@ -12,7 +12,7 @@ title: API Reference
 Analyzes a codebase and displays results.
 
 ```bash
-codeinsight analyze [PATH] [OPTIONS]
+code_analyzer analyze [PATH] [OPTIONS]
 ```
 
 **Arguments:**
@@ -31,7 +31,7 @@ codeinsight analyze [PATH] [OPTIONS]
 Compares two analysis reports.
 
 ```bash
-codeinsight compare [REPORT1_PATH] [REPORT2_PATH] [OPTIONS]
+code_analyzer compare [REPORT1_PATH] [REPORT2_PATH] [OPTIONS]
 ```
 
 **Arguments:**
@@ -44,10 +44,10 @@ codeinsight compare [REPORT1_PATH] [REPORT2_PATH] [OPTIONS]
 
 ### init
 
-Initializes a .codeinsight.yml configuration file.
+Initializes a .code_analyzer.yml configuration file.
 
 ```bash
-codeinsight init [PATH] [OPTIONS]
+code_analyzer init [PATH] [OPTIONS]
 ```
 
 **Arguments:**
@@ -59,7 +59,7 @@ codeinsight init [PATH] [OPTIONS]
 
 ## Configuration File
 
-The `.codeinsight.yml` file supports the following configuration options:
+The `.code_analyzer.yml` file supports the following configuration options:
 
 ### version
 

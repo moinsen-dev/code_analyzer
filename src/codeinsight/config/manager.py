@@ -16,8 +16,8 @@ class ConfigManager:
         self.config: Config = self._load_config()
     
     def _load_config(self) -> Config:
-        """Load configuration from .codeinsight.yml file or use defaults"""
-        config_path = self.project_path / ".codeinsight.yml"
+        """Load configuration from .code_analyzer.yml file or use defaults"""
+        config_path = self.project_path / ".code_analyzer.yml"
         
         if config_path.exists():
             try:

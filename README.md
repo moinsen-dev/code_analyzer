@@ -1,10 +1,10 @@
-# Code Insight Analyzer
+# Code Analyzer
 
 [![Build Status](https://github.com/moinsen-dev/code-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/moinsen-dev/code-analyzer/actions)
 [![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/github/license/moinsen-dev/code-analyzer)](LICENSE)
 [![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/code-analyzer)](https://codecov.io/gh/moinsen-dev/code-analyzer)
-[![PyPI version](https://badge.fury.io/py/codeinsight.svg)](https://badge.fury.io/py/codeinsight)
+[![PyPI version](https://badge.fury.io/py/code_analyzer.svg)](https://badge.fury.io/py/code_analyzer)
 [![CI/CD Integration](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20%26%20GitLab%20CI-blue)](docs/ci-cd-integration.md)
 
 ![Code Analyzer Icon](code-analyzer-icon.png)
@@ -24,7 +24,7 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
 - Export results to JSON/CSV/HTML
-- Configuration file support (.codeinsight.yml)
+- Configuration file support (.code_analyzer.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
 - CI/CD integration support (GitHub Actions, GitLab CI)
@@ -46,7 +46,7 @@ uv sync
 Or install directly from PyPI:
 
 ```bash
-pip install codeinsight
+pip install code_analyzer
 ```
 
 ## Usage
@@ -55,41 +55,41 @@ pip install codeinsight
 
 ```bash
 # Analyze current directory
-uv run codeinsight analyze .
+uv run code_analyzer analyze .
 
 # Analyze specific directory
-uv run codeinsight analyze /path/to/project
+uv run code_analyzer analyze /path/to/project
 
 # Include complexity analysis
-uv run codeinsight analyze . --complexity
+uv run code_analyzer analyze . --complexity
 ```
 
 ### Output Formats
 
 ```bash
 # Display in terminal (default)
-uv run codeinsight analyze . --output terminal
+uv run code_analyzer analyze . --output terminal
 
 # Export to JSON
-uv run codeinsight analyze . --export json --export-dir ./reports
+uv run code_analyzer analyze . --export json --export-dir ./reports
 
 # Export to multiple formats
-uv run codeinsight analyze . --export json,html --export-dir ./reports
+uv run code_analyzer analyze . --export json,html --export-dir ./reports
 ```
 
 ### Advanced Usage
 
 ```bash
 # Compare two analysis reports
-uv run codeinsight compare reports/report1.json reports/report2.json
+uv run code_analyzer compare reports/report1.json reports/report2.json
 
 # Initialize configuration file
-uv run codeinsight init
+uv run code_analyzer init
 ```
 
 ## Supported Languages
 
-The Code Insight Analyzer supports 60+ programming languages:
+The Code Analyzer supports 60+ programming languages:
 
 - **Primary**: Python, JavaScript/TypeScript, Java, C#, C++/C, Go, Rust
 - **Mobile**: Dart/Flutter, Swift, Kotlin
@@ -101,7 +101,7 @@ The Code Insight Analyzer supports 60+ programming languages:
 
 ## Configuration
 
-Create a `.codeinsight.yml` file in your project root:
+Create a `.code_analyzer.yml` file in your project root:
 
 ```yaml
 version: 1.0
@@ -143,11 +143,11 @@ output:
 
 ## CI/CD Integration
 
-Code Insight Analyzer provides built-in support for popular CI/CD platforms:
+Code Analyzer provides built-in support for popular CI/CD platforms:
 
 ### GitHub Actions
 
-To integrate Code Insight Analyzer into your GitHub Actions workflow, create a workflow file in `.github/workflows/`:
+To integrate Code Analyzer into your GitHub Actions workflow, create a workflow file in `.github/workflows/`:
 
 ```yaml
 name: Code Analysis
@@ -158,7 +158,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run Code Insight Analysis
+      - name: Run Code Analysis
         uses: moinsen-dev/code-analyzer@v0.2.0
         with:
           args: analyze . --complexity --export json,html
@@ -170,13 +170,13 @@ Alternatively, you can install and run it directly:
 - name: Install uv
   uses: astral-sh/setup-uv@v3
 
-- name: Install codeinsight
+- name: Install code_analyzer
   run: |
-    uv pip install codeinsight
+    uv pip install code_analyzer
 
 - name: Run analysis
   run: |
-    codeinsight analyze . --complexity --export json,html --export-dir ./reports
+    code_analyzer analyze . --complexity --export json,html --export-dir ./reports
 ```
 
 ### GitLab CI
@@ -187,8 +187,8 @@ For GitLab CI, add this to your `.gitlab-ci.yml`:
 analyze:
   stage: test
   script:
-    - pip install codeinsight
-    - codeinsight analyze . --complexity --export json,html --export-dir ./reports
+    - pip install code_analyzer
+    - code_analyzer analyze . --complexity --export json,html --export-dir ./reports
   artifacts:
     paths:
       - reports/

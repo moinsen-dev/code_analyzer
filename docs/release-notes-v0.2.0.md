@@ -1,15 +1,15 @@
-# Code Insight Analyzer v0.2.0 - CI/CD Integration Release
+# Code Analyzer v0.2.0 - CI/CD Integration Release
 
 ## Summary
 
-In this release, we've implemented comprehensive CI/CD integration support for Code Insight Analyzer, making it easy to integrate code analysis into your automated workflows. This addresses one of the key planned features from our Product Requirement Document.
+In this release, we've implemented comprehensive CI/CD integration support for Code Analyzer, making it easy to integrate code analysis into your automated workflows. This addresses one of the key planned features from our Product Requirement Document.
 
 ## Key Features Implemented
 
 ### 1. GitHub Actions Support
 - **Enhanced CI Workflow**: Extended the existing CI workflow with additional jobs for code quality checks, security audits, integration testing, and performance benchmarking
-- **Dedicated Analysis Workflow**: Created a new `codeinsight-analysis.yml` workflow specifically for running code analysis in CI/CD pipelines
-- **Reusable GitHub Action**: Created an `action.yml` file that allows users to directly use Code Insight Analyzer as a GitHub Action
+- **Dedicated Analysis Workflow**: Created a new `code-analyzer.yml` workflow specifically for running code analysis in CI/CD pipelines
+- **Reusable GitHub Action**: Created an `action.yml` file that allows users to directly use Code Analyzer as a GitHub Action
 - **Docker Support**: Added a Dockerfile for the GitHub Action to ensure consistent execution environments
 
 ### 2. GitLab CI Support
@@ -34,11 +34,11 @@ In this release, we've implemented comprehensive CI/CD integration support for C
 
 ### GitHub Actions
 
-To use Code Insight Analyzer in your GitHub Actions workflow, you can either:
+To use Code Analyzer in your GitHub Actions workflow, you can either:
 
 1. Use the direct action:
 ```yaml
-- name: Run Code Insight Analysis
+- name: Run Code Analysis
   uses: moinsen-dev/code-analyzer@v0.2.0
   with:
     args: analyze . --complexity --export json,html
@@ -46,13 +46,13 @@ To use Code Insight Analyzer in your GitHub Actions workflow, you can either:
 
 2. Install and run manually:
 ```yaml
-- name: Install codeinsight
+- name: Install code_analyzer
   run: |
-    uv pip install codeinsight
+    uv pip install code_analyzer
 
 - name: Run analysis
   run: |
-    codeinsight analyze . --complexity --export json,html --export-dir ./reports
+    code_analyzer analyze . --complexity --export json,html --export-dir ./reports
 ```
 
 ### GitLab CI
@@ -63,8 +63,8 @@ For GitLab CI, add this to your `.gitlab-ci.yml`:
 analyze:
   stage: analyze
   script:
-    - pip install codeinsight
-    - codeinsight analyze . --complexity --export json,html --export-dir ./reports
+    - pip install code_analyzer
+    - code_analyzer analyze . --complexity --export json,html --export-dir ./reports
   artifacts:
     paths:
       - reports/

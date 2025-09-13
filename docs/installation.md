@@ -3,9 +3,9 @@ layout: default
 title: Installation Guide
 ---
 
-# Installation Guide
+# Installation
 
-## Prerequisites
+Code Analyzer can be installed in several ways:
 
 - Python 3.13 or higher
 - [uv](https://github.com/astral-sh/uv) package manager
@@ -36,7 +36,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### Using pip (when available)
 
 ```bash
-pip install codeinsight
+pip install code_analyzer
 ```
 
 ## Verifying Installation
@@ -44,7 +44,7 @@ pip install codeinsight
 To verify that the installation was successful, run:
 
 ```bash
-uv run codeinsight --help
+uv run code_analyzer --help
 ```
 
 You should see the help output showing available commands.
@@ -72,5 +72,5 @@ RUN uv sync --frozen
 
 COPY . .
 
-ENTRYPOINT ["uv", "run", "codeinsight"]
+ENTRYPOINT ["uv", "run", "code_analyzer"]
 ```

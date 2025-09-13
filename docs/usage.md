@@ -12,13 +12,13 @@ title: Usage Guide
 To analyze the current directory:
 
 ```bash
-uv run codeinsight analyze .
+uv run code_analyzer analyze .
 ```
 
 To analyze a specific directory:
 
 ```bash
-uv run codeinsight analyze /path/to/project
+uv run code_analyzer analyze /path/to/project
 ```
 
 ### Including Complexity Analysis
@@ -26,7 +26,7 @@ uv run codeinsight analyze /path/to/project
 To include detailed complexity metrics:
 
 ```bash
-uv run codeinsight analyze . --complexity
+uv run code_analyzer analyze . --complexity
 ```
 
 ## Output Formats
@@ -34,7 +34,7 @@ uv run codeinsight analyze . --complexity
 ### Terminal Output (Default)
 
 ```bash
-uv run codeinsight analyze . --output terminal
+uv run code_analyzer analyze . --output terminal
 ```
 
 ### Exporting Results
@@ -42,13 +42,13 @@ uv run codeinsight analyze . --output terminal
 Export to JSON:
 
 ```bash
-uv run codeinsight analyze . --export json --export-dir ./reports
+uv run code_analyzer analyze . --export json --export-dir ./reports
 ```
 
 Export to multiple formats:
 
 ```bash
-uv run codeinsight analyze . --export json,html --export-dir ./reports
+uv run code_analyzer analyze . --export json,html --export-dir ./reports
 ```
 
 ## Command Line Options
@@ -77,31 +77,31 @@ uv run codeinsight analyze . --export json,html --export-dir ./reports
 
 ```bash
 # Analyze current directory
-uv run codeinsight analyze .
+uv run code_analyzer analyze .
 
 # Analyze with complexity metrics
-uv run codeinsight analyze . --complexity
+uv run code_analyzer analyze . --complexity
 
 # Analyze and export to JSON
-uv run codeinsight analyze . --export json --export-dir ./reports
+uv run code_analyzer analyze . --export json --export-dir ./reports
 ```
 
 ### Advanced Usage
 
 ```bash
 # Export to multiple formats
-uv run codeinsight analyze . --export json,html,css --export-dir ./reports
+uv run code_analyzer analyze . --export json,html,css --export-dir ./reports
 
 # Limit top files display
-uv run codeinsight analyze . --top-files 50
+uv run code_analyzer analyze . --top-files 50
 
 # Compare two analyses
-uv run codeinsight compare reports/2025-01-01.json reports/2025-01-15.json
+uv run code_analyzer compare reports/2025-01-01.json reports/2025-01-15.json
 ```
 
 ## Configuration
 
-Create a `.codeinsight.yml` file in your project root for custom settings:
+Create a `.code_analyzer.yml` file in your project root for custom settings:
 
 ```yaml
 version: 1.0

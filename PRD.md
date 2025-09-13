@@ -1,5 +1,5 @@
 # Product Requirement Document
-## Code Insight Analyzer
+## Code Analyzer
 
 **Version:** 1.0  
 **Date:** January 2025  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-The **Code Insight Analyzer** is a Python-based command-line tool that provides comprehensive analysis of source code repositories. It respects `.gitignore` rules, counts lines of code, measures file sizes, and analyzes code complexity metrics. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
+The **Code Analyzer** is a Python-based command-line tool that provides comprehensive analysis of source code repositories. It respects `.gitignore` rules, counts lines of code, measures file sizes, and analyzes code complexity metrics. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
 
 ### Key Differentiators
 - **Modern Stack**: Python 3.13 with uv package manager for blazing-fast dependency management
@@ -19,7 +19,7 @@ The **Code Insight Analyzer** is a Python-based command-line tool that provides 
 
 ---
 
-## 2. Problem Statement
+### Problem Statement
 
 ### Current Pain Points
 1. **Lack of Visibility**: Developers struggle to understand the true size and complexity of their codebases
@@ -50,7 +50,7 @@ The **Code Insight Analyzer** is a Python-based command-line tool that provides 
 - uv package manager integration
 - Code complexity analysis (Cyclomatic, Cognitive)
 - Export results to JSON/CSV/HTML
-- Configuration file support (.codeinsight.yml)
+- Configuration file support (.code_analyzer.yml)
 
 ### Secondary Goals (Should Have)
 ✅ **Implemented:**
@@ -87,7 +87,7 @@ The **Code Insight Analyzer** is a Python-based command-line tool that provides 
 | Rich terminal output | ✅ Complete | Professional UI with Rich library |
 | Code complexity analysis | ✅ Complete | Cyclomatic, Cognitive, Maintainability, Technical Debt, Halstead metrics |
 | Export functionality | ✅ Complete | JSON, CSV, HTML export formats |
-| Configuration system | ✅ Complete | .codeinsight.yml support for custom settings |
+| Configuration system | ✅ Complete | .code_analyzer.yml support for custom settings |
 | Code smell detection | ✅ Complete | Detects 7+ types of code smells |
 | Historical tracking | ✅ Complete | Compare command for analyzing changes over time |
 | Language support | ✅ Complete | 20+ programming languages supported |
@@ -267,7 +267,7 @@ class ComplexityAnalyzer:
 
 ### 5.2 Configuration System
 
-**File: `.codeinsight.yml`**
+**File: `.code_analyzer.yml`**
 ```yaml
 version: 1.0
 
@@ -310,24 +310,24 @@ output:
 
 ```bash
 # Basic usage with uv
-uv run codeinsight analyze .
+uv run code_analyzer analyze .
 
 # With complexity analysis
-uv run codeinsight analyze . --complexity
+uv run code_analyzer analyze . --complexity
 
 # Export to multiple formats
-uv run codeinsight analyze . \
-  --output terminal \
-  --export json,html \
+uv run code_analyzer analyze . \\
+  --output terminal \\
+  --export json,html \\
   --export-dir ./reports
 
 # Compare two analyses
-uv run codeinsight compare \
-  ./reports/2025-01-01.json \
+uv run code_analyzer compare \\
+  ./reports/2025-01-01.json \\
   ./reports/2025-01-15.json
 
 # Watch mode for real-time analysis (planned)
-uv run codeinsight watch . --complexity
+uv run code_analyzer watch . --complexity
 ```
 
 ---
@@ -365,7 +365,7 @@ uv run codeinsight watch . --complexity
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━┩
 │ smelly.py        │    67 │ 2,161 bytes │
 │ calculator.py    │    44 │ 1,749 bytes │
-│ .codeinsight.yml │    30 │   715 bytes │
+│ .code_analyzer.yml │    30 │   715 bytes │
 │ greeter.js       │    18 │   466 bytes │
 │ .gitignore       │     3 │    18 bytes │
 │ README.md        │     1 │    84 bytes │
@@ -529,14 +529,14 @@ class TestComplexityAnalyzer:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone repository
-git clone https://github.com/yourorg/code-insight-analyzer.git
-cd code-insight-analyzer
+git clone https://github.com/yourorg/code-analyzer.git
+cd code-analyzer
 
 # Install with uv
 uv sync
 
 # Run the analyzer
-uv run codeinsight analyze .
+uv run code_analyzer analyze .
 ```
 
 ### 9.2 Docker Support (Planned)
@@ -553,7 +553,7 @@ RUN uv sync --frozen
 
 COPY . .
 
-ENTRYPOINT ["uv", "run", "codeinsight"]
+ENTRYPOINT ["uv", "run", "code_analyzer"]
 ```
 
 ---
@@ -651,7 +651,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: astral/setup-uv@v1
       - run: uv sync
-      - run: uv run codeinsight analyze . --export json
+      - run: uv run code_analyzer analyze . --export json
       - uses: actions/upload-artifact@v3
         with:
           name: code-analysis

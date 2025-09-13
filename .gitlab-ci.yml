@@ -1,5 +1,5 @@
-# GitLab CI/CD configuration for Code Insight Analyzer
-# This file demonstrates how to integrate Code Insight Analyzer into your GitLab CI/CD pipeline
+# GitLab CI/CD configuration for Code Analyzer
+# This file demonstrates how to integrate Code Analyzer into your GitLab CI/CD pipeline
 
 stages:
   - test
@@ -46,12 +46,12 @@ lint:
     - uv run black --check src/ tests/
     - uv run mypy src/
 
-# Code Insight Analysis
+# Code Analysis
 analyze:
   stage: analyze
   image: python:$PYTHON_VERSION
   script:
-    - uv run codeinsight analyze . --complexity --export json,html --export-dir ./reports
+    - uv run code_analyzer analyze . --complexity --export json,html --export-dir ./reports
   artifacts:
     paths:
       - reports/

@@ -14,7 +14,7 @@ The **Code Insight Analyzer** is a Python-based command-line tool designed to pr
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
 - Export results to JSON/CSV/HTML
-- Configuration file support (.codeinsight.yml)
+- Configuration file support (.code_analyzer.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
 
@@ -60,7 +60,7 @@ The project is now in active development with most core features implemented:
    
    # Clone repository
    git clone <repository-url>
-   cd code-insight-analyzer
+   cd code-analyzer
    
    # Install dependencies
    uv sync
@@ -69,13 +69,13 @@ The project is now in active development with most core features implemented:
 2. **Running the Tool**:
    ```bash
    # Basic usage with uv
-   uv run codeinsight analyze .
+   uv run code_analyzer analyze .
    
    # With complexity analysis
-   uv run codeinsight analyze . --complexity
+   uv run code_analyzer analyze . --complexity
    
    # Export to multiple formats
-   uv run codeinsight analyze . \
+   uv run code_analyzer analyze . \
      --output terminal \
      --export json,html \
      --export-dir ./reports

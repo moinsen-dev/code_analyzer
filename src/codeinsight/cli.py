@@ -14,9 +14,8 @@ from codeinsight.exporters.html_exporter import HTMLExporter
 from codeinsight.analysis.comparator import ReportComparator
 
 app = typer.Typer(
-    name="codeinsight",
+    name="code_analyzer",
     help="A comprehensive code analysis tool",
-    no_args_is_help=True
 )
 
 @app.command()
@@ -24,8 +23,8 @@ def init(
     path: Path = typer.Argument(".", help="Path to initialize configuration"),
     force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing configuration file")
 ) -> None:
-    """Initialize a .codeinsight.yml configuration file in the project directory."""
-    config_path = path / ".codeinsight.yml"
+    """Initialize a .code_analyzer.yml configuration file in the project directory."""
+    config_path = path / ".code_analyzer.yml"
     
     if config_path.exists() and not force:
         typer.echo(f"Configuration file already exists at {config_path}")
@@ -76,7 +75,7 @@ output:
     try:
         with open(config_path, 'w') as f:
             f.write(default_config)
-        typer.echo(f"Created .codeinsight.yml configuration file at {config_path}")
+        typer.echo(f"Created .code_analyzer.yml configuration file at {config_path}")
     except Exception as e:
         typer.echo(f"Error creating configuration file: {e}")
         raise typer.Exit(1)

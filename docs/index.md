@@ -3,7 +3,9 @@ layout: default
 title: Code Insight Analyzer
 ---
 
-# Code Insight Analyzer
+# Code Analyzer Documentation
+
+Welcome to the Code Analyzer documentation!
 
 A Python-based command-line tool that provides comprehensive analysis of source code repositories. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
 
@@ -18,9 +20,10 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
 - Export results to JSON/CSV/HTML
-- Configuration file support (.codeinsight.yml)
+- Configuration file support (.code_analyzer.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
+- CI/CD integration support (GitHub Actions, GitLab CI)
 
 ## Installation
 
@@ -39,14 +42,9 @@ uv sync
 ## Quick Start
 
 ```bash
-# Analyze current directory
-uv run codeinsight analyze .
-
-# Include complexity analysis
-uv run codeinsight analyze . --complexity
-
-# Export to multiple formats
-uv run codeinsight analyze . --export json,html --export-dir ./reports
+uv run code_analyzer analyze .
+uv run code_analyzer analyze . --complexity
+uv run code_analyzer analyze . --export json,html --export-dir ./reports
 ```
 
 ## Supported Languages

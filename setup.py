@@ -4,10 +4,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="codeinsight",
+    name="code_analyzer",
     version="0.2.0",
-    author="Code Insight Team",
-    author_email="codeinsight@example.com",
+    author="Code Analyzer Team",
+    author_email="code_analyzer@example.com",
     description="A Python-based command-line tool that provides comprehensive analysis of source code repositories",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -39,7 +39,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "codeinsight=codeinsight.cli:app",
+            "code_analyzer=codeinsight.cli:app",
         ],
     },
 )

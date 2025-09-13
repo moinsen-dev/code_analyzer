@@ -1,9 +1,9 @@
-name: 'Code Insight Analyzer'
+name: 'Code Analyzer'
 description: 'Analyze your codebase for insights on complexity, code smells, and more'
-author: 'Code Insight Team'
+author: 'Code Analyzer Team'
 inputs:
   args:
-    description: 'Arguments to pass to the codeinsight analyze command'
+    description: 'Arguments to pass to the code_analyzer analyze command'
     required: false
     default: 'analyze .'
 runs:

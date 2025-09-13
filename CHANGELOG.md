@@ -18,13 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD badges in README
 
 ### Changed
+- Updated package name from "codeinsight" to "code_analyzer"
 - Updated version to 0.2.0 in pyproject.toml and setup.py
 - Enhanced existing CI workflow with additional jobs
 
 ## [0.1.0] - 2025-09-13
 
 ### Added
-- Initial release of Code Insight Analyzer
+- Initial release of Code Analyzer
 - Code analysis capabilities with line counting and file size measurement
 - Multi-language support for 60+ programming languages
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead metrics)
@@ -32,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Duplicate code detection
 - Beautiful terminal output using Rich
 - Export functionality to JSON, CSV, and HTML formats
-- Configuration file support (.codeinsight.yml)
+- Configuration file support (.code_analyzer.yml)
 - GitIgnore pattern respect at all directory levels
 - Performance optimizations with parallel processing
 - Comprehensive test suite with >90% coverage

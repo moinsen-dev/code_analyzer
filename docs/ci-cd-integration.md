@@ -1,14 +1,14 @@
 # CI/CD Integration Guide
 
-This guide explains how to integrate Code Insight Analyzer into your CI/CD pipelines for automated code analysis.
+This guide explains how to integrate Code Analyzer into your CI/CD pipelines for automated code analysis.
 
 ## GitHub Actions
 
-Code Insight Analyzer provides built-in GitHub Actions workflows that you can use directly in your projects.
+Code Analyzer provides built-in GitHub Actions workflows that you can use directly in your projects.
 
 ### Pre-built Workflows
 
-1. **Code Analysis Workflow** (`codeinsight-analysis.yml`): Runs code analysis on every push and pull request
+1. **Code Analysis Workflow** (`code-analyzer.yml`): Runs code analysis on every push and pull request
 2. **CI Workflow** (`ci.yml`): Runs tests, linting, and type checking
 3. **Release Workflow** (`release.yml`): Automatically publishes to PyPI when tags are created
 4. **Documentation Workflow** (`docs.yml`): Deploys documentation to GitHub Pages
@@ -20,20 +20,20 @@ To use the built-in code analysis workflow in your project:
 1. Copy the workflow file to your repository:
    ```bash
    mkdir -p .github/workflows
-   cp .github/workflows/codeinsight-analysis.yml .github/workflows/
+   cp .github/workflows/code-analyzer.yml .github/workflows/
    ```
 
 2. Customize the workflow according to your project needs:
    ```yaml
-   # In your .github/workflows/codeinsight-analysis.yml
+   # In your .github/workflows/code-analyzer.yml
    - name: Run code analysis
      run: |
-       codeinsight analyze . --complexity --export json,html --export-dir ./reports
+       code_analyzer analyze . --complexity --export json,html --export-dir ./reports
    ```
 
 ### Example Integration
 
-Here's a complete example of integrating Code Insight Analyzer into your GitHub Actions workflow:
+Here's a complete example of integrating Code Analyzer into your GitHub Actions workflow:
 
 ```yaml
 name: Code Analysis
@@ -58,13 +58,13 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v3
 
-    - name: Install codeinsight
+    - name: Install code_analyzer
       run: |
-        uv pip install codeinsight
+        uv pip install code_analyzer
 
     - name: Run code analysis
       run: |
-        codeinsight analyze . --complexity --export json,html --export-dir ./reports
+        code_analyzer analyze . --complexity --export json,html --export-dir ./reports
 
     - name: Upload analysis reports
       uses: actions/upload-artifact@v4
@@ -95,8 +95,8 @@ analyze:
   stage: analyze
   image: python:3.13
   script:
-    - pip install codeinsight
-    - codeinsight analyze . --complexity --export json,html --export-dir ./reports
+    - pip install code_analyzer
+    - code_analyzer analyze . --complexity --export json,html --export-dir ./reports
   artifacts:
     paths:
       - reports/
@@ -105,7 +105,7 @@ analyze:
 
 ## Configuration Options
 
-When integrating Code Insight Analyzer into your CI/CD pipeline, you can customize the analysis with various options:
+When integrating Code Analyzer into your CI/CD pipeline, you can customize the analysis with various options:
 
 - `--complexity`: Include complexity analysis
 - `--export json,html`: Export results in multiple formats
@@ -114,7 +114,7 @@ When integrating Code Insight Analyzer into your CI/CD pipeline, you can customi
 
 Example with custom configuration:
 ```bash
-codeinsight analyze . \
+code_analyzer analyze . \
   --complexity \
   --export json,html,csv \
   --export-dir ./reports \
@@ -127,7 +127,7 @@ You can configure your CI/CD pipeline to fail builds based on analysis results:
 
 ```bash
 # Example: Fail if any file has >1000 lines
-codeinsight analyze . --export json --export-dir ./reports
+code_analyzer analyze . --export json --export-dir ./reports
 python -c "
 import json
 with open('./reports/report.json') as f:

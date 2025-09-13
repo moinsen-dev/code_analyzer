@@ -6,8 +6,8 @@ RUN pip install uv
 # Set working directory
 WORKDIR /app
 
-# Install codeinsight
-RUN uv pip install codeinsight
+# Install code_analyzer
+RUN uv pip install code_analyzer
 
 # Set entrypoint
-ENTRYPOINT ["codeinsight"]
+ENTRYPOINT ["code_analyzer"]

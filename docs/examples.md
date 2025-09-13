@@ -10,7 +10,7 @@ title: Examples
 ### Simple Project Analysis
 
 ```bash
-uv run codeinsight analyze .
+uv run code_analyzer analyze .
 ```
 
 Output:
@@ -34,7 +34,7 @@ Output:
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━┩
 │ smelly.py        │    67 │ 2,161 bytes │
 │ calculator.py    │    44 │ 1,749 bytes │
-│ .codeinsight.yml │    30 │   715 bytes │
+│ .code_analyzer.yml │    30 │   715 bytes │
 │ greeter.js       │    18 │   466 bytes │
 │ .gitignore       │     3 │    18 bytes │
 │ README.md        │     1 │    84 bytes │
@@ -46,7 +46,7 @@ Output:
 ### With Complexity Metrics
 
 ```bash
-uv run codeinsight analyze . --complexity
+uv run code_analyzer analyze . --complexity
 ```
 
 Output:
@@ -79,7 +79,7 @@ Output:
 ### JSON Export
 
 ```bash
-uv run codeinsight analyze . --export json --export-dir ./reports
+uv run code_analyzer analyze . --export json --export-dir ./reports
 ```
 
 Generated JSON structure:
@@ -129,7 +129,7 @@ Generated JSON structure:
 ### HTML Export
 
 ```bash
-uv run codeinsight analyze . --export html --export-dir ./reports
+uv run code_analyzer analyze . --export html --export-dir ./reports
 ```
 
 Generates a comprehensive HTML report with:
@@ -143,7 +143,7 @@ Generates a comprehensive HTML report with:
 ### Comparing Two Analyses
 
 ```bash
-uv run codeinsight compare reports/2025-01-01.json reports/2025-01-15.json
+uv run code_analyzer compare reports/2025-01-01.json reports/2025-01-15.json
 ```
 
 Output:
@@ -168,7 +168,7 @@ Complexity Changes:
 
 ### Basic Configuration
 
-Create a `.codeinsight.yml` file:
+Create a `.code_analyzer.yml` file:
 
 ```yaml
 version: 1.0

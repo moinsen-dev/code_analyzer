@@ -1,4 +1,4 @@
-name: Code Insight Analysis
+name: Code Analyzer
 
 on:
   push:
@@ -20,13 +20,13 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v3
 
-    - name: Install codeinsight
+    - name: Install code_analyzer
       run: |
-        uv pip install codeinsight
+        uv pip install code_analyzer
 
     - name: Run code analysis
       run: |
-        codeinsight analyze . --complexity --export json,html --export-dir ./reports
+        code_analyzer analyze . --complexity --export json,html --export-dir ./reports
 
     - name: Upload analysis reports
       uses: actions/upload-artifact@v4

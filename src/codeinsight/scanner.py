@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import List, Set
 from datetime import datetime
+from fnmatch import fnmatch
 
 from codeinsight.models.metrics import (
     FileMetrics, CodeInsights, AnalysisReport, Language
@@ -37,6 +38,31 @@ class Scanner:
         'node_modules', 'vendor', 'build', 'dist',
         '__pycache__', '.pytest_cache', '.coverage',
         'coverage', 'target', 'bin', 'obj'
+    }
+    
+    # File patterns that should be ignored (generated files, lock files, etc.)
+    IGNORED_FILE_PATTERNS = {
+        # Generated files
+        '*.g.dart', '*.g.py', '*.generated.*', '*_generated.*',
+        # Lock files
+        'pubspec.lock', 'package-lock.json', 'yarn.lock', 'Gemfile.lock',
+        'composer.lock', 'Cargo.lock', 'poetry.lock', 'Pipfile.lock',
+        'conda-lock.yml', 'mix.lock',
+        # Build/Project files
+        '*.pbxproj', '*.xcodeproj', '*.xcworkspace', '*.xib',
+        '*.storyboard', '*.nib', '*.lproj',
+        # IDE files
+        '*.iml', '.idea', '.vscode', '*.swp', '*.swo',
+        # Log files
+        '*.log', 'log.txt',
+        # Temp/cache files
+        '*.tmp', '*.temp', '.DS_Store', 'Thumbs.db',
+        # Minified files
+        '*.min.js', '*.min.css',
+        # Backup files
+        '*~', '*.bak', '*.backup',
+        # Coverage reports
+        'coverage.xml', 'lcov.info', '*.cobertura.xml'
     }
     
     # Maximum file size to analyze (10MB)
@@ -219,6 +245,14 @@ class Scanner:
         # Skip files in ignored directories
         if self._should_ignore_directory(file_path.parent):
             return False
+        
+        # Skip files matching ignored patterns
+        file_name = file_path.name
+        file_path_str = str(file_path.relative_to(self.project_path)).replace('\\', '/')
+        
+        for pattern in self.IGNORED_FILE_PATTERNS:
+            if fnmatch(file_name, pattern) or fnmatch(file_path_str, pattern):
+                return False
             
         return True
     

@@ -19,6 +19,29 @@ from codeinsight.config.manager import ConfigManager
 class Scanner:
     """Main scanner class for analyzing codebases"""
     
+    # Binary file extensions that should be ignored
+    BINARY_EXTENSIONS = {
+        '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.ico', '.svg',
+        '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+        '.zip', '.tar', '.gz', '.rar', '.7z',
+        '.exe', '.dll', '.so', '.dylib', '.bin',
+        '.mp3', '.mp4', '.avi', '.mov', '.wav',
+        '.db', '.sqlite', '.mdb',
+        '.jar', '.war', '.ear',
+        '.class', '.o', '.obj', '.pyc', '.pyo'
+    }
+    
+    # Directories that should always be ignored
+    IGNORED_DIRECTORIES = {
+        '.git', '.svn', '.hg', '.bzr',
+        'node_modules', 'vendor', 'build', 'dist',
+        '__pycache__', '.pytest_cache', '.coverage',
+        'coverage', 'target', 'bin', 'obj'
+    }
+    
+    # Maximum file size to analyze (10MB)
+    MAX_FILE_SIZE = 10 * 1024 * 1024
+    
     def __init__(self, project_path: Path = None):
         self.project_path = project_path or Path.cwd()
         self.config_manager = ConfigManager(self.project_path)
@@ -119,6 +142,11 @@ class Scanner:
         for dirpath, dirnames, filenames in os.walk(root_path):
             dir_path = Path(dirpath)
             
+            # Skip ignored directories
+            if self._should_ignore_directory(dir_path):
+                dirnames[:] = []  # Don't traverse this directory
+                continue
+            
             # Update gitignore matcher for this directory
             self.gitignore_matcher.update_for_directory(dir_path)
             
@@ -126,21 +154,73 @@ class Scanner:
             filtered_dirnames = []
             for d in dirnames:
                 dir_full_path = dir_path / d
-                gitignore_matches = self.gitignore_matcher.matches_directory(dir_full_path)
-                config_matches = self.config_manager.should_ignore_file(dir_full_path)
-                if not gitignore_matches and not config_matches:
-                    filtered_dirnames.append(d)
+                if not self._should_ignore_directory(dir_full_path):
+                    gitignore_matches = self.gitignore_matcher.matches_directory(dir_full_path)
+                    config_matches = self.config_manager.should_ignore_file(dir_full_path)
+                    if not gitignore_matches and not config_matches:
+                        filtered_dirnames.append(d)
             dirnames[:] = filtered_dirnames
             
             # Add files that aren't ignored
             for filename in filenames:
                 file_path = dir_path / filename
-                gitignore_matches = self.gitignore_matcher.matches_file(file_path)
-                config_matches = self.config_manager.should_ignore_file(file_path)
-                if not gitignore_matches and not config_matches:
-                    files.append(file_path)
+                if self._should_analyze_file(file_path):
+                    gitignore_matches = self.gitignore_matcher.matches_file(file_path)
+                    config_matches = self.config_manager.should_ignore_file(file_path)
+                    if not gitignore_matches and not config_matches:
+                        files.append(file_path)
         
         return files
+    
+    def _should_ignore_directory(self, dir_path: Path) -> bool:
+        """
+        Check if a directory should be ignored
+        
+        Args:
+            dir_path: Path to directory
+            
+        Returns:
+            True if directory should be ignored
+        """
+        # Check if it's a special ignored directory
+        if dir_path.name in self.IGNORED_DIRECTORIES:
+            return True
+        
+        # Check if it's outside the project path
+        try:
+            dir_path.relative_to(self.project_path)
+        except ValueError:
+            return True
+            
+        return False
+    
+    def _should_analyze_file(self, file_path: Path) -> bool:
+        """
+        Check if a file should be analyzed
+        
+        Args:
+            file_path: Path to file
+            
+        Returns:
+            True if file should be analyzed
+        """
+        # Skip binary files
+        if file_path.suffix.lower() in self.BINARY_EXTENSIONS:
+            return False
+        
+        # Skip files that are too large
+        try:
+            if file_path.stat().st_size > self.MAX_FILE_SIZE:
+                return False
+        except OSError:
+            # If we can't stat the file, skip it
+            return False
+        
+        # Skip files in ignored directories
+        if self._should_ignore_directory(file_path.parent):
+            return False
+            
+        return True
     
     def _analyze_file(self, file_path: Path, root_path: Path) -> FileMetrics:
         """
@@ -219,6 +299,11 @@ class Scanner:
             '.yaml': Language.YAML,
             '.json': Language.JSON,
             '.md': Language.MARKDOWN,
+            '.xml': Language.MARKDOWN,  # Treat XML as markdown for now
+            '.toml': Language.MARKDOWN,  # Treat TOML as markdown for now
+            '.cfg': Language.MARKDOWN,   # Treat config files as markdown for now
+            '.ini': Language.MARKDOWN,   # Treat INI files as markdown for now
+            '.txt': Language.MARKDOWN,   # Treat text files as markdown for now
         }
         
         return extension_map.get(extension, Language.MARKDOWN)  # Default to markdown

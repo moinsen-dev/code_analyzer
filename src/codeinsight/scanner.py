@@ -45,6 +45,7 @@ class Scanner:
         # Generated files
         '*.g.dart', '*.freezed.dart', '*.generated.*', '*_generated.*',
         # Lock files
+        '*.lock',  # Generic lock files
         'pubspec.lock', 'package-lock.json', '*-lock.json', 'yarn.lock', 'Gemfile.lock',
         'composer.lock', 'Cargo.lock', 'poetry.lock', 'Pipfile.lock',
         'conda-lock.yml', 'mix.lock',
@@ -253,6 +254,14 @@ class Scanner:
         for pattern in self.IGNORED_FILE_PATTERNS:
             if fnmatch(file_name, pattern) or fnmatch(file_path_str, pattern):
                 return False
+        
+        # Special handling for JSON files - ignore most but allow some
+        if file_path.suffix.lower() == '.json':
+            # Allow package.json as it's often considered source code
+            if file_name == 'package.json':
+                return True
+            # Ignore all other JSON files
+            return False
             
         return True
     

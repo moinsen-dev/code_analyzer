@@ -1,0 +1,80 @@
+{
+  "project_path": "examples/sample_project",
+  "timestamp": "2025-09-13T12:59:59.436001",
+  "total_files": 4,
+  "total_lines": 57,
+  "total_size": 1966,
+  "language_distribution": {
+    "markdown": 2,
+    "python": 1,
+    "javascript": 1
+  },
+  "top_files": [
+    {
+      "file_metrics": {
+        "path": "examples/sample_project/calculator.py",
+        "relative_path": "calculator.py",
+        "language": "python",
+        "lines_of_code": 35,
+        "blank_lines": 9,
+        "comment_lines": 9,
+        "size_bytes": 1398,
+        "last_modified": "2025-09-13T12:54:05.728765"
+      },
+      "complexity_metrics": {
+        "cyclomatic_complexity": 1.375,
+        "cognitive_complexity": 6,
+        "maintainability_index": 65.23843223292091,
+        "technical_debt_ratio": 3.125
+      },
+      "code_smells": [],
+      "duplications": []
+    },
+    {
+      "file_metrics": {
+        "path": "examples/sample_project/greeter.js",
+        "relative_path": "greeter.js",
+        "language": "javascript",
+        "lines_of_code": 18,
+        "blank_lines": 5,
+        "comment_lines": 2,
+        "size_bytes": 466,
+        "last_modified": "2025-09-13T12:54:09.205709"
+      },
+      "complexity_metrics": null,
+      "code_smells": [],
+      "duplications": []
+    },
+    {
+      "file_metrics": {
+        "path": "examples/sample_project/.gitignore",
+        "relative_path": ".gitignore",
+        "language": "markdown",
+        "lines_of_code": 3,
+        "blank_lines": 0,
+        "comment_lines": 0,
+        "size_bytes": 18,
+        "last_modified": "2025-09-13T12:54:14.157024"
+      },
+      "complexity_metrics": null,
+      "code_smells": [],
+      "duplications": []
+    },
+    {
+      "file_metrics": {
+        "path": "examples/sample_project/README.md",
+        "relative_path": "README.md",
+        "language": "markdown",
+        "lines_of_code": 1,
+        "blank_lines": 1,
+        "comment_lines": 1,
+        "size_bytes": 84,
+        "last_modified": "2025-09-13T12:54:00.601827"
+      },
+      "complexity_metrics": null,
+      "code_smells": [],
+      "duplications": []
+    }
+  ],
+  "recommendations": []
+}

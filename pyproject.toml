@@ -1,0 +1,64 @@
+[project]
+name = "codeinsight"
+version = "0.1.0"
+description = "A Python-based command-line tool that provides comprehensive analysis of source code repositories"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.13"
+dependencies = [
+    "rich>=14.0.0",
+    "radon>=6.0.0",
+    "pygments>=2.17.0",
+    "pydantic>=2.5.0",
+    "typer>=0.9.0",
+    "lizard>=1.17.0",
+    "flake8>=7.0.0",
+    "pandas>=2.1.0",
+    "jinja2>=3.1.0",
+    "openpyxl>=3.1.0",
+    "pathspec>=0.11.0"
+]
+
+[project.scripts]
+codeinsight = "codeinsight.cli:app"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "mypy>=1.7.0"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.black]
+line-length = 88
+target-version = ['py313']
+
+[tool.mypy]
+python_version = "3.13"
+strict = true

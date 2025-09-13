@@ -1,11 +1,13 @@
 """
 Domain models for code analysis
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 from datetime import datetime
 from enum import Enum
+import json
+
 
 class Language(str, Enum):
     """Supported programming languages"""
@@ -30,6 +32,17 @@ class Language(str, Enum):
     MARKDOWN = "markdown"
     # Add more as needed
 
+
+@dataclass
+class HalsteadMetrics:
+    """Halstead complexity metrics"""
+    program_length: int = 0
+    vocabulary_size: int = 0
+    volume: float = 0.0
+    difficulty: float = 0.0
+    effort: float = 0.0
+
+
 @dataclass
 class FileMetrics:
     """Metrics for a single file"""
@@ -42,6 +55,7 @@ class FileMetrics:
     size_bytes: int
     last_modified: datetime
 
+
 @dataclass
 class ComplexityMetrics:
     """Code complexity metrics"""
@@ -49,20 +63,17 @@ class ComplexityMetrics:
     cognitive_complexity: float
     maintainability_index: float
     technical_debt_ratio: float
+    halstead_metrics: HalsteadMetrics = field(default_factory=HalsteadMetrics)
+
 
 @dataclass
 class CodeInsights:
     """Insights for a single code file"""
     file_metrics: FileMetrics
     complexity_metrics: Optional[ComplexityMetrics] = None
-    code_smells: List[str] = None
-    duplications: List[Any] = None
-    
-    def __post_init__(self):
-        if self.code_smells is None:
-            self.code_smells = []
-        if self.duplications is None:
-            self.duplications = []
+    code_smells: List[str] = field(default_factory=list)
+    duplications: List[Any] = field(default_factory=list)
+
 
 @dataclass
 class AnalysisReport:
@@ -74,15 +85,14 @@ class AnalysisReport:
     total_size: int
     language_distribution: Dict[Language, int]
     top_files: List[CodeInsights]
-    recommendations: List[str] = None
-    
-    def __post_init__(self):
-        if self.recommendations is None:
-            self.recommendations = []
+    recommendations: List[str] = field(default_factory=list)
     
     def json(self) -> str:
         """Convert report to JSON string"""
-        import json
+        return json.dumps(self.to_dict(), indent=2)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert report to dictionary for serialization"""
         from dataclasses import asdict
         from datetime import datetime
         
@@ -95,4 +105,54 @@ class AnalysisReport:
                 return obj.value
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
         
-        return json.dumps(asdict(self), default=json_serializer, indent=2)
+        return json.loads(json.dumps(asdict(self), default=json_serializer))
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'AnalysisReport':
+        """Create AnalysisReport from dictionary"""
+        from datetime import datetime
+        
+        # Convert timestamp
+        data['timestamp'] = datetime.fromisoformat(data['timestamp'])
+        
+        # Convert project_path
+        data['project_path'] = Path(data['project_path'])
+        
+        # Convert language_distribution keys
+        lang_dist = {}
+        for lang_key, count in data['language_distribution'].items():
+            lang_dist[Language(lang_key)] = count
+        data['language_distribution'] = lang_dist
+        
+        # Convert top_files
+        top_files = []
+        for file_data in data['top_files']:
+            # Convert file_metrics
+            file_metrics_data = file_data['file_metrics']
+            file_metrics_data['path'] = Path(file_metrics_data['path'])
+            file_metrics_data['language'] = Language(file_metrics_data['language'])
+            file_metrics_data['last_modified'] = datetime.fromisoformat(file_metrics_data['last_modified'])
+            file_metrics = FileMetrics(**file_metrics_data)
+            
+            # Convert complexity_metrics if present
+            complexity_metrics = None
+            if file_data['complexity_metrics']:
+                # Convert halstead_metrics if present
+                halstead_data = file_data['complexity_metrics'].get('halstead_metrics')
+                if halstead_data:
+                    halstead_metrics = HalsteadMetrics(**halstead_data)
+                    file_data['complexity_metrics']['halstead_metrics'] = halstead_metrics
+                complexity_metrics = ComplexityMetrics(**file_data['complexity_metrics'])
+            
+            # Create CodeInsights
+            code_insights = CodeInsights(
+                file_metrics=file_metrics,
+                complexity_metrics=complexity_metrics,
+                code_smells=file_data.get('code_smells', []),
+                duplications=file_data.get('duplications', [])
+            )
+            top_files.append(code_insights)
+        
+        data['top_files'] = top_files
+        
+        return cls(**data)

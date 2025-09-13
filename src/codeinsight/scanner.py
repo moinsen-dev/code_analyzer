@@ -12,15 +12,20 @@ from codeinsight.models.metrics import (
 from codeinsight.utils.gitignore import GitIgnoreMatcher
 from codeinsight.analyzers.line_counter import LineCounter
 from codeinsight.analyzers.complexity import ComplexityAnalyzer
+from codeinsight.analysis.smells import CodeSmellDetector
+from codeinsight.config.manager import ConfigManager
 
 
 class Scanner:
     """Main scanner class for analyzing codebases"""
     
-    def __init__(self):
+    def __init__(self, project_path: Path = None):
+        self.project_path = project_path or Path.cwd()
+        self.config_manager = ConfigManager(self.project_path)
         self.gitignore_matcher = GitIgnoreMatcher()
         self.line_counter = LineCounter()
         self.complexity_analyzer = ComplexityAnalyzer()
+        self.smell_detector = CodeSmellDetector()
     
     def analyze(self, path: Path, include_complexity: bool = False) -> AnalysisReport:
         """
@@ -71,6 +76,11 @@ class Scanner:
                     if complexity:
                         insight.complexity_metrics = complexity
                 
+                # Add code smells
+                smells = self.smell_detector.detect_smells(file_path, lang)
+                if smells:
+                    insight.code_smells = smells
+                
                 insights.append(insight)
                 
             except Exception as e:
@@ -96,7 +106,7 @@ class Scanner:
     
     def _discover_files(self, root_path: Path) -> List[Path]:
         """
-        Discover all files in a directory, respecting .gitignore rules
+        Discover all files in a directory, respecting .gitignore rules and config patterns
         
         Args:
             root_path: Root directory to scan
@@ -113,15 +123,21 @@ class Scanner:
             self.gitignore_matcher.update_for_directory(dir_path)
             
             # Filter directories (don't traverse ignored directories)
-            dirnames[:] = [
-                d for d in dirnames 
-                if not self.gitignore_matcher.matches_directory(dir_path / d)
-            ]
+            filtered_dirnames = []
+            for d in dirnames:
+                dir_full_path = dir_path / d
+                gitignore_matches = self.gitignore_matcher.matches_directory(dir_full_path)
+                config_matches = self.config_manager.should_ignore_file(dir_full_path)
+                if not gitignore_matches and not config_matches:
+                    filtered_dirnames.append(d)
+            dirnames[:] = filtered_dirnames
             
             # Add files that aren't ignored
             for filename in filenames:
                 file_path = dir_path / filename
-                if not self.gitignore_matcher.matches_file(file_path):
+                gitignore_matches = self.gitignore_matcher.matches_file(file_path)
+                config_matches = self.config_manager.should_ignore_file(file_path)
+                if not gitignore_matches and not config_matches:
                     files.append(file_path)
         
         return files

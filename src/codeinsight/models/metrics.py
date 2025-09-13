@@ -106,7 +106,7 @@ class AnalysisReport:
         from dataclasses import asdict
         from datetime import datetime
         
-        def json_serializer(obj):
+        def json_serializer(obj: Any) -> Any:
             if isinstance(obj, Path):
                 return str(obj)
             if isinstance(obj, datetime):
@@ -115,7 +115,8 @@ class AnalysisReport:
                 return obj.value
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
         
-        return json.loads(json.dumps(asdict(self), default=json_serializer))
+        result: Dict[str, Any] = json.loads(json.dumps(asdict(self), default=json_serializer))
+        return result
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'AnalysisReport':

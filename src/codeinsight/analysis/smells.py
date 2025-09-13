@@ -2,10 +2,10 @@
 Code smell detection functionality
 """
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Any
 import ast
 
-from codeinsight.models.metrics import Language
+from codeinsight.models.metrics import Language, Duplication
 
 
 class CodeSmellDetector:
@@ -157,7 +157,7 @@ class CodeSmellDetector:
             
             return []
     
-    def _extract_code_blocks(self, tree: ast.AST) -> List[Dict]:
+    def _extract_code_blocks(self, tree: ast.AST) -> List[Dict[str, Any]]:
         """Extract code blocks from AST with their structural information"""
         blocks = []
         
@@ -222,9 +222,9 @@ class CodeSmellDetector:
             # Fallback to simple hash
             return str(hash(str(type(node))))
     
-    def _find_duplicate_blocks(self, blocks: List[Dict]) -> Dict[str, List[Dict]]:
+    def _find_duplicate_blocks(self, blocks: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
         """Find duplicate code blocks by their hashes"""
-        duplicates = {}
+        duplicates: Dict[str, List[Dict[str, Any]]] = {}
         
         # Group blocks by hash
         for block in blocks:
@@ -254,7 +254,7 @@ class CodeSmellDetector:
         """Detect deeply nested blocks"""
         smells = []
         
-        def check_nesting(node, depth=0):
+        def check_nesting(node: ast.AST, depth: int = 0) -> None:
             if depth > 4:  # Threshold for deep nesting
                 if isinstance(node, (ast.If, ast.For, ast.While, ast.With, ast.Try)):
                     smells.append(f"Deeply nested block (depth {depth})")
@@ -269,7 +269,7 @@ class CodeSmellDetector:
         check_nesting(tree)
         return smells
 
-    def detect_duplications(self, file_path: Path, language: Language) -> List[Dict]:
+    def detect_duplications(self, file_path: Path, language: Language) -> List[Duplication]:
         """
         Detect code duplications in a file
         
@@ -296,16 +296,16 @@ class CodeSmellDetector:
             duplicates = self._find_duplicate_blocks(code_blocks)
             
             # Convert to Duplication objects
-            duplications = []
+            duplications: List[Duplication] = []
             for block_hash, locations in duplicates.items():
                 if len(locations) > 1:  # Found duplicates
-                    duplication = {
-                        'type': locations[0]['type'],
-                        'name': locations[0]['name'],
-                        'line': locations[0]['line'],
-                        'count': len(locations),
-                        'locations': [{'line': loc['line'], 'name': loc['name']} for loc in locations]
-                    }
+                    duplication = Duplication(
+                        type=locations[0]['type'],
+                        name=locations[0]['name'],
+                        line=locations[0]['line'],
+                        count=len(locations),
+                        locations=[{'line': loc['line'], 'name': loc['name']} for loc in locations]
+                    )
                     duplications.append(duplication)
             
             return duplications

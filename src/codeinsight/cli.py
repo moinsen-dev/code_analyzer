@@ -3,7 +3,7 @@ Code Insight Analyzer CLI
 """
 import typer
 import json
-from typing import List
+from typing import List, Dict, Any
 from pathlib import Path
 
 from codeinsight.scanner import Scanner
@@ -23,7 +23,7 @@ app = typer.Typer(
 def init(
     path: Path = typer.Argument(".", help="Path to initialize configuration"),
     force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing configuration file")
-):
+) -> None:
     """Initialize a .codeinsight.yml configuration file in the project directory."""
     config_path = path / ".codeinsight.yml"
     
@@ -89,7 +89,7 @@ def analyze(
     export: List[str] = typer.Option([], "--export", "-e", help="Export formats (json, html, csv)"),
     export_dir: Path = typer.Option("./reports", "--export-dir", help="Directory for exports"),
     top_files: int = typer.Option(20, "--top-files", "-t", help="Number of top files to display [default: 20]")
-):
+) -> None:
     """Analyze a codebase and display results."""
     typer.echo(f"Analyzing {path}")
     
@@ -113,7 +113,7 @@ def analyze(
             flattened_export.extend(item.split(','))
         _export_results(report, flattened_export, export_dir)
 
-def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: int = 20):
+def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: int = 20) -> None:
     """Display results in terminal with Rich formatting."""
     try:
         from rich.console import Console
@@ -165,24 +165,33 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
                 
                 for file_insight in complex_files[:5]:
                     complexity = file_insight.complexity_metrics
-                    cyclomatic = complexity.cyclomatic_complexity
-                    
-                    # Determine risk level
-                    if cyclomatic > 20:
-                        risk_level = "[red]🔴 High[/red]"
-                    elif cyclomatic > 10:
-                        risk_level = "[orange]🟠 Medium[/orange]"
-                    elif cyclomatic > 5:
-                        risk_level = "[yellow]🟡 Low[/yellow]"
+                    if complexity is not None:
+                        cyclomatic = complexity.cyclomatic_complexity
+                        
+                        # Determine risk level
+                        if cyclomatic > 20:
+                            risk_level = "[red]🔴 High[/red]"
+                        elif cyclomatic > 10:
+                            risk_level = "[orange]🟠 Medium[/orange]"
+                        elif cyclomatic > 5:
+                            risk_level = "[yellow]🟡 Low[/yellow]"
+                        else:
+                            risk_level = "[green]🟢 Good[/green]"
+                        
+                        complexity_table.add_row(
+                            str(file_insight.file_metrics.relative_path),
+                            str(file_insight.file_metrics.lines_of_code),
+                            f"{cyclomatic:.1f}",
+                            risk_level
+                        )
                     else:
-                        risk_level = "[green]🟢 Good[/green]"
-                    
-                    complexity_table.add_row(
-                        str(file_insight.file_metrics.relative_path),
-                        str(file_insight.file_metrics.lines_of_code),
-                        f"{cyclomatic:.1f}",
-                        risk_level
-                    )
+                        # Handle case where complexity metrics are not available
+                        complexity_table.add_row(
+                            str(file_insight.file_metrics.relative_path),
+                            str(file_insight.file_metrics.lines_of_code),
+                            "-",
+                            "[grey]N/A[/grey]"
+                        )
                 
                 console.print(complexity_table)
         
@@ -239,7 +248,7 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
             dup_table.add_column("Duplication", style="yellow")
             
             for file_path, duplication in duplications_found[:10]:  # Show top 10 duplications
-                dup_info = f"{duplication['type']} '{duplication['name']}' ({duplication['count']} duplicates)"
+                dup_info = f"{duplication.type} '{duplication.name}' ({duplication.count} duplicates)"
                 dup_table.add_row(file_path, dup_info)
             
             console.print(dup_table)
@@ -281,24 +290,33 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
                 
                 for file_insight in complex_files[:5]:
                     complexity = file_insight.complexity_metrics
-                    cyclomatic = complexity.cyclomatic_complexity
-                    
-                    # Determine risk level
-                    if cyclomatic > 20:
-                        risk_level = "🔴 High"
-                    elif cyclomatic > 10:
-                        risk_level = "🟠 Medium"
-                    elif cyclomatic > 5:
-                        risk_level = "🟡 Low"
+                    if complexity is not None:
+                        cyclomatic = complexity.cyclomatic_complexity
+                        
+                        # Determine risk level
+                        if cyclomatic > 20:
+                            risk_level = "🔴 High"
+                        elif cyclomatic > 10:
+                            risk_level = "🟠 Medium"
+                        elif cyclomatic > 5:
+                            risk_level = "🟡 Low"
+                        else:
+                            risk_level = "🟢 Good"
+                        
+                        print("  {:<30} {:<6} {:<10.1f} {:<10}".format(
+                            str(file_insight.file_metrics.relative_path)[:30],
+                            file_insight.file_metrics.lines_of_code,
+                            cyclomatic,
+                            risk_level
+                        ))
                     else:
-                        risk_level = "🟢 Good"
-                    
-                    print("  {:<30} {:<6} {:<10.1f} {:<10}".format(
-                        str(file_insight.file_metrics.relative_path)[:30],
-                        file_insight.file_metrics.lines_of_code,
-                        cyclomatic,
-                        risk_level
-                    ))
+                        # Handle case where complexity metrics are not available
+                        print("  {:<30} {:<6} {:<10} {:<10}".format(
+                            str(file_insight.file_metrics.relative_path)[:30],
+                            file_insight.file_metrics.lines_of_code,
+                            "-",
+                            "N/A"
+                        ))
         
         print(f"\n📁 Top Files by Line Count (Top {top_files})")
         print("─" * (33 + len(str(top_files))))
@@ -335,7 +353,7 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
             print("\n🔍 Code Duplications Detected")
             print("────────────────────────────")
             for file_path, duplication in duplications_found[:10]:  # Show top 10 duplications
-                dup_info = f"{duplication['type']} '{duplication['name']}' ({duplication['count']} duplicates)"
+                dup_info = f"{duplication.type} '{duplication.name}' ({duplication.count} duplicates)"
                 print(f"  • {file_path}: {dup_info}")
         
         # Display recommendations if any
@@ -345,23 +363,23 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: 
             for recommendation in report.recommendations[:5]:  # Show top 5 recommendations
                 print(f"  • {recommendation}")
 
-def _export_results(report: AnalysisReport, formats: List[str], export_dir: Path):
+def _export_results(report: AnalysisReport, formats: List[str], export_dir: Path) -> None:
     """Export results to specified formats."""
     export_dir.mkdir(exist_ok=True)
     
     for fmt in formats:
         try:
             if fmt == "json":
-                exporter = JSONExporter()
-                exporter.export(report, export_dir / "report.json")
+                json_exporter = JSONExporter()
+                json_exporter.export(report, export_dir / "report.json")
                 typer.echo(f"Exported JSON report to {export_dir / 'report.json'}")
             elif fmt == "csv":
-                exporter = CSVExporter()
-                exporter.export(report, export_dir / "report.csv")
+                csv_exporter = CSVExporter()
+                csv_exporter.export(report, export_dir / "report.csv")
                 typer.echo(f"Exported CSV report to {export_dir / 'report.csv'}")
             elif fmt == "html":
-                exporter = HTMLExporter()
-                exporter.export(report, export_dir / "report.html")
+                html_exporter = HTMLExporter()
+                html_exporter.export(report, export_dir / "report.html")
                 typer.echo(f"Exported HTML report to {export_dir / 'report.html'}")
             else:
                 typer.echo(f"Warning: Unknown export format '{fmt}'")
@@ -373,7 +391,7 @@ def compare(
     report1_path: Path = typer.Argument(..., help="First report file (JSON)"),
     report2_path: Path = typer.Argument(..., help="Second report file (JSON)"),
     output: str = typer.Option("terminal", "--output", "-o", help="Output format (terminal, json)")
-):
+) -> None:
     """Compare two analysis reports."""
     # Load the reports
     try:
@@ -398,7 +416,7 @@ def compare(
     elif output == "json":
         typer.echo(json.dumps(comparison, indent=2))
 
-def _display_comparison_terminal(comparison: dict, report1: AnalysisReport, report2: AnalysisReport):
+def _display_comparison_terminal(comparison: Dict[str, Any], report1: AnalysisReport, report2: AnalysisReport) -> None:
     """Display comparison results in terminal with Rich formatting."""
     try:
         from rich.console import Console

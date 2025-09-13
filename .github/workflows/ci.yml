@@ -28,7 +28,7 @@ jobs:
       run: |
         uv sync
 
-    - name: Run tests
+    - name: Run tests with coverage
       run: |
         uv run pytest
 
@@ -39,3 +39,12 @@ jobs:
     - name: Run type checker
       run: |
         uv run mypy src/
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

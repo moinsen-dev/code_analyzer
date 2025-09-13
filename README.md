@@ -1,5 +1,11 @@
 # Code Insight Analyzer
 
+[![Build Status](https://github.com/moinsen-dev/code-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/moinsen-dev/code-analyzer/actions)
+[![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/github/license/moinsen-dev/code-analyzer)](LICENSE)
+[![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/code-analyzer)](https://codecov.io/gh/moinsen-dev/code-analyzer)
+[![PyPI version](https://badge.fury.io/py/codeinsight.svg)](https://badge.fury.io/py/codeinsight)
+
 ![Code Analyzer Icon](code-analyzer-icon.png)
 
 A Python-based command-line tool that provides comprehensive analysis of source code repositories. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
@@ -109,11 +115,11 @@ analysis:
     - "*.min.js"
     - "node_modules/"
     - ".git/"
-  
+
   complexity:
     include_docstrings: false
     count_assertions: true
-  
+
   thresholds:
     file_too_long: 500
     function_too_complex: 20
@@ -129,7 +135,9 @@ output:
 
 ## Documentation
 
-For detailed documentation, visit our [GitHub Pages site](https://yourorg.github.io/code-insight-analyzer/).
+For detailed documentation, visit our [GitHub Pages site](https://moinsen-dev.github.io/code-analyzer/).
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Contributing
 

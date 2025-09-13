@@ -3,15 +3,15 @@ Configuration manager for Code Insight Analyzer
 """
 import yaml
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
-from codeinsight.config.models import Config
+from codeinsight.config.models import Config, LanguageConfig
 
 
 class ConfigManager:
     """Manages configuration loading and defaults"""
     
-    def __init__(self, project_path: Path = None):
+    def __init__(self, project_path: Optional[Path] = None):
         self.project_path = project_path or Path.cwd()
         self.config: Config = self._load_config()
     
@@ -38,23 +38,23 @@ class ConfigManager:
         
         # Set up default language configurations
         config.languages = {
-            "python": {
-                "max_line_length": 88,
-                "complexity_threshold": 10
-            },
-            "typescript": {
-                "max_line_length": 100,
-                "complexity_threshold": 15
-            },
-            "javascript": {
-                "max_line_length": 100,
-                "complexity_threshold": 15
-            }
+            "python": LanguageConfig(
+                max_line_length=88,
+                complexity_threshold=10
+            ),
+            "typescript": LanguageConfig(
+                max_line_length=100,
+                complexity_threshold=15
+            ),
+            "javascript": LanguageConfig(
+                max_line_length=100,
+                complexity_threshold=15
+            )
         }
         
         return config
     
-    def get_language_config(self, language: str) -> Dict[str, Any]:
+    def get_language_config(self, language: str) -> LanguageConfig | Dict[str, Any]:
         """Get configuration for a specific language"""
         return self.config.languages.get(language, {})
     

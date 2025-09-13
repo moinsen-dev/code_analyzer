@@ -3,7 +3,7 @@ Code scanner for analyzing directories and files
 """
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Optional, Dict
 from datetime import datetime
 from fnmatch import fnmatch
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -71,7 +71,7 @@ class Scanner:
     # Maximum file size to analyze (10MB)
     MAX_FILE_SIZE = 10 * 1024 * 1024
     
-    def __init__(self, project_path: Path = None):
+    def __init__(self, project_path: Optional[Path] = None):
         self.project_path = project_path or Path.cwd()
         self.config_manager = ConfigManager(self.project_path)
         self.gitignore_matcher = GitIgnoreMatcher()
@@ -104,7 +104,7 @@ class Scanner:
         insights = []
         total_lines = 0
         total_size = 0
-        language_dist = {}
+        language_dist: Dict[Language, int] = {}
         
         # Use parallel processing for better performance on large codebases
         max_workers = min(multiprocessing.cpu_count(), 8)  # Limit to 8 workers max
@@ -162,7 +162,7 @@ class Scanner:
         
         return report
     
-    def _analyze_file_parallel(self, file_path: Path, root_path: Path, include_complexity: bool) -> tuple:
+    def _analyze_file_parallel(self, file_path: Path, root_path: Path, include_complexity: bool) -> tuple[CodeInsights, FileMetrics] | None:
         """
         Analyze a single file in parallel processing context
         

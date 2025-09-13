@@ -8,7 +8,7 @@ from codeinsight.models.metrics import AnalysisReport
 class JSONExporter:
     """Exports analysis reports to JSON format"""
     
-    def export(self, report: AnalysisReport, output_path: Path):
+    def export(self, report: AnalysisReport, output_path: Path) -> None:
         """
         Export report to JSON file
         

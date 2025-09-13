@@ -2,6 +2,7 @@
 GitIgnore parsing and matching utilities
 """
 from pathlib import Path
+from typing import Dict, Optional
 try:
     import pathspec
     PATHSPEC_AVAILABLE = True
@@ -12,11 +13,11 @@ except ImportError:
 class GitIgnoreMatcher:
     """Matches files and directories against .gitignore patterns"""
     
-    def __init__(self):
-        self.specs = {}  # directory -> pathspec.GitIgnoreSpec
-        self.root_path = None
+    def __init__(self) -> None:
+        self.specs: Dict[Path, pathspec.GitIgnoreSpec] = {}  # directory -> pathspec.GitIgnoreSpec
+        self.root_path: Optional[Path] = None
     
-    def update_for_directory(self, directory: Path):
+    def update_for_directory(self, directory: Path) -> None:
         """
         Load .gitignore patterns for a directory and its parents
         

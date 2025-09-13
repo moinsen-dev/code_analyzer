@@ -9,7 +9,7 @@ from codeinsight.models.metrics import AnalysisReport
 class CSVExporter:
     """Exports analysis reports to CSV format"""
     
-    def export(self, report: AnalysisReport, output_path: Path):
+    def export(self, report: AnalysisReport, output_path: Path) -> None:
         """
         Export report to CSV file
         

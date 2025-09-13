@@ -25,7 +25,8 @@ def analyze(
     complexity: bool = typer.Option(False, "--complexity", "-c", help="Include complexity analysis"),
     output: str = typer.Option("terminal", "--output", "-o", help="Output format (terminal, json, html, csv)"),
     export: List[str] = typer.Option([], "--export", "-e", help="Export formats (json, html, csv)"),
-    export_dir: Path = typer.Option("./reports", "--export-dir", help="Directory for exports")
+    export_dir: Path = typer.Option("./reports", "--export-dir", help="Directory for exports"),
+    top_files: int = typer.Option(20, "--top-files", "-t", help="Number of top files to display [default: 20]")
 ):
     """Analyze a codebase and display results."""
     typer.echo(f"Analyzing {path}")
@@ -38,7 +39,7 @@ def analyze(
     
     # Display output based on format
     if output == "terminal":
-        _display_terminal(report, complexity)
+        _display_terminal(report, complexity, top_files)
     elif output == "json":
         typer.echo(report.json())
     
@@ -50,7 +51,7 @@ def analyze(
             flattened_export.extend(item.split(','))
         _export_results(report, flattened_export, export_dir)
 
-def _display_terminal(report: AnalysisReport, show_complexity: bool):
+def _display_terminal(report: AnalysisReport, show_complexity: bool, top_files: int = 20):
     """Display results in terminal with Rich formatting."""
     try:
         from rich.console import Console
@@ -125,15 +126,15 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool):
                 console.print(complexity_table)
         
         # Display top files by line count
-        console.print("\n[bold]📁 Top Files by Line Count[/bold]")
-        console.print("─" * 28)
+        console.print(f"\n[bold]📁 Top Files by Line Count (Top {top_files})[/bold]")
+        console.print("─" * (31 + len(str(top_files))))
         
         files_table = Table(show_header=True)
         files_table.add_column("File", style="cyan")
         files_table.add_column("Lines", justify="right", style="green")
         files_table.add_column("Size", justify="right", style="magenta")
         
-        for file_insight in report.top_files[:10]:
+        for file_insight in report.top_files[:top_files]:
             files_table.add_row(
                 str(file_insight.file_metrics.relative_path),
                 str(file_insight.file_metrics.lines_of_code),
@@ -217,12 +218,12 @@ def _display_terminal(report: AnalysisReport, show_complexity: bool):
                         risk_level
                     ))
         
-        print("\n📁 Top Files by Line Count")
-        print("─────────────────────────")
+        print(f"\n📁 Top Files by Line Count (Top {top_files})")
+        print("─" * (33 + len(str(top_files))))
         print("  {:<30} {:<6} {:<12}".format("File", "Lines", "Size"))
         print("  " + "─" * 50)
         
-        for file_insight in report.top_files[:10]:
+        for file_insight in report.top_files[:top_files]:
             print("  {:<30} {:<6} {:<12}".format(
                 str(file_insight.file_metrics.relative_path)[:30],
                 file_insight.file_metrics.lines_of_code,

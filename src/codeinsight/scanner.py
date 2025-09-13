@@ -45,7 +45,7 @@ class Scanner:
         # Generated files
         '*.g.dart', '*.freezed.dart', '*.generated.*', '*_generated.*',
         # Lock files
-        '*.lock',  # Generic lock files
+        '*.lock', '*.lock.yaml',  # Generic lock files
         'pubspec.lock', 'package-lock.json', '*-lock.json', 'yarn.lock', 'Gemfile.lock',
         'composer.lock', 'Cargo.lock', 'poetry.lock', 'Pipfile.lock',
         'conda-lock.yml', 'mix.lock',
@@ -263,6 +263,14 @@ class Scanner:
             # Ignore all other JSON files
             return False
             
+        # Special handling for YAML files - ignore lock files but allow others
+        if file_path.suffix.lower() in ['.yaml', '.yml']:
+            # Ignore lock.yaml files
+            if 'lock.yaml' in file_name or 'lock.yml' in file_name:
+                return False
+            # Allow other YAML files (they might be config files but could be relevant)
+            return True
+        
         return True
     
     def _analyze_file(self, file_path: Path, root_path: Path) -> FileMetrics:

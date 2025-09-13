@@ -1,0 +1,43 @@
+name: Code Insight Analysis
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Install codeinsight
+      run: |
+        uv pip install codeinsight
+
+    - name: Run code analysis
+      run: |
+        codeinsight analyze . --complexity --export json,html --export-dir ./reports
+
+    - name: Upload analysis reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-analysis-report
+        path: ./reports/
+        retention-days: 30
+
+    - name: Check for code smells
+      run: |
+        # Fail the build if high complexity files are found
+        # This is just an example - customize based on your project needs
+        echo "Checking for files with high complexity..."
+        # You can add custom logic here to fail builds based on analysis results

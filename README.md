@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/github/license/moinsen-dev/code-analyzer)](LICENSE)
 [![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/code-analyzer)](https://codecov.io/gh/moinsen-dev/code-analyzer)
 [![PyPI version](https://badge.fury.io/py/codeinsight.svg)](https://badge.fury.io/py/codeinsight)
+[![CI/CD Integration](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20%26%20GitLab%20CI-blue)](docs/ci-cd-integration.md)
 
 ![Code Analyzer Icon](code-analyzer-icon.png)
 
@@ -26,6 +27,7 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Configuration file support (.codeinsight.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
+- CI/CD integration support (GitHub Actions, GitLab CI)
 
 ## Installation
 
@@ -138,6 +140,61 @@ output:
   show_recommendations: true
   export_path: "./reports"
 ```
+
+## CI/CD Integration
+
+Code Insight Analyzer provides built-in support for popular CI/CD platforms:
+
+### GitHub Actions
+
+To integrate Code Insight Analyzer into your GitHub Actions workflow, create a workflow file in `.github/workflows/`:
+
+```yaml
+name: Code Analysis
+on: [push, pull_request]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Code Insight Analysis
+        uses: moinsen-dev/code-analyzer@v0.2.0
+        with:
+          args: analyze . --complexity --export json,html
+```
+
+Alternatively, you can install and run it directly:
+
+```yaml
+- name: Install uv
+  uses: astral-sh/setup-uv@v3
+
+- name: Install codeinsight
+  run: |
+    uv pip install codeinsight
+
+- name: Run analysis
+  run: |
+    codeinsight analyze . --complexity --export json,html --export-dir ./reports
+```
+
+### GitLab CI
+
+For GitLab CI, add this to your `.gitlab-ci.yml`:
+
+```yaml
+analyze:
+  stage: test
+  script:
+    - pip install codeinsight
+    - codeinsight analyze . --complexity --export json,html --export-dir ./reports
+  artifacts:
+    paths:
+      - reports/
+```
+
+See [CI/CD Integration Guide](docs/ci-cd-integration.md) for more detailed instructions.
 
 ## Documentation
 

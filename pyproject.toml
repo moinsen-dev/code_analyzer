@@ -1,6 +1,6 @@
 [project]
 name = "codeinsight"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Python-based command-line tool that provides comprehensive analysis of source code repositories"
 authors = [
     { name = "Code Insight Team", email = "codeinsight@example.com" }
@@ -49,6 +49,7 @@ dev-dependencies = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "pytest-mock>=3.15.0",
+    "pytest-benchmark>=5.1.0",
     "ruff>=0.13.0",
     "black>=25.1.0",
     "mypy>=1.18.1"

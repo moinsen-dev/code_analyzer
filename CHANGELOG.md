@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-09-13
+
+### Added
+- CI/CD integration support for GitHub Actions and GitLab CI
+- Pre-built GitHub Actions workflow for code analysis
+- GitLab CI configuration template
+- GitHub Action for direct use in workflows
+- CI/CD integration documentation
+- Dockerfile for GitHub Action
+- Enhanced CI workflow with code quality checks and benchmarking
+- CI/CD badges in README
+
+### Changed
+- Updated version to 0.2.0 in pyproject.toml and setup.py
+- Enhanced existing CI workflow with additional jobs
+
 ## [0.1.0] - 2025-09-13
 
 ### Added

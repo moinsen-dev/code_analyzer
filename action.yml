@@ -1,0 +1,16 @@
+name: 'Code Insight Analyzer'
+description: 'Analyze your codebase for insights on complexity, code smells, and more'
+author: 'Code Insight Team'
+inputs:
+  args:
+    description: 'Arguments to pass to the codeinsight analyze command'
+    required: false
+    default: 'analyze .'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.args }}
+branding:
+  icon: 'bar-chart-2'
+  color: 'blue'

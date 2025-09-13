@@ -1,5 +1,0 @@
-File Path,Relative Path,Language,Lines of Code,Blank Lines,Comment Lines,Size (bytes),Last Modified,Cyclomatic Complexity,Cognitive Complexity,Maintainability Index,Technical Debt Ratio
-examples/sample_project/calculator.py,calculator.py,python,35,9,9,1398,2025-09-13T12:54:05.728765,1.375,6,65.23843223292091,3.125
-examples/sample_project/greeter.js,greeter.js,javascript,18,5,2,466,2025-09-13T12:54:09.205709,,,,
-examples/sample_project/.gitignore,.gitignore,markdown,3,0,0,18,2025-09-13T12:54:14.157024,,,,
-examples/sample_project/README.md,README.md,markdown,1,1,1,84,2025-09-13T12:54:00.601827,,,,

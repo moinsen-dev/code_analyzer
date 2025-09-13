@@ -65,9 +65,8 @@ The **Code Insight Analyzer** is a Python-based command-line tool that provides 
 - Language-specific complexity metrics (multi-language support with Lizard)
 - Performance optimizations (parallel processing implementation)
 
-⚪ **Not Yet Implemented:**
+✅ **Implemented:**
 - Integration with CI/CD pipelines
-- Advanced duplicate code detection
 
 ### Future Goals (Nice to Have)
 ⚪ **Not Yet Implemented:**
@@ -107,7 +106,7 @@ The **Code Insight Analyzer** is a Python-based command-line tool that provides 
 | IDE plugins | ⚪ Planned | VS Code and IntelliJ extensions |
 | Real-time watching | ⚪ Planned | File system watcher for live analysis |
 | AI-powered suggestions | ⚪ Planned | Intelligent refactoring recommendations |
-| CI/CD integrations | ⚪ Planned | GitHub Actions, GitLab CI, etc. |
+| CI/CD integrations | ✅ Complete | GitHub Actions, GitLab CI |
 | Advanced duplicate detection | ⚪ Planned | AST-based duplicate code detection |
 
 ---

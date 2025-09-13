@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="codeinsight",
-    version="0.1.0",
+    version="0.2.0",
     author="Code Insight Team",
     author_email="codeinsight@example.com",
     description="A Python-based command-line tool that provides comprehensive analysis of source code repositories",

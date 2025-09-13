@@ -41,6 +41,12 @@ Then install the dependencies:
 uv sync
 ```
 
+Or install directly from PyPI:
+
+```bash
+pip install codeinsight
+```
+
 ## Usage
 
 ### Basic Analysis
@@ -142,3 +148,12 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for more information.
+
+## Release Process
+
+New versions are automatically published to PyPI when a new tag is created following the pattern `v*.*.*`. To release a new version:
+
+1. Update the version in `pyproject.toml` and `setup.py`
+2. Create a new tag: `git tag -a v1.0.0 -m "Release version 1.0.0"`
+3. Push the tag: `git push origin v1.0.0`
+4. The GitHub Actions workflow will automatically build and publish to PyPI

@@ -20,6 +20,68 @@ app = typer.Typer(
 )
 
 @app.command()
+def init(
+    path: Path = typer.Argument(".", help="Path to initialize configuration"),
+    force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing configuration file")
+):
+    """Initialize a .codeinsight.yml configuration file in the project directory."""
+    config_path = path / ".codeinsight.yml"
+    
+    if config_path.exists() and not force:
+        typer.echo(f"Configuration file already exists at {config_path}")
+        typer.echo("Use --force to overwrite the existing file.")
+        raise typer.Exit(1)
+    
+    # Default configuration content
+    default_config = """version: 1.0
+
+# Language-specific settings
+languages:
+  python:
+    max_line_length: 88
+    complexity_threshold: 10
+  typescript:
+    max_line_length: 100
+    complexity_threshold: 15
+  javascript:
+    max_line_length: 100
+    complexity_threshold: 15
+
+# Analysis rules
+analysis:
+  ignore_patterns:
+    - "*.generated.*"
+    - "*_pb2.py"
+    - "*.min.js"
+    - "node_modules/"
+    - ".git/"
+  
+  complexity:
+    include_docstrings: false
+    count_assertions: true
+  
+  thresholds:
+    file_too_long: 500
+    function_too_complex: 20
+    class_too_large: 1000
+
+# Output preferences
+output:
+  format: "terminal"  # terminal, json, html, csv
+  theme: "monokai"
+  show_recommendations: true
+  export_path: "./reports"
+"""
+    
+    try:
+        with open(config_path, 'w') as f:
+            f.write(default_config)
+        typer.echo(f"Created .codeinsight.yml configuration file at {config_path}")
+    except Exception as e:
+        typer.echo(f"Error creating configuration file: {e}")
+        raise typer.Exit(1)
+
+@app.command()
 def analyze(
     path: Path = typer.Argument(..., help="Path to analyze"),
     complexity: bool = typer.Option(False, "--complexity", "-c", help="Include complexity analysis"),

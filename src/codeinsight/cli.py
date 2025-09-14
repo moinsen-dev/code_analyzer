@@ -598,7 +598,6 @@ def _display_live_terminal(
         from rich.console import Console
         from rich.table import Table
         from rich.panel import Panel
-        from rich.live import Live
 
         console = Console()
 

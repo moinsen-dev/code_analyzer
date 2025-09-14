@@ -2,9 +2,7 @@
 Benchmark tests for Code Analyzer
 """
 
-import pytest
 from pathlib import Path
-import time
 
 
 def test_analysis_performance(benchmark):

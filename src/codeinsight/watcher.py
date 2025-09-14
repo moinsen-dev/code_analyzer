@@ -3,7 +3,6 @@ File watcher for real-time code analysis
 """
 
 import time
-import os
 from pathlib import Path
 from typing import Callable, Optional, Set
 from watchdog.observers import Observer

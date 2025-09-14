@@ -2,11 +2,10 @@
 Test script for report comparator
 """
 
-import json
 from pathlib import Path
 from datetime import datetime
 
-from codeinsight.models.metrics import AnalysisReport, FileMetrics, Language
+from codeinsight.models.metrics import AnalysisReport, Language
 from codeinsight.analysis.comparator import ReportComparator
 
 
@@ -48,28 +47,6 @@ def test_comparator():
 
 def test_comparator_with_file_changes():
     """Test the report comparator with file changes"""
-    # Create mock file metrics
-    file1_metrics = FileMetrics(
-        path=Path("test1.py"),
-        relative_path="test1.py",
-        language=Language.PYTHON,
-        lines_of_code=100,
-        blank_lines=10,
-        comment_lines=5,
-        size_bytes=2000,
-        last_modified=datetime.now(),
-    )
-
-    file2_metrics = FileMetrics(
-        path=Path("test1.py"),
-        relative_path="test1.py",
-        language=Language.PYTHON,
-        lines_of_code=150,  # Increased from 100
-        blank_lines=10,
-        comment_lines=5,
-        size_bytes=2500,  # Increased from 2000
-        last_modified=datetime.now(),
-    )
 
     # Create reports with file data
     report1 = AnalysisReport(

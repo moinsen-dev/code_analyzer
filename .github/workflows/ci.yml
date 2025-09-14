@@ -78,7 +78,7 @@ jobs:
     - name: Security audit
       run: |
         uv pip install safety
-        uv run safety check
+        uv run safety scan
 
   # Integration testing
   integration-test:

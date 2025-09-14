@@ -1,33 +1,34 @@
 """
 HTML export functionality
 """
+
 from pathlib import Path
 from codeinsight.models.metrics import AnalysisReport
 
 
 class HTMLExporter:
     """Exports analysis reports to HTML format"""
-    
+
     def export(self, report: AnalysisReport, output_path: Path) -> None:
         """
         Export report to HTML file
-        
+
         Args:
             report: AnalysisReport to export
             output_path: Path to output file
         """
         html_content = self._generate_html(report)
-        
-        with open(output_path, 'w', encoding='utf-8') as f:
+
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(html_content)
-    
+
     def _generate_html(self, report: AnalysisReport) -> str:
         """
         Generate HTML content for the report
-        
+
         Args:
             report: AnalysisReport to convert to HTML
-            
+
         Returns:
             HTML content as string
         """
@@ -36,7 +37,7 @@ class HTMLExporter:
         for i, file_insight in enumerate(report.top_files[:20]):  # Limit to top 20
             file_metrics = file_insight.file_metrics
             complexity_metrics = file_insight.complexity_metrics
-            
+
             # Determine risk level based on complexity
             risk_level = "🟢 Good"
             risk_class = "risk-good"
@@ -51,7 +52,7 @@ class HTMLExporter:
                 elif cyclomatic > 5:
                     risk_level = "🟡 Low"
                     risk_class = "risk-low"
-            
+
             file_rows += f"""
                 <tr>
                     <td>{file_metrics.relative_path}</td>
@@ -62,13 +63,13 @@ class HTMLExporter:
                     <td class="{risk_class}">{risk_level}</td>
                 </tr>
             """
-        
+
         # Generate language distribution
         lang_dist = ""
         for lang, count in report.language_distribution.items():
             percentage = (count / report.total_files) * 100
             lang_dist += f"<li>{lang.value if hasattr(lang, 'value') else str(lang)}: {count} ({percentage:.0f}%)</li>"
-        
+
         # Generate code smells
         smell_rows = ""
         total_smells = 0
@@ -82,14 +83,14 @@ class HTMLExporter:
                             <td>{smell}</td>
                         </tr>
                     """
-        
+
         # Generate complexity hotspots
         complex_rows = ""
         for file_insight in report.top_files:
             if file_insight.complexity_metrics:
                 complexity = file_insight.complexity_metrics
                 cyclomatic = complexity.cyclomatic_complexity
-                
+
                 # Determine risk level
                 if cyclomatic > 20:
                     risk_level = "🔴 High"
@@ -103,7 +104,7 @@ class HTMLExporter:
                 else:
                     risk_level = "🟢 Good"
                     risk_class = "risk-good"
-                
+
                 complex_rows += f"""
                     <tr>
                         <td>{file_insight.file_metrics.relative_path}</td>
@@ -114,7 +115,7 @@ class HTMLExporter:
                         <td class="{risk_class}">{risk_level}</td>
                     </tr>
                 """
-        
+
         html_template = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -454,5 +455,5 @@ class HTMLExporter:
 </body>
 </html>
         """
-        
+
         return html_template

@@ -1,12 +1,14 @@
 """
 Test script for report comparator
 """
+
 import json
 from pathlib import Path
 from datetime import datetime
 
 from codeinsight.models.metrics import AnalysisReport, FileMetrics, Language
 from codeinsight.analysis.comparator import ReportComparator
+
 
 def test_comparator():
     """Test the report comparator functionality"""
@@ -19,9 +21,9 @@ def test_comparator():
         total_size=50000,
         language_distribution={Language.PYTHON: 10},
         top_files=[],
-        recommendations=[]
+        recommendations=[],
     )
-    
+
     report2 = AnalysisReport(
         project_path=Path("."),
         timestamp=datetime.now(),
@@ -30,18 +32,19 @@ def test_comparator():
         total_size=55000,  # Increased from 50000
         language_distribution={Language.PYTHON: 12},
         top_files=[],
-        recommendations=[]
+        recommendations=[],
     )
-    
+
     # Compare the reports
     comparator = ReportComparator()
     comparison = comparator.compare(report1, report2)
-    
+
     # Verify the comparison results
     assert comparison is not None
     assert comparison["summary"]["total_files"]["difference"] == 2
     assert comparison["summary"]["total_lines"]["difference"] == 200
     assert comparison["summary"]["total_size"]["difference"] == 5000
+
 
 def test_comparator_with_file_changes():
     """Test the report comparator with file changes"""
@@ -54,9 +57,9 @@ def test_comparator_with_file_changes():
         blank_lines=10,
         comment_lines=5,
         size_bytes=2000,
-        last_modified=datetime.now()
+        last_modified=datetime.now(),
     )
-    
+
     file2_metrics = FileMetrics(
         path=Path("test1.py"),
         relative_path="test1.py",
@@ -65,9 +68,9 @@ def test_comparator_with_file_changes():
         blank_lines=10,
         comment_lines=5,
         size_bytes=2500,  # Increased from 2000
-        last_modified=datetime.now()
+        last_modified=datetime.now(),
     )
-    
+
     # Create reports with file data
     report1 = AnalysisReport(
         project_path=Path("."),
@@ -77,9 +80,9 @@ def test_comparator_with_file_changes():
         total_size=2000,
         language_distribution={Language.PYTHON: 1},
         top_files=[],
-        recommendations=[]
+        recommendations=[],
     )
-    
+
     report2 = AnalysisReport(
         project_path=Path("."),
         timestamp=datetime.now(),
@@ -88,13 +91,13 @@ def test_comparator_with_file_changes():
         total_size=2500,
         language_distribution={Language.PYTHON: 1},
         top_files=[],
-        recommendations=[]
+        recommendations=[],
     )
-    
+
     # Compare the reports
     comparator = ReportComparator()
     comparison = comparator.compare(report1, report2)
-    
+
     # Verify the comparison results
     assert comparison is not None
     assert comparison["summary"]["total_lines"]["difference"] == 50

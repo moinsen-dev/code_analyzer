@@ -94,6 +94,11 @@ def analyze(
     complexity: bool = typer.Option(
         False, "--complexity", "-c", help="Include complexity analysis"
     ),
+    duplicates: bool = typer.Option(
+        True,
+        "--duplicates/--no-duplicates",
+        help="Enable/disable duplicate code detection",
+    ),
     output: str = typer.Option(
         "terminal", "--output", "-o", help="Output format (terminal, json, html, csv)"
     ),
@@ -111,14 +116,14 @@ def analyze(
     typer.echo(f"Analyzing {path}")
 
     # Initialize scanner with the project path
-    scanner = Scanner(path)
+    scanner = Scanner(path, enable_duplicates=duplicates)
 
     # Perform analysis
     report = scanner.analyze(path, include_complexity=complexity)
 
     # Display output based on format
     if output == "terminal":
-        _display_terminal(report, complexity, top_files)
+        _display_terminal(report, complexity, top_files, duplicates)
     elif output == "json":
         typer.echo(report.json())
 
@@ -132,7 +137,10 @@ def analyze(
 
 
 def _display_terminal(
-    report: AnalysisReport, show_complexity: bool, top_files: int = 20
+    report: AnalysisReport,
+    show_complexity: bool,
+    top_files: int = 20,
+    show_duplicates: bool = True,
 ) -> None:
     """Display results in terminal with Rich formatting."""
     try:
@@ -265,29 +273,34 @@ def _display_terminal(
             console.print(smell_table)
 
         # Display code duplications if any
-        duplications_found = []
-        for file_insight in report.top_files:
-            if file_insight.duplications:
-                for duplication in file_insight.duplications:
-                    duplications_found.append(
-                        (file_insight.file_metrics.relative_path, duplication)
-                    )
+        if show_duplicates:
+            duplications_found = []
+            for file_insight in report.top_files:
+                if file_insight.duplications:
+                    for duplication in file_insight.duplications:
+                        duplications_found.append(
+                            (file_insight.file_metrics.relative_path, duplication)
+                        )
 
-        if duplications_found:
-            console.print("\n[bold]🔍 Code Duplications Detected[/bold]")
-            console.print("─" * 30)
+            if duplications_found:
+                console.print("\n[bold]🔍 Code Duplications Detected[/bold]")
+                console.print("─" * 30)
 
-            dup_table = Table(show_header=True)
-            dup_table.add_column("File", style="cyan")
-            dup_table.add_column("Duplication", style="yellow")
+                dup_table = Table(show_header=True)
+                dup_table.add_column("File", style="cyan")
+                dup_table.add_column("Duplication", style="yellow")
+                dup_table.add_column("Type", style="magenta")
+                dup_table.add_column("Similarity", style="green")
 
-            for file_path, duplication in duplications_found[
-                :10
-            ]:  # Show top 10 duplications
-                dup_info = f"{duplication.type} '{duplication.name}' ({duplication.count} duplicates)"
-                dup_table.add_row(file_path, dup_info)
+                for file_path, duplication in duplications_found[
+                    :10
+                ]:  # Show top 10 duplications
+                    dup_info = f"{duplication.type} '{duplication.name}' ({duplication.count} duplicates)"
+                    clone_type = duplication.clone_type.capitalize()
+                    similarity = f"{duplication.similarity:.2f}"
+                    dup_table.add_row(file_path, dup_info, clone_type, similarity)
 
-            console.print(dup_table)
+                console.print(dup_table)
 
         # Display recommendations if any
         if report.recommendations:
@@ -397,22 +410,25 @@ def _display_terminal(
                 print(f"  • {file_path}: {smell}")
 
         # Display code duplications if any
-        duplications_found = []
-        for file_insight in report.top_files:
-            if file_insight.duplications:
-                for duplication in file_insight.duplications:
-                    duplications_found.append(
-                        (file_insight.file_metrics.relative_path, duplication)
-                    )
+        if show_duplicates:
+            duplications_found = []
+            for file_insight in report.top_files:
+                if file_insight.duplications:
+                    for duplication in file_insight.duplications:
+                        duplications_found.append(
+                            (file_insight.file_metrics.relative_path, duplication)
+                        )
 
-        if duplications_found:
-            print("\n🔍 Code Duplications Detected")
-            print("────────────────────────────")
-            for file_path, duplication in duplications_found[
-                :10
-            ]:  # Show top 10 duplications
-                dup_info = f"{duplication.type} '{duplication.name}' ({duplication.count} duplicates)"
-                print(f"  • {file_path}: {dup_info}")
+            if duplications_found:
+                print("\n🔍 Code Duplications Detected")
+                print("────────────────────────────")
+                for file_path, duplication in duplications_found[
+                    :10
+                ]:  # Show top 10 duplications
+                    dup_info = f"{duplication.type} '{duplication.name}' ({duplication.count} duplicates)"
+                    print(
+                        f"  • {file_path}: {dup_info} [{duplication.clone_type}, {duplication.similarity:.2f}]"
+                    )
 
         # Display recommendations if any
         if report.recommendations:
@@ -726,6 +742,176 @@ Total Size:      {report.total_size:,} bytes"""
                     f"{file_insight.file_metrics.size_bytes:,} bytes",
                 )
             )
+
+
+@app.command()
+def duplicates(
+    path: Path = typer.Argument(..., help="Path to analyze for duplicates"),
+    clone_type: str = typer.Option(
+        "all",
+        "--type",
+        "-t",
+        help="Type of clones to detect (exact, renamed, modified, semantic, all)",
+    ),
+    min_similarity: float = typer.Option(
+        0.7, "--min-similarity", help="Minimum similarity threshold (0.0 to 1.0)"
+    ),
+    output: str = typer.Option(
+        "terminal", "--output", "-o", help="Output format (terminal, json)"
+    ),
+) -> None:
+    """Analyze codebase for duplicate code patterns"""
+    typer.echo(f"Analyzing {path} for duplicate code...")
+
+    # Initialize scanner with duplicate detection enabled
+    scanner = Scanner(path, enable_duplicates=True)
+
+    # Perform analysis
+    report = scanner.analyze(path, include_complexity=False)
+
+    # Display output based on format
+    if output == "terminal":
+        _display_duplicates_terminal(report, clone_type, min_similarity)
+    elif output == "json":
+        typer.echo(report.json())
+
+
+def _display_duplicates_terminal(
+    report: AnalysisReport, clone_type_filter: str = "all", min_similarity: float = 0.7
+) -> None:
+    """Display duplicate code findings in terminal"""
+    try:
+        from rich.console import Console
+        from rich.table import Table
+        from rich.panel import Panel
+
+        console = Console()
+
+        # Display main header
+        console.print(
+            Panel(
+                f"[bold]Code Insight Analyzer - Duplicate Code Analysis[/bold]\n"
+                f"[cyan]Project:[/cyan] {report.project_path}",
+                expand=False,
+            )
+        )
+
+        # Collect all duplications
+        all_duplications = []
+        for file_insight in report.top_files:
+            if file_insight.duplications:
+                for duplication in file_insight.duplications:
+                    # Apply filters
+                    if (
+                        clone_type_filter != "all"
+                        and duplication.clone_type != clone_type_filter
+                    ):
+                        continue
+                    if duplication.similarity < min_similarity:
+                        continue
+                    all_duplications.append(
+                        (file_insight.file_metrics.relative_path, duplication)
+                    )
+
+        # Sort by similarity (descending)
+        all_duplications.sort(key=lambda x: x[1].similarity, reverse=True)
+
+        if all_duplications:
+            console.print(
+                f"\n[bold]🔍 Duplicate Code Findings ({len(all_duplications)} found)[/bold]"
+            )
+            console.print("─" * 40)
+
+            dup_table = Table(show_header=True)
+            dup_table.add_column("File", style="cyan")
+            dup_table.add_column("Type", style="magenta")
+            dup_table.add_column("Name", style="yellow")
+            dup_table.add_column("Count", justify="right", style="green")
+            dup_table.add_column("Similarity", justify="right", style="blue")
+
+            for file_path, duplication in all_duplications[:20]:  # Show top 20
+                dup_table.add_row(
+                    file_path,
+                    duplication.clone_type.capitalize(),
+                    f"{duplication.type} '{duplication.name}'",
+                    str(duplication.count),
+                    f"{duplication.similarity:.2f}",
+                )
+
+            console.print(dup_table)
+
+            # Show detailed locations for top duplications
+            console.print("\n[bold]📍 Detailed Locations (Top 5)[/bold]")
+            console.print("─" * 30)
+
+            for i, (file_path, duplication) in enumerate(all_duplications[:5]):
+                console.print(
+                    f"\n[bold]{i+1}. {duplication.type} '{duplication.name}'[/bold]"
+                )
+                console.print(f"   Clone Type: {duplication.clone_type.capitalize()}")
+                console.print(f"   Similarity: {duplication.similarity:.2f}")
+                console.print("   Locations:")
+                for location in duplication.locations[:5]:  # Show first 5 locations
+                    loc_file = location.get("file", file_path)
+                    loc_line = location.get("line", "Unknown")
+                    console.print(f"     • {loc_file}:{loc_line}")
+
+        else:
+            console.print(
+                "[green]✅ No duplicate code found matching the criteria.[/green]"
+            )
+
+    except ImportError:
+        # Fallback to basic output
+        print("Code Insight Analyzer - Duplicate Code Analysis")
+        print(f"Project: {report.project_path}")
+
+        # Collect all duplications
+        all_duplications = []
+        for file_insight in report.top_files:
+            if file_insight.duplications:
+                for duplication in file_insight.duplications:
+                    # Apply filters
+                    if (
+                        clone_type_filter != "all"
+                        and duplication.clone_type != clone_type_filter
+                    ):
+                        continue
+                    if duplication.similarity < min_similarity:
+                        continue
+                    all_duplications.append(
+                        (file_insight.file_metrics.relative_path, duplication)
+                    )
+
+        # Sort by similarity (descending)
+        all_duplications.sort(key=lambda x: x[1].similarity, reverse=True)
+
+        if all_duplications:
+            print(f"\n🔍 Duplicate Code Findings ({len(all_duplications)} found)")
+            print("────────────────────────────────────────")
+
+            for file_path, duplication in all_duplications[:20]:  # Show top 20
+                print(
+                    f"  {file_path}: {duplication.type} '{duplication.name}' "
+                    f"({duplication.count} duplicates) "
+                    f"[{duplication.clone_type}, {duplication.similarity:.2f}]"
+                )
+
+            # Show detailed locations for top duplications
+            print("\n📍 Detailed Locations (Top 5)")
+            print("──────────────────────────────")
+
+            for i, (file_path, duplication) in enumerate(all_duplications[:5]):
+                print(f"\n{i+1}. {duplication.type} '{duplication.name}'")
+                print(f"   Clone Type: {duplication.clone_type.capitalize()}")
+                print(f"   Similarity: {duplication.similarity:.2f}")
+                print("   Locations:")
+                for location in duplication.locations[:5]:  # Show first 5 locations
+                    loc_file = location.get("file", file_path)
+                    loc_line = location.get("line", "Unknown")
+                    print(f"     • {loc_file}:{loc_line}")
+        else:
+            print("✅ No duplicate code found matching the criteria.")
 
 
 @app.command()

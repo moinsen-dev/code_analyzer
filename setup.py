@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="code_analyzer",
-    version="0.2.1",
+    version="0.3.0",
     author="Code Analyzer Team",
     author_email="code_analyzer@example.com",
     description="A Python-based command-line tool that provides comprehensive analysis of source code repositories",

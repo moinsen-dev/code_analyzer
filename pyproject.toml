@@ -1,6 +1,6 @@
 [project]
 name = "code_analyzer"
-version = "0.2.1"
+version = "0.3.0"
 description = "A Python-based command-line tool that provides comprehensive analysis of source code repositories"
 authors = [
     { name = "Code Analyzer Team", email = "code_analyzer@example.com" }

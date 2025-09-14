@@ -20,6 +20,7 @@ from codeinsight.utils.gitignore import GitIgnoreMatcher
 from codeinsight.analyzers.line_counter import LineCounter
 from codeinsight.analyzers.complexity import ComplexityAnalyzer
 from codeinsight.analysis.smells import CodeSmellDetector
+from codeinsight.analysis.advanced_duplicates import advanced_duplicate_detector
 from codeinsight.config.manager import ConfigManager
 
 
@@ -148,13 +149,91 @@ class Scanner:
     # Maximum file size to analyze (10MB)
     MAX_FILE_SIZE = 10 * 1024 * 1024
 
-    def __init__(self, project_path: Optional[Path] = None):
+    def __init__(
+        self, project_path: Optional[Path] = None, enable_duplicates: bool = True
+    ):
         self.project_path = project_path or Path.cwd()
+        self.enable_duplicates = enable_duplicates
         self.config_manager = ConfigManager(self.project_path)
         self.gitignore_matcher = GitIgnoreMatcher()
         self.line_counter = LineCounter()
         self.complexity_analyzer = ComplexityAnalyzer()
         self.smell_detector = CodeSmellDetector()
+
+    # Directories that should always be ignored
+    IGNORED_DIRECTORIES = {
+        ".git",
+        ".svn",
+        ".hg",
+        ".bzr",
+        "node_modules",
+        "vendor",
+        "build",
+        "dist",
+        "__pycache__",
+        ".pytest_cache",
+        ".coverage",
+        "coverage",
+        "target",
+        "bin",
+        "obj",
+    }
+
+    # File patterns that should be ignored (generated files, lock files, etc.)
+    IGNORED_FILE_PATTERNS = {
+        # Generated files
+        "*.g.dart",
+        "*.freezed.dart",
+        "*.generated.*",
+        "*_generated.*",
+        # Lock files
+        "*.lock",
+        "*.lock.yaml",  # Generic lock files
+        "pubspec.lock",
+        "package-lock.json",
+        "*-lock.json",
+        "yarn.lock",
+        "Gemfile.lock",
+        "composer.lock",
+        "Cargo.lock",
+        "poetry.lock",
+        "Pipfile.lock",
+        "conda-lock.yml",
+        "mix.lock",
+        # Build/Project files
+        "*.pbxproj",
+        "*.xcodeproj",
+        "*.xcworkspace",
+        "*.xib",
+        "*.storyboard",
+        "*.nib",
+        "*.lproj",
+        # IDE files
+        "*.iml",
+        ".idea",
+        ".vscode",
+        "*.swp",
+        "*.swo",
+        # Log files
+        "*.log",
+        "log.txt",
+        # Temp/cache files
+        "*.tmp",
+        "*.temp",
+        ".DS_Store",
+        "Thumbs.db",
+        # Minified files
+        "*.min.js",
+        "*.min.css",
+        # Backup files
+        "*~",
+        "*.bak",
+        "*.backup",
+        # Coverage reports
+        "coverage.xml",
+        "lcov.info",
+        "*.cobertura.xml",
+    }
 
     def analyze(self, path: Path, include_complexity: bool = False) -> AnalysisReport:
         """
@@ -271,12 +350,21 @@ class Scanner:
             if smells:
                 insight.code_smells = smells
 
-            # Add code duplications
-            duplications = self.smell_detector.detect_duplications(
-                file_path, file_metrics.language
-            )
-            if duplications:
-                insight.duplications = duplications
+            # Add code duplications if enabled
+            if self.enable_duplicates:
+                basic_duplications = self.smell_detector.detect_duplications(
+                    file_path, file_metrics.language
+                )
+
+                # Add advanced duplicate detection
+                advanced_duplications = advanced_duplicate_detector.detect_duplicates(
+                    file_path, file_metrics.language
+                )
+
+                # Combine both types of duplications
+                all_duplications = basic_duplications + advanced_duplications
+                if all_duplications:
+                    insight.duplications = all_duplications
 
             return (insight, file_metrics)
         except Exception as e:

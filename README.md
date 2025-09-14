@@ -29,6 +29,36 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Performance optimizations with parallel processing
 - CI/CD integration support (GitHub Actions, GitLab CI)
 - Real-time file watching for live code analysis
+- Advanced AST-based duplicate code detection with clone type classification
+
+## Duplicate Code Detection
+
+The Code Analyzer provides advanced AST-based duplicate code detection with the following features:
+
+- **Clone Type Classification**: Identifies different types of code clones:
+  - **Exact Clones** (Type-1): Identical code except for comments and whitespace
+  - **Renamed Clones** (Type-2): Syntactically identical with identifier renames
+  - **Modified Clones** (Type-3): Semantically similar with small modifications
+  - **Semantic Clones** (Type-4): Functionally equivalent but syntactically different
+
+- **Cross-File Detection**: Finds duplicate code patterns across different files in your project
+
+- **Similarity Scoring**: Provides quantitative similarity measures between code blocks (0.0 to 1.0)
+
+- **Performance Optimizations**: Uses caching and global indexing for efficient analysis of large codebases
+
+The duplicate detection can be customized with the `duplicates` command:
+
+```bash
+# Analyze for exact duplicates only
+uv run code_analyzer duplicates src/ --type exact
+
+# Find similar code with minimum similarity threshold
+uv run code_analyzer duplicates src/ --min-similarity 0.8
+
+# Focus on renamed clones
+uv run code_analyzer duplicates src/ --type renamed
+```
 
 ## Installation
 
@@ -96,6 +126,9 @@ uv run code_analyzer compare reports/report1.json reports/report2.json
 
 # Initialize configuration file
 uv run code_analyzer init
+
+# Analyze for duplicate code with advanced options
+uv run code_analyzer duplicates src/ --type exact --min-similarity 0.9
 ```
 
 ## Supported Languages

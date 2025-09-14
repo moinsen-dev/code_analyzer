@@ -54,6 +54,8 @@ class Duplication:
     name: str  # Name of the duplicated element
     line: int  # Line number where duplication starts
     count: int  # Number of duplicates found
+    clone_type: str = "exact"  # exact, renamed, modified, semantic
+    similarity: float = 1.0  # Similarity score (0.0 to 1.0)
     locations: List[Dict[str, Any]] = field(default_factory=list)  # Detailed locations
 
 

@@ -4,10 +4,13 @@ Code Insight Analyzer CLI
 
 import typer
 import json
+import signal
+import sys
 from typing import List, Dict, Any
 from pathlib import Path
 
 from codeinsight.scanner import Scanner
+from codeinsight.watcher import CodeWatcher
 from codeinsight.models.metrics import AnalysisReport
 from codeinsight.exporters.json_exporter import JSONExporter
 from codeinsight.exporters.csv_exporter import CSVExporter
@@ -585,6 +588,188 @@ def _display_comparison_terminal(
             f"  Total Size: {summary['total_size']['report1']:,} -> {summary['total_size']['report2']:,} "
             f"({summary['total_size']['difference']:+d}, {summary['total_size']['percentage_change']:+.1f}%)"
         )
+
+
+def _display_live_terminal(
+    report: AnalysisReport, show_complexity: bool, top_files: int = 20
+) -> None:
+    """Display results in terminal with Rich formatting for live updates."""
+    try:
+        from rich.console import Console
+        from rich.table import Table
+        from rich.panel import Panel
+        from rich.live import Live
+
+        console = Console()
+
+        # Create the display components
+        def create_display():
+            # Display main header
+            header = Panel(
+                f"[bold]Code Insight Analyzer v1.0 (Live)[/bold]\n"
+                f"[cyan]Project:[/cyan] {report.project_path}\n"
+                f"[yellow]Last Updated:[/yellow] {report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
+                expand=False,
+            )
+
+            # Display analysis summary
+            summary_text = f"""
+[bold]📊 Analysis Summary[/bold]
+──────────────────
+Total Files:     {report.total_files:,}
+Lines of Code:   {report.total_lines:,}
+Total Size:      {report.total_size:,} bytes"""
+
+            # Language distribution summary
+            if report.language_distribution:
+                lang_summary = []
+                for lang, count in sorted(
+                    report.language_distribution.items(),
+                    key=lambda x: x[1],
+                    reverse=True,
+                )[:3]:
+                    percentage = (count / report.total_files) * 100
+                    lang_summary.append(f"{lang.value} ({percentage:.0f}%)")
+                summary_text += f"\nLanguages:       {', '.join(lang_summary)}"
+
+            # Display top files by line count
+            files_table = Table(show_header=True, title="📁 Top Files by Line Count")
+            files_table.add_column("File", style="cyan")
+            files_table.add_column("Lines", justify="right", style="green")
+            files_table.add_column("Size", justify="right", style="magenta")
+
+            for file_insight in report.top_files[:top_files]:
+                files_table.add_row(
+                    str(file_insight.file_metrics.relative_path),
+                    str(file_insight.file_metrics.lines_of_code),
+                    f"{file_insight.file_metrics.size_bytes:,} bytes",
+                )
+
+            return header, summary_text, files_table
+
+        # For now, we'll just print the updated report each time
+        # In a more advanced implementation, we could use Rich's Live display
+        console.clear()
+        header, summary_text, files_table = create_display()
+        console.print(header)
+        console.print(summary_text)
+        console.print(files_table)
+
+        # Display complexity if requested
+        if show_complexity:
+            complex_files = [f for f in report.top_files if f.complexity_metrics]
+            if complex_files:
+                complexity_table = Table(
+                    show_header=True, title="🔥 Complexity Hotspots"
+                )
+                complexity_table.add_column("File", style="cyan")
+                complexity_table.add_column("Lines", justify="right", style="green")
+                complexity_table.add_column(
+                    "Complexity", justify="right", style="yellow"
+                )
+                complexity_table.add_column("Risk Level", justify="center")
+
+                for file_insight in complex_files[:5]:
+                    complexity = file_insight.complexity_metrics
+                    if complexity is not None:
+                        cyclomatic = complexity.cyclomatic_complexity
+
+                        # Determine risk level
+                        if cyclomatic > 20:
+                            risk_level = "[red]🔴 High[/red]"
+                        elif cyclomatic > 10:
+                            risk_level = "[orange]🟠 Medium[/orange]"
+                        elif cyclomatic > 5:
+                            risk_level = "[yellow]🟡 Low[/yellow]"
+                        else:
+                            risk_level = "[green]🟢 Good[/green]"
+
+                        complexity_table.add_row(
+                            str(file_insight.file_metrics.relative_path),
+                            str(file_insight.file_metrics.lines_of_code),
+                            f"{cyclomatic:.1f}",
+                            risk_level,
+                        )
+
+                console.print(complexity_table)
+
+    except ImportError:
+        # Fallback to basic output
+        print("\033[2J\033[H")  # Clear screen and move cursor to top-left
+        print("Code Insight Analyzer v1.0 (Live)")
+        print(f"Project: {report.project_path}")
+        print(f"Last Updated: {report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+        print("\n📊 Analysis Summary")
+        print("──────────────────")
+        print(f"  Total Files:        {report.total_files:,}")
+        print(f"  Lines of Code:      {report.total_lines:,}")
+        print(f"  Total Size:         {report.total_size:,} bytes")
+
+        if report.language_distribution:
+            lang_summary = []
+            for lang, count in sorted(
+                report.language_distribution.items(), key=lambda x: x[1], reverse=True
+            )[:3]:
+                percentage = (count / report.total_files) * 100
+                lang_summary.append(f"{lang.value} ({percentage:.0f}%)")
+            print(f"  Languages:          {', '.join(lang_summary)}")
+
+        print(f"\n📁 Top Files by Line Count (Top {top_files})")
+        print("─" * (33 + len(str(top_files))))
+        print("  {:<30} {:<6} {:<12}".format("File", "Lines", "Size"))
+        print("  " + "─" * 50)
+
+        for file_insight in report.top_files[:top_files]:
+            print(
+                "  {:<30} {:<6} {:<12}".format(
+                    str(file_insight.file_metrics.relative_path)[:30],
+                    file_insight.file_metrics.lines_of_code,
+                    f"{file_insight.file_metrics.size_bytes:,} bytes",
+                )
+            )
+
+
+@app.command()
+def watch(
+    path: Path = typer.Argument(..., help="Path to watch"),
+    complexity: bool = typer.Option(
+        False, "--complexity", "-c", help="Include complexity analysis"
+    ),
+    top_files: int = typer.Option(
+        20, "--top-files", "-t", help="Number of top files to display [default: 20]"
+    ),
+) -> None:
+    """Watch a codebase for changes and display real-time analysis."""
+    typer.echo(f"Watching {path} for changes... Press Ctrl+C to stop.")
+
+    # Create watcher
+    watcher = CodeWatcher(path)
+
+    # Handle Ctrl+C gracefully
+    def signal_handler(sig, frame):
+        typer.echo("\nStopping watcher...")
+        watcher.stop()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+
+    # Start watching
+    try:
+        watcher.start(
+            analysis_callback=lambda report: _display_live_terminal(
+                report, complexity, top_files
+            ),
+            include_complexity=complexity,
+        )
+
+        # Keep the process running
+        while True:
+            import time
+
+            time.sleep(1)
+    except KeyboardInterrupt:
+        typer.echo("\nStopping watcher...")
+        watcher.stop()
 
 
 if __name__ == "__main__":

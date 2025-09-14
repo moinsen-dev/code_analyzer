@@ -28,6 +28,7 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
 - CI/CD integration support (GitHub Actions, GitLab CI)
+- Real-time file watching for live code analysis
 
 ## Installation
 
@@ -62,6 +63,16 @@ uv run code_analyzer analyze /path/to/project
 
 # Include complexity analysis
 uv run code_analyzer analyze . --complexity
+```
+
+### Real-time Watching
+
+```bash
+# Watch current directory for changes
+uv run code_analyzer watch .
+
+# Watch with complexity analysis
+uv run code_analyzer watch . --complexity
 ```
 
 ### Output Formats

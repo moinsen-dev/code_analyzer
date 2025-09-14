@@ -1,6 +1,6 @@
 [project]
 name = "code_analyzer"
-version = "0.2.0"
+version = "0.2.1"
 description = "A Python-based command-line tool that provides comprehensive analysis of source code repositories"
 authors = [
     { name = "Code Analyzer Team", email = "code_analyzer@example.com" }
@@ -28,7 +28,8 @@ dependencies = [
     "jinja2>=3.1.6",
     "openpyxl>=3.1.5",
     "pathspec>=0.12.1",
-    "pyyaml>=6.0.2"
+    "pyyaml>=6.0.2",
+    "watchdog>=6.0.0",
 ]
 
 [project.scripts]

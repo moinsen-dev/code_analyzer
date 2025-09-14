@@ -1,9 +1,9 @@
-name: 'Code Analyzer'
+name: 'Refactoroscope'
 description: 'Analyze your codebase for insights on complexity, code smells, and more'
-author: 'Code Analyzer Team'
+author: 'Refactoroscope Team'
 inputs:
   args:
-    description: 'Arguments to pass to the code_analyzer analyze command'
+    description: 'Arguments to pass to the refactoroscope analyze command'
     required: false
     default: 'analyze .'
 runs:

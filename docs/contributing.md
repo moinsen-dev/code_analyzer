@@ -5,7 +5,7 @@ title: Contributing
 
 # Contributing
 
-We welcome contributions to the Code Insight Analyzer project! This document provides guidelines for contributing to the project.
+We welcome contributions to the Refactoroscope project! This document provides guidelines for contributing to the project.
 
 ## Getting Started
 

@@ -53,67 +53,6 @@ wheels = [
 ]
 
 [[package]]
-name = "code-analyzer"
-version = "0.3.0"
-source = { editable = "." }
-dependencies = [
-    { name = "flake8" },
-    { name = "jinja2" },
-    { name = "lizard" },
-    { name = "openpyxl" },
-    { name = "pandas" },
-    { name = "pathspec" },
-    { name = "pydantic" },
-    { name = "pygments" },
-    { name = "pyyaml" },
-    { name = "radon" },
-    { name = "rich" },
-    { name = "typer" },
-    { name = "watchdog" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "black" },
-    { name = "mypy" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-benchmark" },
-    { name = "pytest-cov" },
-    { name = "pytest-mock" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "flake8", specifier = ">=7.3.0" },
-    { name = "jinja2", specifier = ">=3.1.6" },
-    { name = "lizard", specifier = ">=1.17.31" },
-    { name = "openpyxl", specifier = ">=3.1.5" },
-    { name = "pandas", specifier = ">=2.3.2" },
-    { name = "pathspec", specifier = ">=0.12.1" },
-    { name = "pydantic", specifier = ">=2.11.9" },
-    { name = "pygments", specifier = ">=2.19.2" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "radon", specifier = ">=6.0.1" },
-    { name = "rich", specifier = ">=14.1.0" },
-    { name = "typer", specifier = ">=0.17.4" },
-    { name = "watchdog", specifier = ">=6.0.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "black", specifier = ">=25.1.0" },
-    { name = "mypy", specifier = ">=1.18.1" },
-    { name = "pre-commit", specifier = ">=4.3.0" },
-    { name = "pytest", specifier = ">=8.4.2" },
-    { name = "pytest-benchmark", specifier = ">=5.1.0" },
-    { name = "pytest-cov", specifier = ">=7.0.0" },
-    { name = "pytest-mock", specifier = ">=3.15.0" },
-    { name = "ruff", specifier = ">=0.13.0" },
-]
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -699,6 +638,67 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/6d/98e61600febf6bd929cf04154537c39dc577ce414bafbfc24a286c4fa76d/radon-6.0.1.tar.gz", hash = "sha256:d1ac0053943a893878940fedc8b19ace70386fc9c9bf0a09229a44125ebf45b5", size = 1874992, upload-time = "2023-03-26T06:24:38.868Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/93/f7/d00d9b4a0313a6be3a3e0818e6375e15da6d7076f4ae47d1324e7ca986a1/radon-6.0.1-py2.py3-none-any.whl", hash = "sha256:632cc032364a6f8bb1010a2f6a12d0f14bc7e5ede76585ef29dc0cecf4cd8859", size = 52784, upload-time = "2023-03-26T06:24:33.949Z" },
+]
+
+[[package]]
+name = "refactoroscope"
+version = "0.3.1"
+source = { editable = "." }
+dependencies = [
+    { name = "flake8" },
+    { name = "jinja2" },
+    { name = "lizard" },
+    { name = "openpyxl" },
+    { name = "pandas" },
+    { name = "pathspec" },
+    { name = "pydantic" },
+    { name = "pygments" },
+    { name = "pyyaml" },
+    { name = "radon" },
+    { name = "rich" },
+    { name = "typer" },
+    { name = "watchdog" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-benchmark" },
+    { name = "pytest-cov" },
+    { name = "pytest-mock" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "flake8", specifier = ">=7.3.0" },
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "lizard", specifier = ">=1.17.31" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
+    { name = "pandas", specifier = ">=2.3.2" },
+    { name = "pathspec", specifier = ">=0.12.1" },
+    { name = "pydantic", specifier = ">=2.11.9" },
+    { name = "pygments", specifier = ">=2.19.2" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "radon", specifier = ">=6.0.1" },
+    { name = "rich", specifier = ">=14.1.0" },
+    { name = "typer", specifier = ">=0.17.4" },
+    { name = "watchdog", specifier = ">=6.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=25.1.0" },
+    { name = "mypy", specifier = ">=1.18.1" },
+    { name = "pre-commit", specifier = ">=4.3.0" },
+    { name = "pytest", specifier = ">=8.4.2" },
+    { name = "pytest-benchmark", specifier = ">=5.1.0" },
+    { name = "pytest-cov", specifier = ">=7.0.0" },
+    { name = "pytest-mock", specifier = ">=3.15.0" },
+    { name = "ruff", specifier = ">=0.13.0" },
 ]
 
 [[package]]

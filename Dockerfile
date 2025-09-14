@@ -6,8 +6,8 @@ RUN pip install uv
 # Set working directory
 WORKDIR /app
 
-# Install code_analyzer
-RUN uv pip install code_analyzer
+# Install Refactoroscope
+RUN uv pip install refactoroscope
 
 # Set entrypoint
-ENTRYPOINT ["code_analyzer"]
+ENTRYPOINT ["refactoroscope"]

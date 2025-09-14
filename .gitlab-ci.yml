@@ -51,7 +51,7 @@ analyze:
   stage: analyze
   image: python:$PYTHON_VERSION
   script:
-    - uv run code_analyzer analyze . --complexity --export json,html --export-dir ./reports
+    - uv run refactoroscope analyze . --complexity --export json,html --export-dir ./reports
   artifacts:
     paths:
       - reports/

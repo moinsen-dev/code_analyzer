@@ -1,5 +1,5 @@
 """
-Configuration manager for Code Insight Analyzer
+Configuration manager for Refactoroscope
 """
 
 import yaml
@@ -17,8 +17,8 @@ class ConfigManager:
         self.config: Config = self._load_config()
 
     def _load_config(self) -> Config:
-        """Load configuration from .code_analyzer.yml file or use defaults"""
-        config_path = self.project_path / ".code_analyzer.yml"
+        """Load configuration from .refactoroscope.yml file or use defaults"""
+        config_path = self.project_path / ".refactoroscope.yml"
 
         if config_path.exists():
             try:

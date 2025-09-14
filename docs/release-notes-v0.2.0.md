@@ -17,7 +17,7 @@ In this release, we've implemented comprehensive CI/CD integration support for C
 - **Pre-configured Stages**: Set up stages for test, analyze, and deploy with appropriate artifacts and caching
 
 ### 3. Documentation
-- **CI/CD Integration Guide**: Created detailed documentation explaining how to integrate Code Insight Analyzer into both GitHub Actions and GitLab CI/CD pipelines
+- **CI/CD Integration Guide**: Created detailed documentation explaining how to integrate Refactoroscope into both GitHub Actions and GitLab CI/CD pipelines
 - **README Updates**: Added CI/CD badges and integration instructions to the main README
 - **Examples**: Provided practical examples for both GitHub Actions and GitLab CI integrations
 

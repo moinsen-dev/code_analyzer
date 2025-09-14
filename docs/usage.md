@@ -101,7 +101,7 @@ uv run code_analyzer compare reports/2025-01-01.json reports/2025-01-15.json
 
 ## Configuration
 
-Create a `.code_analyzer.yml` file in your project root for custom settings:
+Create a `.refactoroscope.yml` file in your project root for custom settings:
 
 ```yaml
 version: 1.0

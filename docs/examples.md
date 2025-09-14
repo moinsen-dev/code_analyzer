@@ -16,7 +16,7 @@ uv run code_analyzer analyze .
 Output:
 ```
 ╭──────────────────────────────────╮
-│ Code Insight Analyzer v1.0       │
+│ Refactoroscope v1.0                     │
 │ Project: examples/sample_project │
 ╰──────────────────────────────────╯
 
@@ -34,7 +34,7 @@ Output:
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━┩
 │ smelly.py        │    67 │ 2,161 bytes │
 │ calculator.py    │    44 │ 1,749 bytes │
-│ .code_analyzer.yml │    30 │   715 bytes │
+│ .refactoroscope.yml │    30 │   715 bytes │
 │ greeter.js       │    18 │   466 bytes │
 │ .gitignore       │     3 │    18 bytes │
 │ README.md        │     1 │    84 bytes │
@@ -168,7 +168,7 @@ Complexity Changes:
 
 ### Basic Configuration
 
-Create a `.code_analyzer.yml` file:
+Create a `.refactoroscope.yml` file:
 
 ```yaml
 version: 1.0

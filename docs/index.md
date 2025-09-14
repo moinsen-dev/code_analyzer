@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Code Insight Analyzer
+title: Refactoroscope
 ---
 
 # Code Analyzer Documentation
@@ -20,7 +20,7 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
 - Export results to JSON/CSV/HTML
-- Configuration file support (.code_analyzer.yml)
+- Configuration file support (.refactoroscope.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
 - CI/CD integration support (GitHub Actions, GitLab CI)
@@ -49,7 +49,7 @@ uv run code_analyzer analyze . --export json,html --export-dir ./reports
 
 ## Supported Languages
 
-The Code Insight Analyzer supports 60+ programming languages:
+The Refactoroscope supports 60+ programming languages:
 
 - **Primary**: Python, JavaScript/TypeScript, Java, C#, C++/C, Go, Rust
 - **Mobile**: Dart/Flutter, Swift, Kotlin

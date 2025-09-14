@@ -12,7 +12,7 @@ title: API Reference
 Analyzes a codebase and displays results.
 
 ```bash
-code_analyzer analyze [PATH] [OPTIONS]
+refactoroscope analyze [PATH] [OPTIONS]
 ```
 
 **Arguments:**
@@ -31,7 +31,7 @@ code_analyzer analyze [PATH] [OPTIONS]
 Compares two analysis reports.
 
 ```bash
-code_analyzer compare [REPORT1_PATH] [REPORT2_PATH] [OPTIONS]
+refactoroscope compare [REPORT1_PATH] [REPORT2_PATH] [OPTIONS]
 ```
 
 **Arguments:**
@@ -44,10 +44,10 @@ code_analyzer compare [REPORT1_PATH] [REPORT2_PATH] [OPTIONS]
 
 ### init
 
-Initializes a .code_analyzer.yml configuration file.
+Initializes a .refactoroscope.yml configuration file.
 
 ```bash
-code_analyzer init [PATH] [OPTIONS]
+refactoroscope init [PATH] [OPTIONS]
 ```
 
 **Arguments:**
@@ -59,7 +59,7 @@ code_analyzer init [PATH] [OPTIONS]
 
 ## Configuration File
 
-The `.code_analyzer.yml` file supports the following configuration options:
+The `.refactoroscope.yml` file supports the following configuration options:
 
 ### version
 

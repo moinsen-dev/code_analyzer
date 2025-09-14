@@ -1,5 +1,5 @@
 """
-Configuration models for Code Insight Analyzer
+Configuration models for Refactoroscope
 """
 
 from typing import Dict, List

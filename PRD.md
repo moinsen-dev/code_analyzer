@@ -1,5 +1,5 @@
 # Product Requirement Document
-## Code Analyzer
+## Refactoroscope
 
 **Version:** 1.0  
 **Date:** January 2025  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-The **Code Analyzer** is a Python-based command-line tool that provides comprehensive analysis of source code repositories. It respects `.gitignore` rules, counts lines of code, measures file sizes, and analyzes code complexity metrics. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
+The **Refactoroscope** is a Python-based command-line tool that provides comprehensive analysis of source code repositories. It respects `.gitignore` rules, counts lines of code, measures file sizes, and analyzes code complexity metrics. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
 
 ### Key Differentiators
 - **Modern Stack**: Python 3.13 with uv package manager for blazing-fast dependency management
@@ -50,7 +50,7 @@ The **Code Analyzer** is a Python-based command-line tool that provides comprehe
 - uv package manager integration
 - Code complexity analysis (Cyclomatic, Cognitive)
 - Export results to JSON/CSV/HTML
-- Configuration file support (.code_analyzer.yml)
+- Configuration file support (.refactoroscope.yml)
 
 ### Secondary Goals (Should Have)
 ✅ **Implemented:**
@@ -87,7 +87,7 @@ The **Code Analyzer** is a Python-based command-line tool that provides comprehe
 | Rich terminal output | ✅ Complete | Professional UI with Rich library |
 | Code complexity analysis | ✅ Complete | Cyclomatic, Cognitive, Maintainability, Technical Debt, Halstead metrics |
 | Export functionality | ✅ Complete | JSON, CSV, HTML export formats |
-| Configuration system | ✅ Complete | .code_analyzer.yml support for custom settings |
+| Configuration system | ✅ Complete | .refactoroscope.yml support for custom settings |
 | Code smell detection | ✅ Complete | Detects 7+ types of code smells |
 | Historical tracking | ✅ Complete | Compare command for analyzing changes over time |
 | Language support | ✅ Complete | 20+ programming languages supported |
@@ -267,7 +267,7 @@ class ComplexityAnalyzer:
 
 ### 5.2 Configuration System
 
-**File: `.code_analyzer.yml`**
+**File: `.refactoroscope.yml`**
 ```yaml
 version: 1.0
 
@@ -309,25 +309,28 @@ output:
 ### 5.3 Command-Line Interface
 
 ```bash
-# Basic usage with uv
-uv run code_analyzer analyze .
+# Basic usage with uv (complexity analysis is now enabled by default)
+uv run refactoroscope analyze .
 
-# With complexity analysis
-uv run code_analyzer analyze . --complexity
+# Disable complexity analysis (if needed)
+uv run refactoroscope analyze . --no-complexity
 
 # Export to multiple formats
-uv run code_analyzer analyze . \\
+uv run refactoroscope analyze . \\
   --output terminal \\
   --export json,html \\
   --export-dir ./reports
 
 # Compare two analyses
-uv run code_analyzer compare \\
+uv run refactoroscope compare \\
   ./reports/2025-01-01.json \\
   ./reports/2025-01-15.json
 
-# Watch mode for real-time analysis (planned)
-uv run code_analyzer watch . --complexity
+# Watch mode for real-time analysis (complexity analysis is now enabled by default)
+uv run refactoroscope watch .
+
+# Disable complexity analysis in watch mode (if needed)
+uv run refactoroscope watch . --no-complexity
 ```
 
 ---
@@ -338,7 +341,7 @@ uv run code_analyzer watch . --complexity
 
 ```
 ╭──────────────────────────────────╮
-│ Code Insight Analyzer v1.0       │
+│ Refactoroscope v1.0                     │
 │ Project: examples/sample_project │
 ╰──────────────────────────────────╯
 
@@ -365,7 +368,7 @@ uv run code_analyzer watch . --complexity
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━┩
 │ smelly.py        │    67 │ 2,161 bytes │
 │ calculator.py    │    44 │ 1,749 bytes │
-│ .code_analyzer.yml │    30 │   715 bytes │
+│ .refactoroscope.yml │    30 │   715 bytes │
 │ greeter.js       │    18 │   466 bytes │
 │ .gitignore       │     3 │    18 bytes │
 │ README.md        │     1 │    84 bytes │
@@ -553,7 +556,7 @@ RUN uv sync --frozen
 
 COPY . .
 
-ENTRYPOINT ["uv", "run", "code_analyzer"]
+ENTRYPOINT ["uv", "run", "refactoroscope"]
 ```
 
 ---
@@ -651,7 +654,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: astral/setup-uv@v1
       - run: uv sync
-      - run: uv run code_analyzer analyze . --export json
+      - run: uv run refactoroscope analyze . --export json
       - uses: actions/upload-artifact@v3
         with:
           name: code-analysis

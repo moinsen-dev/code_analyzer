@@ -18,7 +18,7 @@ If you don't have uv installed, you can install it with:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-## Installing Code Insight Analyzer
+## Installing Refactoroscope
 
 ### From Source
 

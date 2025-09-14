@@ -3,19 +3,19 @@ layout: default
 title: Configuration
 ---
 
-# Configuration
+The Refactoroscope can be configured using a `.refactoroscope.yml` file in your project root.
 
-The Code Analyzer can be configured using a `.code_analyzer.yml` file in your project root.
+This file allows you to customize language-specific settings, analysis rules, and output preferences.
 
 ## Creating a Configuration File
 
-You can create a configuration file using the `init` command:
+To create a configuration file, run:
 
 ```bash
-uv run code_analyzer init
+refactoroscope init
 ```
 
-This will create a `.code_analyzer.yml` file with default settings.
+This will create a `.refactoroscope.yml` file with default settings.
 
 To overwrite an existing configuration file:
 

@@ -1,4 +1,4 @@
-name: Code Analyzer
+name: Refactoroscope Analysis
 
 on:
   push:
@@ -20,13 +20,13 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v3
 
-    - name: Install code_analyzer
+    - name: Install Refactoroscope
       run: |
-        uv pip install code_analyzer
+        uv pip install refactoroscope
 
-    - name: Run code analysis
+    - name: Run Refactoroscope Analysis
       run: |
-        code_analyzer analyze . --complexity --export json,html --export-dir ./reports
+        refactoroscope analyze . --export json,html --export-dir ./reports
 
     - name: Upload analysis reports
       uses: actions/upload-artifact@v4

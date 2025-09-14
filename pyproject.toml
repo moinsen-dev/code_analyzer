@@ -1,9 +1,9 @@
 [project]
-name = "code_analyzer"
-version = "0.3.0"
+name = "refactoroscope"
+version = "0.3.1"
 description = "A Python-based command-line tool that provides comprehensive analysis of source code repositories"
 authors = [
-    { name = "Code Analyzer Team", email = "code_analyzer@example.com" }
+    { name = "Refactoroscope Team", email = "refactoroscope@example.com" }
 ]
 readme = "README.md"
 license = { text = "MIT" }
@@ -33,14 +33,14 @@ dependencies = [
 ]
 
 [project.scripts]
-code_analyzer = "codeinsight.cli:app"
+refactoroscope = "codeinsight.cli:app"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

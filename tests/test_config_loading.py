@@ -11,7 +11,7 @@ from codeinsight.scanner import Scanner
 
 
 def test_configuration_loading():
-    """Test that local .code_analyzer.yml is properly loaded and used"""
+    """Test that local .refactoroscope.yml is properly loaded and used"""
     # Create a temporary directory with a custom config
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
@@ -40,7 +40,7 @@ def test_configuration_loading():
         }
 
         # Write the custom config
-        config_path = temp_path / ".code_analyzer.yml"
+        config_path = temp_path / ".refactoroscope.yml"
         with open(config_path, "w") as f:
             yaml.dump(custom_config, f)
 

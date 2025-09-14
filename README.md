@@ -1,17 +1,17 @@
-# Code Analyzer
+# Refactoroscope
 
 [![Build Status](https://github.com/moinsen-dev/code-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/moinsen-dev/code-analyzer/actions)
 [![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/github/license/moinsen-dev/code-analyzer)](LICENSE)
 [![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/code-analyzer)](https://codecov.io/gh/moinsen-dev/code-analyzer)
-[![PyPI version](https://badge.fury.io/py/code_analyzer.svg)](https://badge.fury.io/py/code_analyzer)
+[![PyPI version](https://badge.fury.io/py/refactoroscope.svg)](https://badge.fury.io/py/refactoroscope)
 [![CI/CD Integration](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20%26%20GitLab%20CI-blue)](docs/ci-cd-integration.md)
 
-![Code Analyzer Icon](code-analyzer-icon.png)
+![Refactoroscope Icon](code-analyzer-icon.png)
 
 A Python-based command-line tool that provides comprehensive analysis of source code repositories. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
 
-![Code Analyzer Wallpaper](code-analyzer-wallpaper.png)
+![Refactoroscope Wallpaper](code-analyzer-wallpaper.png)
 
 ## Features
 
@@ -24,7 +24,7 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
 - Export results to JSON/CSV/HTML
-- Configuration file support (.code_analyzer.yml)
+- Configuration file support (.refactoroscope.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
 - CI/CD integration support (GitHub Actions, GitLab CI)
@@ -50,17 +50,17 @@ The Code Analyzer provides advanced AST-based duplicate code detection with the 
 The duplicate detection can be customized with the `duplicates` command:
 
 ```bash
-# Analyze for exact duplicates only
-uv run code_analyzer duplicates src/ --type exact
+# Analyze for exact duplicates only (complexity analysis is now included by default)
+uv run refactoroscope duplicates src/ --type exact
 
 # Find similar code with minimum similarity threshold
-uv run code_analyzer duplicates src/ --min-similarity 0.8
+uv run refactoroscope duplicates src/ --min-similarity 0.8
 
 # Focus on renamed clones
-uv run code_analyzer duplicates src/ --type renamed
+uv run refactoroscope duplicates src/ --type renamed
 ```
 
-## Installation
+### Installation
 
 First, install [uv](https://github.com/astral-sh/uv) if you haven't already:
 
@@ -77,7 +77,7 @@ uv sync
 Or install directly from PyPI:
 
 ```bash
-pip install code_analyzer
+pip install refactoroscope
 ```
 
 ## Usage
@@ -85,50 +85,50 @@ pip install code_analyzer
 ### Basic Analysis
 
 ```bash
-# Analyze current directory
-uv run code_analyzer analyze .
+# Analyze current directory (complexity analysis is now enabled by default)
+uv run refactoroscope analyze .
 
 # Analyze specific directory
-uv run code_analyzer analyze /path/to/project
+uv run refactoroscope analyze /path/to/project
 
-# Include complexity analysis
-uv run code_analyzer analyze . --complexity
+# Disable complexity analysis (if needed)
+uv run refactoroscope analyze . --no-complexity
 ```
 
 ### Real-time Watching
 
 ```bash
-# Watch current directory for changes
-uv run code_analyzer watch .
+# Watch current directory for changes (complexity analysis is now enabled by default)
+uv run refactoroscope watch .
 
-# Watch with complexity analysis
-uv run code_analyzer watch . --complexity
+# Disable complexity analysis (if needed)
+uv run refactoroscope watch . --no-complexity
 ```
 
 ### Output Formats
 
 ```bash
 # Display in terminal (default)
-uv run code_analyzer analyze . --output terminal
+uv run refactoroscope analyze . --output terminal
 
 # Export to JSON
-uv run code_analyzer analyze . --export json --export-dir ./reports
+uv run refactoroscope analyze . --export json --export-dir ./reports
 
 # Export to multiple formats
-uv run code_analyzer analyze . --export json,html --export-dir ./reports
+uv run refactoroscope analyze . --export json,html --export-dir ./reports
 ```
 
 ### Advanced Usage
 
 ```bash
 # Compare two analysis reports
-uv run code_analyzer compare reports/report1.json reports/report2.json
+uv run refactoroscope compare reports/report1.json reports/report2.json
 
 # Initialize configuration file
-uv run code_analyzer init
+uv run refactoroscope init
 
 # Analyze for duplicate code with advanced options
-uv run code_analyzer duplicates src/ --type exact --min-similarity 0.9
+uv run refactoroscope duplicates src/ --type exact --min-similarity 0.9
 ```
 
 ## Supported Languages
@@ -145,7 +145,7 @@ The Code Analyzer supports 60+ programming languages:
 
 ## Configuration
 
-Create a `.code_analyzer.yml` file in your project root:
+Create a `.refactoroscope.yml` file in your project root:
 
 ```yaml
 version: 1.0
@@ -191,7 +191,7 @@ Code Analyzer provides built-in support for popular CI/CD platforms:
 
 ### GitHub Actions
 
-To integrate Code Analyzer into your GitHub Actions workflow, create a workflow file in `.github/workflows/`:
+To integrate Refactoroscope into your GitHub Actions workflow, create a workflow file in `.github/workflows/`:
 
 ```yaml
 name: Code Analysis
@@ -214,13 +214,13 @@ Alternatively, you can install and run it directly:
 - name: Install uv
   uses: astral-sh/setup-uv@v3
 
-- name: Install code_analyzer
+- name: Install Refactoroscope
   run: |
-    uv pip install code_analyzer
+    uv pip install refactoroscope
 
 - name: Run analysis
   run: |
-    code_analyzer analyze . --complexity --export json,html --export-dir ./reports
+    refactoroscope analyze . --complexity --export json,html --export-dir ./reports
 ```
 
 ### GitLab CI
@@ -231,8 +231,8 @@ For GitLab CI, add this to your `.gitlab-ci.yml`:
 analyze:
   stage: test
   script:
-    - pip install code_analyzer
-    - code_analyzer analyze . --complexity --export json,html --export-dir ./reports
+    - pip install refactoroscope
+    - refactoroscope analyze . --complexity --export json,html --export-dir ./reports
   artifacts:
     paths:
       - reports/

@@ -1,5 +1,5 @@
 """
-Test file for Code Insight Analyzer
+Test file for Refactoroscope
 """
 
 import tempfile
@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def test_basic_functionality():
-    """Test basic functionality of the code insight analyzer"""
+    """Test basic functionality of the Refactoroscope"""
     # Create a temporary directory with some test files
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)

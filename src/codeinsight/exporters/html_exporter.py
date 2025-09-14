@@ -345,7 +345,7 @@ class HTMLExporter:
 <body>
     <div class="container">
         <div class="header">
-            <h1>Code Insight Analyzer Report</h1>
+            <h1>Refactoroscope Report</h1>
             <p>Project: {report.project_path}</p>
             <p>Analysis Timestamp: {report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}</p>
         </div>

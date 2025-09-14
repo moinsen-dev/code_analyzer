@@ -1,5 +1,5 @@
 """
-Code Insight Analyzer CLI
+Refactoroscope CLI
 """
 
 import typer
@@ -18,7 +18,7 @@ from codeinsight.exporters.html_exporter import HTMLExporter
 from codeinsight.analysis.comparator import ReportComparator
 
 app = typer.Typer(
-    name="code_analyzer",
+    name="refactoroscope",
     help="A comprehensive code analysis tool",
 )
 
@@ -30,8 +30,8 @@ def init(
         False, "--force", "-f", help="Overwrite existing configuration file"
     ),
 ) -> None:
-    """Initialize a .code_analyzer.yml configuration file in the project directory."""
-    config_path = path / ".code_analyzer.yml"
+    """Initialize a .refactoroscope.yml configuration file in the project directory."""
+    config_path = path / ".refactoroscope.yml"
 
     if config_path.exists() and not force:
         typer.echo(f"Configuration file already exists at {config_path}")
@@ -82,7 +82,7 @@ output:
     try:
         with open(config_path, "w") as f:
             f.write(default_config)
-        typer.echo(f"Created .code_analyzer.yml configuration file at {config_path}")
+        typer.echo(f"Created .refactoroscope.yml configuration file at {config_path}")
     except Exception as e:
         typer.echo(f"Error creating configuration file: {e}")
         raise typer.Exit(1)
@@ -92,7 +92,10 @@ output:
 def analyze(
     path: Path = typer.Argument(..., help="Path to analyze"),
     complexity: bool = typer.Option(
-        False, "--complexity", "-c", help="Include complexity analysis"
+        True,
+        "--complexity/--no-complexity",
+        "-c/-C",
+        help="Include complexity analysis [default: enabled]",
     ),
     duplicates: bool = typer.Option(
         True,
@@ -153,7 +156,7 @@ def _display_terminal(
         # Display main header
         console.print(
             Panel(
-                f"[bold]Code Insight Analyzer v1.0[/bold]\n"
+                f"[bold]Refactoroscope v1.0[/bold]\n"
                 f"[cyan]Project:[/cyan] {report.project_path}",
                 expand=False,
             )
@@ -314,7 +317,7 @@ def _display_terminal(
 
     except ImportError:
         # Fallback to basic output
-        print("Code Insight Analyzer v1.0")
+        print("Refactoroscope v1.0")
         print(f"Project: {report.project_path}")
         print("\n📊 Analysis Summary")
         print("──────────────────")
@@ -621,7 +624,7 @@ def _display_live_terminal(
         def create_display() -> tuple:
             # Display main header
             header = Panel(
-                f"[bold]Code Insight Analyzer v1.0 (Live)[/bold]\n"
+                f"[bold]Refactoroscope v1.0 (Live)[/bold]\n"
                 f"[cyan]Project:[/cyan] {report.project_path}\n"
                 f"[yellow]Last Updated:[/yellow] {report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
                 expand=False,
@@ -711,7 +714,7 @@ Total Size:      {report.total_size:,} bytes"""
     except ImportError:
         # Fallback to basic output
         print("\033[2J\033[H")  # Clear screen and move cursor to top-left
-        print("Code Insight Analyzer v1.0 (Live)")
+        print("Refactoroscope v1.0 (Live)")
         print(f"Project: {report.project_path}")
         print(f"Last Updated: {report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
         print("\n📊 Analysis Summary")
@@ -767,7 +770,7 @@ def duplicates(
     scanner = Scanner(path, enable_duplicates=True)
 
     # Perform analysis
-    report = scanner.analyze(path, include_complexity=False)
+    report = scanner.analyze(path, include_complexity=True)
 
     # Display output based on format
     if output == "terminal":
@@ -790,7 +793,7 @@ def _display_duplicates_terminal(
         # Display main header
         console.print(
             Panel(
-                f"[bold]Code Insight Analyzer - Duplicate Code Analysis[/bold]\n"
+                f"[bold]Refactoroscope - Duplicate Code Analysis[/bold]\n"
                 f"[cyan]Project:[/cyan] {report.project_path}",
                 expand=False,
             )
@@ -863,7 +866,7 @@ def _display_duplicates_terminal(
 
     except ImportError:
         # Fallback to basic output
-        print("Code Insight Analyzer - Duplicate Code Analysis")
+        print("Refactoroscope - Duplicate Code Analysis")
         print(f"Project: {report.project_path}")
 
         # Collect all duplications
@@ -918,7 +921,10 @@ def _display_duplicates_terminal(
 def watch(
     path: Path = typer.Argument(..., help="Path to watch"),
     complexity: bool = typer.Option(
-        False, "--complexity", "-c", help="Include complexity analysis"
+        True,
+        "--complexity/--no-complexity",
+        "-c/-C",
+        help="Include complexity analysis [default: enabled]",
     ),
     top_files: int = typer.Option(
         20, "--top-files", "-t", help="Number of top files to display [default: 20]"

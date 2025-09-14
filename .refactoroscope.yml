@@ -1,0 +1,35 @@
+version: 1.0
+
+# Language-specific settings
+languages:
+  python:
+    max_line_length: 88
+    complexity_threshold: 10
+  typescript:
+    max_line_length: 100
+    complexity_threshold: 15
+
+# Analysis rules
+analysis:
+  ignore_patterns:
+    - "*.generated.*"
+    - "*_pb2.py"
+    - "*.min.js"
+    - "node_modules/"
+    - ".git/"
+
+  complexity:
+    include_docstrings: false
+    count_assertions: true
+
+  thresholds:
+    file_too_long: 500
+    function_too_complex: 20
+    class_too_large: 1000
+
+# Output preferences
+output:
+  format: "terminal"  # terminal, json, html, csv
+  theme: "monokai"
+  show_recommendations: true
+  export_path: "./reports"

@@ -1,8 +1,11 @@
-# Code Insight Analyzer - Project Context
+# Refactoroscope - Project Context
+
+## IMPORTANT:
+- Before committing, ensure all tests pass and code is formatted with `black` and alway ask the user for confirmation before committing.
 
 ## Project Overview
 
-The **Code Insight Analyzer** is a Python-based command-line tool designed to provide comprehensive analysis of source code repositories. It functions as an "MRI scanner for your codebase," revealing not just what's there but also the health and complexity of your code structure.
+The **Refactoroscope** is a Python-based command-line tool designed to provide comprehensive analysis of source code repositories. It functions as an "MRI scanner for your codebase," revealing not just what's there but also the health and complexity of your code structure.
 
 ### Key Features
 - Scans directories recursively for source code files
@@ -14,7 +17,7 @@ The **Code Insight Analyzer** is a Python-based command-line tool designed to pr
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
 - Export results to JSON/CSV/HTML
-- Configuration file support (.code_analyzer.yml)
+- Configuration file support (.refactoroscope.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
 
@@ -57,27 +60,27 @@ The project is now in active development with most core features implemented:
    ```bash
    # Install uv (if not already installed)
    curl -LsSf https://astral.sh/uv/install.sh | sh
-   
+
    # Clone repository
    git clone <repository-url>
    cd code-analyzer
-   
+
    # Install dependencies
    uv sync
    ```
 
 2. **Running the Tool**:
    ```bash
-   # Basic usage with uv
-   uv run code_analyzer analyze .
-   
-   # With complexity analysis
-   uv run code_analyzer analyze . --complexity
-   
+   # Basic usage with uv (complexity analysis is now enabled by default)
+   uv run refactoroscope analyze .
+
+   # Disable complexity analysis (if needed)
+   uv run refactoroscope analyze . --no-complexity
+
    # Export to multiple formats
-   uv run code_analyzer analyze . \
-     --output terminal \
-     --export json,html \
+   uv run refactoroscope analyze . \\
+     --output terminal \\
+     --export json,html \\
      --export-dir ./reports
    ```
 

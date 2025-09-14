@@ -1,5 +1,5 @@
 """
-Integration tests for Code Insight Analyzer
+Integration tests for Refactoroscope
 """
 
 import subprocess
@@ -10,7 +10,7 @@ def test_cli_integration():
     """Test that the CLI can be invoked and runs successfully"""
     # Run a basic analysis on the examples directory
     result = subprocess.run(
-        ["code_analyzer", "analyze", "."],
+        ["refactoroscope", "analyze", "."],
         cwd=Path(__file__).parent.parent,
         capture_output=True,
         text=True,
@@ -31,7 +31,7 @@ def test_cli_complexity_integration():
     """Test that the CLI can run complexity analysis"""
     # Run analysis with complexity on the examples directory
     result = subprocess.run(
-        ["code_analyzer", "analyze", ".", "--complexity"],
+        ["refactoroscope", "analyze", ".", "--complexity"],
         cwd=Path(__file__).parent.parent,
         capture_output=True,
         text=True,

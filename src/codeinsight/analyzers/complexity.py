@@ -2,9 +2,9 @@
 Code complexity analyzer using Radon and other tools
 """
 
+import ast
 from pathlib import Path
 from typing import Optional
-import ast
 
 try:
     from radon.complexity import cc_visit
@@ -21,7 +21,7 @@ try:
 except ImportError:
     LIZARD_AVAILABLE = False
 
-from codeinsight.models.metrics import ComplexityMetrics, Language, HalsteadMetrics
+from codeinsight.models.metrics import ComplexityMetrics, HalsteadMetrics, Language
 
 
 class ComplexityAnalyzer:
@@ -140,7 +140,7 @@ class ComplexityAnalyzer:
             try:
                 halstead = self._calculate_halstead_metrics(content)
             except Exception:
-                pass  # Keep default halstead metrics if calculation fails
+                pass  # Keep default halstead metrics if calculation fails - acceptable fallback
 
         return ComplexityMetrics(
             cyclomatic_complexity=avg_ccn,

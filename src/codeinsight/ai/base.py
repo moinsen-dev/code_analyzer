@@ -3,10 +3,11 @@ Base classes and interfaces for AI providers in Refactoroscope
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
 from enum import Enum
-from pydantic import BaseModel
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
 
 
 class AIProviderType(Enum):
@@ -48,7 +49,9 @@ class AIProvider(ABC):
     """Abstract base class for AI providers"""
 
     @abstractmethod
-    def __init__(self, api_key: Optional[str] = None, model: str = None, **kwargs):
+    def __init__(
+        self, api_key: Optional[str] = None, model: Optional[str] = None, **kwargs: Any
+    ) -> None:
         """Initialize the AI provider with credentials and settings"""
         pass
 

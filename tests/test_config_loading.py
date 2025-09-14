@@ -2,8 +2,9 @@
 Test script to verify configuration loading and usage
 """
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
+
 import yaml
 
 from codeinsight.config.manager import ConfigManager

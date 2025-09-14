@@ -5,10 +5,10 @@ Advanced AST-based duplicate code detection
 import ast
 import hashlib
 import time
-from typing import List, Dict, Any, Set, Tuple
-from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Set, Tuple
 
 from codeinsight.models.metrics import Duplication, Language
 
@@ -176,7 +176,7 @@ class ASTNormalizer:
 
         # Create hash from structural elements
         structural_info = "|".join(sorted(structural_elements))
-        return hashlib.md5(structural_info.encode()).hexdigest()
+        return hashlib.md5(structural_info.encode(), usedforsecurity=False).hexdigest()
 
     def _calculate_structure_similarity(self, tree1: ast.AST, tree2: ast.AST) -> float:
         """Calculate similarity based on structural elements"""

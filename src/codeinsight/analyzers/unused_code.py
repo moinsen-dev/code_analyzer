@@ -2,9 +2,10 @@
 Unused code analyzer using AST-based approach
 """
 
-from pathlib import Path
-from typing import List, Set, Dict
 import ast
+from pathlib import Path
+from typing import Dict, List, Set
+
 from codeinsight.models.metrics import Language, UnusedCodeFinding
 
 
@@ -49,28 +50,28 @@ class UnusedCodeVisitor(ast.NodeVisitor):
         self.imports: List[Dict] = []
         self.current_scope: List[str] = []  # Stack of scope names
 
-    def visit_FunctionDef(self, node):
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Track function definitions"""
         self._add_definition("function", node.name, node.lineno)
         self._enter_scope(node.name)
         self.generic_visit(node)
         self._exit_scope()
 
-    def visit_AsyncFunctionDef(self, node):
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
         """Track async function definitions"""
         self._add_definition("function", node.name, node.lineno)
         self._enter_scope(node.name)
         self.generic_visit(node)
         self._exit_scope()
 
-    def visit_ClassDef(self, node):
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """Track class definitions"""
         self._add_definition("class", node.name, node.lineno)
         self._enter_scope(node.name)
         self.generic_visit(node)
         self._exit_scope()
 
-    def visit_Name(self, node):
+    def visit_Name(self, node: ast.Name) -> None:
         """Track variable names"""
         if isinstance(node.ctx, ast.Store):
             # Variable assignment
@@ -80,7 +81,7 @@ class UnusedCodeVisitor(ast.NodeVisitor):
             self.usages.add(node.id)
         self.generic_visit(node)
 
-    def visit_Import(self, node):
+    def visit_Import(self, node: ast.Import) -> None:
         """Track imports"""
         for alias in node.names:
             name = alias.asname if alias.asname else alias.name
@@ -94,7 +95,7 @@ class UnusedCodeVisitor(ast.NodeVisitor):
                 }
             )
 
-    def visit_ImportFrom(self, node):
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Track from imports"""
         for alias in node.names:
             name = alias.asname if alias.asname else alias.name
@@ -109,7 +110,7 @@ class UnusedCodeVisitor(ast.NodeVisitor):
                 }
             )
 
-    def visit_Attribute(self, node):
+    def visit_Attribute(self, node: ast.Attribute) -> None:
         """Track attribute usage"""
         if isinstance(node.ctx, ast.Load):
             # Track attribute access
@@ -118,7 +119,7 @@ class UnusedCodeVisitor(ast.NodeVisitor):
                 self.usages.add(attr_name)
         self.generic_visit(node)
 
-    def _add_definition(self, type_: str, name: str, line: int):
+    def _add_definition(self, type_: str, name: str, line: int) -> None:
         """Add a definition to tracking"""
         if name not in self.definitions:
             self.definitions[name] = []
@@ -131,11 +132,11 @@ class UnusedCodeVisitor(ast.NodeVisitor):
             }
         )
 
-    def _enter_scope(self, name: str):
+    def _enter_scope(self, name: str) -> None:
         """Enter a new scope"""
         self.current_scope.append(name)
 
-    def _exit_scope(self):
+    def _exit_scope(self) -> None:
         """Exit current scope"""
         if self.current_scope:
             self.current_scope.pop()

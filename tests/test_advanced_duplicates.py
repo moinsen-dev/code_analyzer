@@ -8,8 +8,8 @@ from pathlib import Path
 from codeinsight.analysis.advanced_duplicates import (
     AdvancedDuplicateDetector,
     ASTNormalizer,
-    NormalizedAST,
     CloneType,
+    NormalizedAST,
 )
 from codeinsight.models.metrics import Duplication, Language
 

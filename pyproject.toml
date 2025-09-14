@@ -66,6 +66,10 @@ dev-dependencies = [
     "black>=25.1.0",
     "mypy>=1.18.1",
     "pre-commit>=4.3.0",
+    "bandit>=1.7.10",
+    "vulture>=2.13",
+    "isort>=5.13.2",
+    "pip-audit>=0.8.0",
 ]
 
 [tool.pytest.ini_options]
@@ -82,7 +86,29 @@ target-version = "py313"
 [tool.black]
 line-length = 88
 target-version = ['py313']
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | \.direnv
+)/
+'''
 
 [tool.mypy]
 python_version = "3.13"
 strict = true
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["codeinsight"]
+known_third_party = ["anthropic", "google", "jinja2", "lizard", "networkx", "openai", "openpyxl", "pandas", "pathspec", "pydantic", "pygments", "pytest", "radon", "requests", "rich", "typer", "yaml"]

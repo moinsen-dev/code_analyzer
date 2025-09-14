@@ -3,7 +3,8 @@ Factory for creating and managing AI providers in Refactoroscope
 """
 
 import os
-from typing import Dict, Type
+from typing import Any, Dict, Optional, Type
+
 from codeinsight.ai.base import AIProvider, AIProviderType
 from codeinsight.config.manager import ConfigManager
 
@@ -17,12 +18,14 @@ class AIProviderFactory:
     @classmethod
     def register_provider(
         cls, provider_type: AIProviderType, provider_class: Type[AIProvider]
-    ):
+    ) -> None:
         """Register a new AI provider"""
         cls._providers[provider_type] = provider_class
 
     @classmethod
-    def create_provider(cls, provider_type: AIProviderType, **kwargs) -> AIProvider:
+    def create_provider(
+        cls, provider_type: AIProviderType, **kwargs: Any
+    ) -> AIProvider:
         """Create an instance of an AI provider"""
         if provider_type not in cls._providers:
             raise ValueError(f"Provider {provider_type} is not registered")
@@ -32,7 +35,9 @@ class AIProviderFactory:
 
     @classmethod
     def get_provider_instance(
-        cls, provider_type: AIProviderType, config_manager: ConfigManager = None
+        cls,
+        provider_type: AIProviderType,
+        config_manager: Optional[ConfigManager] = None,
     ) -> AIProvider:
         """Get a singleton instance of an AI provider"""
         if provider_type in cls._instances:
@@ -40,10 +45,21 @@ class AIProviderFactory:
 
         # Get configuration
         if config_manager:
-            ai_config = (
-                config_manager.config.ai if hasattr(config_manager.config, "ai") else {}
-            )
-            provider_config = ai_config.get(provider_type.value, {})
+            config_ai = config_manager.config.ai
+            if config_ai is not None:
+                provider_config_obj = config_ai.providers.get(provider_type.value)
+                if provider_config_obj is not None:
+                    # Convert AIProviderConfig to dict
+                    provider_config = {
+                        "api_key": provider_config_obj.api_key,
+                        "model": provider_config_obj.model,
+                        "base_url": provider_config_obj.base_url,
+                        "enabled": provider_config_obj.enabled,
+                    }
+                else:
+                    provider_config = {}
+            else:
+                provider_config = {}
         else:
             provider_config = {}
 
@@ -64,7 +80,9 @@ class AIProviderFactory:
         return provider
 
     @classmethod
-    def get_available_providers(cls, config_manager: ConfigManager = None) -> list:
+    def get_available_providers(
+        cls, config_manager: Optional[ConfigManager] = None
+    ) -> list:
         """Get list of available providers that are properly configured"""
         available = []
         for provider_type in cls._providers:
@@ -74,5 +92,5 @@ class AIProviderFactory:
                     available.append(provider_type)
             except Exception:
                 # Provider not available or misconfigured
-                continue
+                continue  # This is acceptable as we're checking multiple providers
         return available

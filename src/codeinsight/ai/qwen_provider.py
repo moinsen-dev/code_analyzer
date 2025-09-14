@@ -3,13 +3,13 @@ Qwen provider implementation for Refactoroscope
 """
 
 import time
-from typing import Optional
+from typing import Any, Optional
 
 from codeinsight.ai.base import (
-    AIProvider,
-    CodeContext,
     AIAnalysisResult,
+    AIProvider,
     AIProviderType,
+    CodeContext,
 )
 from codeinsight.ai.factory import AIProviderFactory
 
@@ -18,8 +18,8 @@ class QwenProvider(AIProvider):
     """Qwen provider implementation (placeholder)"""
 
     def __init__(
-        self, api_key: Optional[str] = None, model: str = "qwen-max", **kwargs
-    ):
+        self, api_key: Optional[str] = None, model: str = "qwen-max", **kwargs: Any
+    ) -> None:
         self.model = model
         self.api_key = api_key
         # Qwen would require specific implementation when available

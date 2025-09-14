@@ -2,8 +2,8 @@
 Test script to verify file filtering
 """
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 from codeinsight.scanner import Scanner
 

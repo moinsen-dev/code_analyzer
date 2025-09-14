@@ -56,7 +56,7 @@ class GitIgnoreMatcher:
                 with open(gitignore_path, "r") as f:
                     patterns.extend(f.read().splitlines())
             except Exception:
-                pass  # Skip unreadable files
+                pass  # Skip unreadable files - acceptable fallback
 
         # Create spec if we have patterns
         if patterns:

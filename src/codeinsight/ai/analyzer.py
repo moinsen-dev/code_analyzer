@@ -2,10 +2,10 @@
 AI-powered code analyzer for Refactoroscope
 """
 
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
-from codeinsight.ai.base import CodeContext, AIAnalysisResult
+from codeinsight.ai.base import AIAnalysisResult, CodeContext
 from codeinsight.ai.factory import AIProviderFactory
 from codeinsight.config.manager import ConfigManager
 from codeinsight.models.metrics import Language
@@ -78,7 +78,7 @@ class AIAnalyzer:
 
     def _get_project_structure(self, root_path: Path) -> dict:
         """Get a simplified project structure for context"""
-        structure = {"directories": [], "files": []}
+        structure: dict = {"directories": [], "files": []}
 
         try:
             # Get top-level directories and files
@@ -91,24 +91,19 @@ class AIAnalyzer:
                     )
         except Exception:
             # If we can't read the structure, return empty
-            pass
+            pass  # This is acceptable as we're just providing context info
 
         return structure
 
     def get_provider_preferences(self) -> List[str]:
         """Get provider preferences from configuration"""
-        try:
-            ai_config = (
-                self.config_manager.config.ai
-                if hasattr(self.config_manager.config, "ai")
-                else {}
-            )
-            return ai_config.get(
-                "provider_preferences", ["openai", "anthropic", "google", "ollama"]
-            )
-        except Exception:
-            # Default preference order
-            return ["openai", "anthropic", "google", "ollama"]
+        # Get configuration
+        if hasattr(self.config_manager.config, "ai"):
+            ai_config = self.config_manager.config.ai
+            if ai_config is not None:
+                return ai_config.provider_preferences
+        # Default preference order
+        return ["openai", "anthropic", "google", "ollama"]
 
     def analyze_with_preferred_provider(
         self, file_path: Path, language: Language
@@ -146,7 +141,7 @@ class AIAnalyzer:
                         return result
                 except Exception:
                     # Try next provider
-                    continue
+                    continue  # This is acceptable as we're trying multiple providers
 
             # If no preferred provider worked, use the first available
             for provider in self.providers:

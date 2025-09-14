@@ -2,8 +2,8 @@
 Test script to simulate the original issue with .git files and images
 """
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 from codeinsight.scanner import Scanner
 

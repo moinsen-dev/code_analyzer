@@ -2,8 +2,8 @@
 Test script to verify filtering of *lock.yaml files
 """
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 from codeinsight.scanner import Scanner
 

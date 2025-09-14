@@ -4,6 +4,7 @@ CSV export functionality
 
 import csv
 from pathlib import Path
+
 from codeinsight.models.metrics import AnalysisReport
 
 

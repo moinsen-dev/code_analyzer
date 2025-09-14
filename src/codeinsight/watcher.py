@@ -5,11 +5,12 @@ File watcher for real-time code analysis
 import time
 from pathlib import Path
 from typing import Callable, Optional, Set
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
-from codeinsight.scanner import Scanner
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
+from watchdog.observers import Observer
+
 from codeinsight.models.metrics import AnalysisReport
+from codeinsight.scanner import Scanner
 
 
 class CodeChangeHandler(FileSystemEventHandler):

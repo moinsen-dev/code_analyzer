@@ -2,7 +2,7 @@
 Analysis report comparison functionality
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 from codeinsight.models.metrics import AnalysisReport
 

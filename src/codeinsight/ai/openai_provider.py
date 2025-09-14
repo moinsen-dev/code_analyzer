@@ -2,9 +2,9 @@
 OpenAI provider implementation for Refactoroscope
 """
 
-import time
-from typing import Optional
 import os
+import time
+from typing import Any, Optional
 
 try:
     import openai
@@ -14,10 +14,10 @@ except ImportError:
     OPENAI_AVAILABLE = False
 
 from codeinsight.ai.base import (
-    AIProvider,
-    CodeContext,
     AIAnalysisResult,
+    AIProvider,
     AIProviderType,
+    CodeContext,
 )
 from codeinsight.ai.factory import AIProviderFactory
 
@@ -26,8 +26,8 @@ class OpenAIProvider(AIProvider):
     """OpenAI provider implementation"""
 
     def __init__(
-        self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo", **kwargs
-    ):
+        self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo", **kwargs: Any
+    ) -> None:
         if not OPENAI_AVAILABLE:
             raise ImportError(
                 "openai package is not installed. Install it with 'pip install openai'"
@@ -57,18 +57,19 @@ class OpenAIProvider(AIProvider):
 
         try:
             # Call OpenAI API
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert code reviewer providing actionable suggestions for code quality improvements.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.1,
-                max_tokens=1000,
-            )
+            if self.client is not None:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are an expert code reviewer providing actionable suggestions for code quality improvements.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=0.1,
+                    max_tokens=1000,
+                )
 
             # Process response
             suggestions = self._parse_response(response.choices[0].message.content)
@@ -130,7 +131,7 @@ Keep suggestions concise but detailed enough to be actionable.
         suggestions = []
         lines = response_text.strip().split("\n")
 
-        current_suggestion = {}
+        current_suggestion: dict = {}
         for line in lines:
             if line.startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")):
                 if current_suggestion:

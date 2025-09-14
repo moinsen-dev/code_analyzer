@@ -48,8 +48,8 @@ temp/
 
         # Try to import and use our modules
         try:
-            from codeinsight.scanner import Scanner
             from codeinsight.models.metrics import Language
+            from codeinsight.scanner import Scanner
 
             # Test language detection
             scanner = Scanner()

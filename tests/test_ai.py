@@ -2,9 +2,10 @@
 Tests for AI-powered code analysis functionality
 """
 
-import tempfile
 import os
+import tempfile
 from pathlib import Path
+
 from codeinsight.ai.base import CodeContext
 
 

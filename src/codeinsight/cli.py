@@ -2,20 +2,21 @@
 Refactoroscope CLI
 """
 
-import typer
 import json
 import signal
 import sys
-from typing import List, Dict, Any
 from pathlib import Path
+from typing import Any, Dict, List
 
-from codeinsight.scanner import Scanner
-from codeinsight.watcher import CodeWatcher
-from codeinsight.models.metrics import AnalysisReport
-from codeinsight.exporters.json_exporter import JSONExporter
+import typer
+
+from codeinsight.analysis.comparator import ReportComparator
 from codeinsight.exporters.csv_exporter import CSVExporter
 from codeinsight.exporters.html_exporter import HTMLExporter
-from codeinsight.analysis.comparator import ReportComparator
+from codeinsight.exporters.json_exporter import JSONExporter
+from codeinsight.models.metrics import AnalysisReport
+from codeinsight.scanner import Scanner
+from codeinsight.watcher import CodeWatcher
 
 app = typer.Typer(
     name="refactoroscope",
@@ -153,8 +154,8 @@ def _display_terminal(
     """Display results in terminal with Rich formatting."""
     try:
         from rich.console import Console
-        from rich.table import Table
         from rich.panel import Panel
+        from rich.table import Table
 
         console = Console()
 
@@ -513,8 +514,8 @@ def _display_comparison_terminal(
     """Display comparison results in terminal with Rich formatting."""
     try:
         from rich.console import Console
-        from rich.table import Table
         from rich.panel import Panel
+        from rich.table import Table
 
         console = Console()
 
@@ -620,8 +621,8 @@ def _display_live_terminal(
     """Display results in terminal with Rich formatting for live updates."""
     try:
         from rich.console import Console
-        from rich.table import Table
         from rich.panel import Panel
+        from rich.table import Table
 
         console = Console()
 
@@ -790,8 +791,8 @@ def _display_duplicates_terminal(
     """Display duplicate code findings in terminal"""
     try:
         from rich.console import Console
-        from rich.table import Table
         from rich.panel import Panel
+        from rich.table import Table
 
         console = Console()
 
@@ -1077,88 +1078,6 @@ def _display_unused_files_json(findings: List[str]) -> None:
     print(json.dumps(output, indent=2))
 
 
-def _display_unused_terminal(report: AnalysisReport) -> None:
-    """Display unused code findings in terminal"""
-    try:
-        from rich.console import Console
-        from rich.table import Table
-        from rich.panel import Panel
-
-        console = Console()
-
-        # Display main header
-        console.print(
-            Panel(
-                f"[bold]Refactoroscope - Unused Code Analysis[/bold]\n"
-                f"[cyan]Project:[/cyan] {report.project_path}",
-                expand=False,
-            )
-        )
-
-        # Collect all unused code findings
-        all_unused = []
-        for file_insight in report.top_files:
-            if file_insight.unused_code:
-                for finding in file_insight.unused_code:
-                    all_unused.append(
-                        (file_insight.file_metrics.relative_path, finding)
-                    )
-
-        if all_unused:
-            console.print(
-                f"\n[bold]🔍 Unused Code Findings ({len(all_unused)} found)[/bold]"
-            )
-            console.print("─" * 40)
-
-            unused_table = Table(show_header=True)
-            unused_table.add_column("File", style="cyan")
-            unused_table.add_column("Type", style="magenta")
-            unused_table.add_column("Name", style="yellow")
-            unused_table.add_column("Line", justify="right", style="green")
-            unused_table.add_column("Confidence", justify="right", style="blue")
-
-            for file_path, finding in all_unused[:50]:  # Show top 50
-                confidence_str = f"{finding.confidence:.0%}"
-                unused_table.add_row(
-                    file_path,
-                    finding.type.capitalize(),
-                    finding.name,
-                    str(finding.line),
-                    confidence_str,
-                )
-
-            console.print(unused_table)
-        else:
-            console.print("[green]✅ No unused code found.[/green]")
-
-    except ImportError:
-        # Fallback to basic output
-        print("Refactoroscope - Unused Code Analysis")
-        print(f"Project: {report.project_path}")
-
-        # Collect all unused code findings
-        all_unused = []
-        for file_insight in report.top_files:
-            if file_insight.unused_code:
-                for finding in file_insight.unused_code:
-                    all_unused.append(
-                        (file_insight.file_metrics.relative_path, finding)
-                    )
-
-        if all_unused:
-            print(f"\n🔍 Unused Code Findings ({len(all_unused)} found)")
-            print("────────────────────────────────────────")
-
-            for file_path, finding in all_unused[:50]:  # Show top 50
-                confidence_str = f"{finding.confidence:.0%}"
-                print(
-                    f"  {file_path}: {finding.type} '{finding.name}' "
-                    f"(line {finding.line}) [{confidence_str}]"
-                )
-        else:
-            print("✅ No unused code found.")
-
-
 @app.command()
 def ai(
     path: Path = typer.Argument(..., help="Path to analyze with AI"),
@@ -1364,8 +1283,8 @@ def _display_unused_terminal(report: AnalysisReport) -> None:
     """Display unused code findings in terminal"""
     try:
         from rich.console import Console
-        from rich.table import Table
         from rich.panel import Panel
+        from rich.table import Table
 
         console = Console()
 

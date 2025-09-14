@@ -8,6 +8,13 @@ repos:
         types: [python]
         pass_filenames: false
       
+      - id: isort-check
+        name: isort-check
+        entry: uv run isort --check-only src/ tests/
+        language: system
+        types: [python]
+        pass_filenames: false
+      
       - id: ruff-check
         name: ruff-check
         entry: uv run ruff check src/ tests/
@@ -18,6 +25,27 @@ repos:
       - id: mypy-check
         name: mypy-check
         entry: uv run mypy src/
+        language: system
+        types: [python]
+        pass_filenames: false
+      
+      - id: bandit-check
+        name: bandit-check
+        entry: uv run bandit -r src/ --severity-level high
+        language: system
+        types: [python]
+        pass_filenames: false
+      
+      - id: vulture-check
+        name: vulture-check
+        entry: uv run vulture src/
+        language: system
+        types: [python]
+        pass_filenames: false
+      
+      - id: pip-audit-check
+        name: pip-audit-check
+        entry: uv run pip-audit
         language: system
         types: [python]
         pass_filenames: false

@@ -3,14 +3,15 @@ Ollama provider implementation for Refactoroscope
 """
 
 import time
-from typing import Optional
+from typing import Any, Optional
+
 import requests
 
 from codeinsight.ai.base import (
-    AIProvider,
-    CodeContext,
     AIAnalysisResult,
+    AIProvider,
     AIProviderType,
+    CodeContext,
 )
 from codeinsight.ai.factory import AIProviderFactory
 
@@ -23,8 +24,8 @@ class OllamaProvider(AIProvider):
         api_key: Optional[str] = None,
         model: str = "llama2",
         base_url: str = "http://localhost:11434",
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         self.model = model
         self.base_url = base_url
         self.api_key = api_key  # Ollama typically doesn't require API keys
@@ -119,7 +120,7 @@ Keep suggestions concise but detailed enough to be actionable.
         suggestions = []
         lines = response_text.strip().split("\n")
 
-        current_suggestion = {}
+        current_suggestion: dict = {}
         for line in lines:
             if line.startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")):
                 if current_suggestion:

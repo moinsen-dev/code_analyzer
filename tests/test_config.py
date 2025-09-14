@@ -3,6 +3,7 @@ Test script for configuration manager
 """
 
 from pathlib import Path
+
 from codeinsight.config.manager import ConfigManager
 
 

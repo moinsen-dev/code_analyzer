@@ -2,11 +2,12 @@
 Configuration manager for Refactoroscope
 """
 
-import yaml
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
-from codeinsight.config.models import Config, LanguageConfig, AIConfig
+import yaml
+
+from codeinsight.config.models import AIConfig, Config, LanguageConfig
 
 
 class ConfigManager:

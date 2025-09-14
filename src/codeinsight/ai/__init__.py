@@ -2,9 +2,9 @@
 AI module for Refactoroscope
 """
 
-from .base import AIProvider, CodeContext, AIAnalysisResult, AIProviderType
-from .factory import AIProviderFactory
 from .analyzer import AIAnalyzer
+from .base import AIAnalysisResult, AIProvider, AIProviderType, CodeContext
+from .factory import AIProviderFactory
 
 __all__ = [
     "AIProvider",

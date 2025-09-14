@@ -2,11 +2,11 @@
 Test script for report comparator
 """
 
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
-from codeinsight.models.metrics import AnalysisReport, Language
 from codeinsight.analysis.comparator import ReportComparator
+from codeinsight.models.metrics import AnalysisReport, Language
 
 
 def test_comparator():

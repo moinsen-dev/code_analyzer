@@ -2,9 +2,10 @@
 Tests for unused code detection functionality
 """
 
-import tempfile
 import os
+import tempfile
 from pathlib import Path
+
 from codeinsight.analyzers.unused_code import UnusedCodeAnalyzer
 from codeinsight.models.metrics import Language
 

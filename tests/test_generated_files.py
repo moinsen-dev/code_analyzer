@@ -2,8 +2,8 @@
 Test script to verify filtering of generated and build files
 """
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 from codeinsight.scanner import Scanner
 

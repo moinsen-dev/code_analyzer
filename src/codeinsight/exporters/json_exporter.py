@@ -3,6 +3,7 @@ JSON export functionality
 """
 
 from pathlib import Path
+
 from codeinsight.models.metrics import AnalysisReport
 
 

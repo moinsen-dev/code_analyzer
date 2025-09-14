@@ -3,6 +3,7 @@ Test script to debug file ignoring
 """
 
 from pathlib import Path
+
 from codeinsight.config.manager import ConfigManager
 
 

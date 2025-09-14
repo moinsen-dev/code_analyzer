@@ -2,28 +2,28 @@
 Code scanner for analyzing directories and files
 """
 
+import multiprocessing
 import os
-from pathlib import Path
-from typing import List, Optional, Dict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from fnmatch import fnmatch
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import multiprocessing
+from pathlib import Path
+from typing import Dict, List, Optional
 
+from codeinsight.analysis.advanced_duplicates import advanced_duplicate_detector
+from codeinsight.analysis.smells import CodeSmellDetector
+from codeinsight.analyzers.complexity import ComplexityAnalyzer
+from codeinsight.analyzers.line_counter import LineCounter
+from codeinsight.analyzers.unused_code import UnusedCodeAnalyzer
+from codeinsight.analyzers.unused_files import UnusedFileAnalyzer
+from codeinsight.config.manager import ConfigManager
 from codeinsight.models.metrics import (
-    FileMetrics,
-    CodeInsights,
     AnalysisReport,
+    CodeInsights,
+    FileMetrics,
     Language,
 )
 from codeinsight.utils.gitignore import GitIgnoreMatcher
-from codeinsight.analyzers.line_counter import LineCounter
-from codeinsight.analyzers.complexity import ComplexityAnalyzer
-from codeinsight.analyzers.unused_code import UnusedCodeAnalyzer
-from codeinsight.analyzers.unused_files import UnusedFileAnalyzer
-from codeinsight.analysis.smells import CodeSmellDetector
-from codeinsight.analysis.advanced_duplicates import advanced_duplicate_detector
-from codeinsight.config.manager import ConfigManager
 
 
 class Scanner:
@@ -421,7 +421,7 @@ class Scanner:
                             insight.code_smells.extend(ai_smells)
                     except Exception:
                         # Don't fail the entire analysis if AI analysis fails
-                        pass
+                        pass  # Acceptable as we don't want AI failures to break the whole analysis
 
             return (insight, file_metrics)
         except Exception as e:

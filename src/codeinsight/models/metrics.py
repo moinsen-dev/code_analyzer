@@ -2,12 +2,12 @@
 Domain models for code analysis
 """
 
+import json
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
-from pathlib import Path
 from datetime import datetime
 from enum import Enum
-import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 class Language(str, Enum):

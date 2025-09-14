@@ -2,11 +2,11 @@
 Code smell detection functionality
 """
 
-from pathlib import Path
-from typing import List, Dict, Any
 import ast
+from pathlib import Path
+from typing import Any, Dict, List
 
-from codeinsight.models.metrics import Language, Duplication
+from codeinsight.models.metrics import Duplication, Language
 
 
 class CodeSmellDetector:
@@ -233,7 +233,9 @@ class CodeSmellDetector:
             import hashlib
 
             structural_info = "|".join(node_info)
-            return hashlib.md5(structural_info.encode()).hexdigest()
+            return hashlib.md5(
+                structural_info.encode(), usedforsecurity=False
+            ).hexdigest()
         except Exception:
             # Fallback to simple hash
             return str(hash(str(type(node))))

@@ -2,12 +2,14 @@
 Unused file analyzer for detecting completely unused files
 """
 
-from pathlib import Path
-from typing import List, Set, Dict
 import ast
+from pathlib import Path
+from typing import Dict, List, Optional, Set
+
 import networkx as nx
-from codeinsight.models.metrics import UnusedFileFinding
+
 from codeinsight.config.manager import ConfigManager
+from codeinsight.models.metrics import UnusedFileFinding
 
 
 class UnusedFileAnalyzer:
@@ -106,14 +108,14 @@ class UnusedFileAnalyzer:
         if file_name in ["setup.py", "conftest.py", "manage.py"]:
             confidence -= 0.2
 
-        # Files with __main__ guards are likely entry points
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-                if '__name__ == "__main__"' in content:
-                    confidence -= 0.3
-        except Exception:
-            pass
+            # Files with __main__ guards are likely entry points
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    if '__name__ == "__main__"' in content:
+                        confidence -= 0.3
+            except Exception:
+                pass  # Acceptable as we're just adjusting confidence scores
 
         return max(0.1, min(0.9, confidence))  # Keep between 0.1 and 0.9
 
@@ -137,7 +139,7 @@ class FileDependencyGraphBuilder:
     def __init__(self, project_path: Path, config_manager: ConfigManager):
         self.project_path = project_path
         self.config_manager = config_manager
-        self.graph = nx.DiGraph()
+        self.graph: nx.DiGraph = nx.DiGraph()
         self.file_modules: Dict[Path, str] = {}
         self.module_files: Dict[str, Path] = {}
 
@@ -151,7 +153,7 @@ class FileDependencyGraphBuilder:
 
         return self.graph
 
-    def _initialize_nodes(self):
+    def _initialize_nodes(self) -> None:
         """Initialize graph nodes for all Python files"""
         for py_file in self.project_path.rglob("*.py"):
             # Skip files that should be ignored
@@ -177,7 +179,7 @@ class FileDependencyGraphBuilder:
             except (ValueError, OSError):
                 continue
 
-    def _add_import_edges(self):
+    def _add_import_edges(self) -> None:
         """Add edges based on import statements"""
         for py_file in self.graph.nodes():
             try:
@@ -194,16 +196,16 @@ class FileDependencyGraphBuilder:
                             self._add_import_edge(py_file, node.module)
             except Exception:
                 # Skip files that can't be parsed
-                continue
+                continue  # Acceptable as we're processing many files
 
-    def _add_import_edge(self, source_file: Path, module_name: str):
+    def _add_import_edge(self, source_file: Path, module_name: str) -> None:
         """Add an import edge to the graph"""
         target_file = self._resolve_module(module_name)
         if target_file and target_file != source_file:
             # Add edge
             self.graph.add_edge(source_file, target_file)
 
-    def _resolve_module(self, module_name: str) -> Path:
+    def _resolve_module(self, module_name: str) -> Optional[Path]:
         """Resolve a module name to a file path"""
         # Exact match
         if module_name in self.module_files:
@@ -233,7 +235,7 @@ class FileDependencyGraphBuilder:
                     if '__name__ == "__main__"' in content:
                         entry_points.append(node)
             except Exception:
-                continue
+                continue  # Acceptable as we're checking many files
 
         # Root-level files and common entry point names
         common_entry_names = ["main.py", "app.py", "run.py", "cli.py", "manage.py"]
@@ -246,6 +248,6 @@ class FileDependencyGraphBuilder:
                 ):
                     entry_points.append(py_file)
         except Exception:
-            pass
+            pass  # Acceptable as we're just finding additional entry points
 
         return entry_points

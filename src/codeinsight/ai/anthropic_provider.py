@@ -2,9 +2,9 @@
 Anthropic provider implementation for Refactoroscope
 """
 
-import time
-from typing import Optional
 import os
+import time
+from typing import Any, Optional
 
 try:
     import anthropic
@@ -14,10 +14,10 @@ except ImportError:
     ANTHROPIC_AVAILABLE = False
 
 from codeinsight.ai.base import (
-    AIProvider,
-    CodeContext,
     AIAnalysisResult,
+    AIProvider,
     AIProviderType,
+    CodeContext,
 )
 from codeinsight.ai.factory import AIProviderFactory
 
@@ -29,8 +29,8 @@ class AnthropicProvider(AIProvider):
         self,
         api_key: Optional[str] = None,
         model: str = "claude-3-haiku-20240307",
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         if not ANTHROPIC_AVAILABLE:
             raise ImportError(
                 "anthropic package is not installed. Install it with 'pip install anthropic'"
@@ -60,12 +60,13 @@ class AnthropicProvider(AIProvider):
 
         try:
             # Call Anthropic API
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=1000,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1,
-            )
+            if self.client is not None:
+                response = self.client.messages.create(
+                    model=self.model,
+                    max_tokens=1000,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.1,
+                )
 
             # Process response
             suggestions = self._parse_response(response.content[0].text)
@@ -135,7 +136,7 @@ Assistant:
         suggestions = []
         lines = response_text.strip().split("\n")
 
-        current_suggestion = {}
+        current_suggestion: dict = {}
         for line in lines:
             if line.startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")):
                 if current_suggestion:

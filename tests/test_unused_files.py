@@ -4,9 +4,10 @@ Tests for unused file detection functionality
 
 import tempfile
 from pathlib import Path
+
 from codeinsight.analyzers.unused_files import (
-    UnusedFileAnalyzer,
     FileDependencyGraphBuilder,
+    UnusedFileAnalyzer,
 )
 from codeinsight.config.manager import ConfigManager
 

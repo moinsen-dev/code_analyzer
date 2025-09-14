@@ -2,9 +2,9 @@
 Google Gemini provider implementation for Refactoroscope
 """
 
-import time
-from typing import Optional
 import os
+import time
+from typing import Any, Optional
 
 try:
     import google.generativeai as genai
@@ -14,10 +14,10 @@ except ImportError:
     GOOGLE_AVAILABLE = False
 
 from codeinsight.ai.base import (
-    AIProvider,
-    CodeContext,
     AIAnalysisResult,
+    AIProvider,
     AIProviderType,
+    CodeContext,
 )
 from codeinsight.ai.factory import AIProviderFactory
 
@@ -26,8 +26,8 @@ class GoogleProvider(AIProvider):
     """Google Gemini provider implementation"""
 
     def __init__(
-        self, api_key: Optional[str] = None, model: str = "gemini-pro", **kwargs
-    ):
+        self, api_key: Optional[str] = None, model: str = "gemini-pro", **kwargs: Any
+    ) -> None:
         if not GOOGLE_AVAILABLE:
             raise ImportError(
                 "google-generativeai package is not installed. Install it with 'pip install google-generativeai'"
@@ -58,12 +58,13 @@ class GoogleProvider(AIProvider):
 
         try:
             # Call Google Gemini API
-            response = self.client.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.1, max_output_tokens=1000
-                ),
-            )
+            if self.client is not None:
+                response = self.client.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.1, max_output_tokens=1000
+                    ),
+                )
 
             # Process response
             suggestions = self._parse_response(response.text)
@@ -122,7 +123,7 @@ Keep suggestions concise but detailed enough to be actionable.
         suggestions = []
         lines = response_text.strip().split("\n")
 
-        current_suggestion = {}
+        current_suggestion: dict = {}
         for line in lines:
             if line.startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")):
                 if current_suggestion:

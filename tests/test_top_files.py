@@ -2,8 +2,9 @@
 Test script to verify the --top-files option
 """
 
-from codeinsight.cli import app
 from typer.testing import CliRunner
+
+from codeinsight.cli import app
 
 
 def test_top_files_option():

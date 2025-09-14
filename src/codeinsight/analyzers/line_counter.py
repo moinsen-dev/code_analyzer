@@ -4,6 +4,7 @@ Line counting analyzer
 
 from pathlib import Path
 from typing import Tuple
+
 from codeinsight.models.metrics import Language
 
 

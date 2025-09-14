@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="refactoroscope",
-    version="0.3.1",
+    version="0.3.3",
     author="Moinsen Dev",
     author_email="uli@moinsen.dev",
     description="A Python-based command-line tool that provides comprehensive analysis of source code repositories",

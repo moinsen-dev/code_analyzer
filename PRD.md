@@ -72,8 +72,6 @@ The **Refactoroscope** is a Python-based command-line tool that provides compreh
 ⚪ **Not Yet Implemented:**
 - Web dashboard
 - IDE plugins (VS Code, IntelliJ)
-- Real-time file watching
-- AI-powered code quality suggestions
 - Team collaboration features
 
 ---
@@ -94,6 +92,7 @@ The **Refactoroscope** is a Python-based command-line tool that provides compreh
 | Duplicate code detection | ✅ Complete | AST-based duplicate code detection |
 | Language-specific metrics | ✅ Complete | Multi-language complexity analysis with Lizard |
 | Performance optimizations | ✅ Complete | Parallel processing for improved performance |
+| AI-powered suggestions | ✅ Complete | Intelligent refactoring recommendations |
 
 ### 🟡 In Progress Features
 | Feature | Status | Notes |
@@ -104,10 +103,13 @@ The **Refactoroscope** is a Python-based command-line tool that provides compreh
 |---------|--------|-------|
 | Web dashboard | ⚪ Planned | Interactive web-based reports |
 | IDE plugins | ⚪ Planned | VS Code and IntelliJ extensions |
-| Real-time watching | ⚪ Planned | File system watcher for live analysis |
-| AI-powered suggestions | ⚪ Planned | Intelligent refactoring recommendations |
-| CI/CD integrations | ✅ Complete | GitHub Actions, GitLab CI |
-| Advanced duplicate detection | ⚪ Planned | AST-based duplicate code detection |
+| Team collaboration features | ⚪ Planned | Shared analysis reports and findings |
+
+### ✅ Completed Features (v0.3.2)
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Unused code detection | ✅ Complete | AST-based detection of unused functions, classes, variables, and imports |
+| AI-powered suggestions | ✅ Complete | Intelligent refactoring recommendations with multi-provider support |
 
 ---
 
@@ -288,11 +290,11 @@ analysis:
     - "*.min.js"
     - "node_modules/"
     - ".git/"
-
+  
   complexity:
     include_docstrings: false
     count_assertions: true
-
+  
   thresholds:
     file_too_long: 500
     function_too_complex: 20
@@ -304,9 +306,218 @@ output:
   theme: "monokai"
   show_recommendations: true
   export_path: "./reports"
+
+# AI configuration
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: false
+  
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+  
+  # Whether to cache AI analysis results
+  cache_results: true
+  
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+  
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "ollama"
+  
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+      
+      # Model to use
+      model: "gpt-3.5-turbo"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    anthropic:
+      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
+      # api_key: "your-anthropic-api-key"
+      
+      # Model to use
+      model: "claude-3-haiku-20240307"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    google:
+      # API key (can also be set via GOOGLE_API_KEY environment variable)
+      # api_key: "your-google-api-key"
+      
+      # Model to use
+      model: "gemini-pro"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    ollama:
+      # Ollama doesn't require API keys
+      
+      # Model to use
+      model: "llama2"
+      
+      # Base URL for Ollama (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: false
 ```
 
-### 5.3 Command-Line Interface
+### 5.3 Unused Code Detection Engine
+
+The unused code detection engine uses AST-based static analysis to identify potentially dead code in Python projects. It tracks definitions and usages of functions, classes, variables, and imports to find elements that are defined but never used.
+
+**Detection Capabilities:**
+- Unused functions and methods
+- Unused classes
+- Unused variables
+- Unused imports
+
+**Confidence Scoring:**
+Each finding is assigned a confidence score to help distinguish between likely unused code and potential false positives:
+- Imports: 90% confidence
+- Functions: 70% confidence
+- Classes: 70% confidence
+- Variables: 60% confidence
+
+**Implementation Example:**
+```python
+class UnusedCodeAnalyzer:
+    def analyze(self, file_path: Path, language: Language) -> List[UnusedCodeFinding]:
+        """Analyze a file for unused code elements"""
+        if language != Language.PYTHON:
+            return []
+            
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+                
+            tree = ast.parse(content)
+            visitor = UnusedCodeVisitor(file_path)
+            visitor.visit(tree)
+            
+            return visitor.get_unused_findings()
+        except Exception as e:
+            print(f"Warning: Could not analyze unused code for {file_path}: {e}")
+            return []
+```
+
+### 5.4 AI-Powered Code Quality Suggestions
+
+The AI-powered code quality suggestions feature provides intelligent insights on code readability, performance, potential bugs, and security issues using multiple AI providers including OpenAI, Anthropic, Google, and Ollama.
+
+**Supported AI Providers:**
+1. **OpenAI**: Supports GPT models (GPT-3.5, GPT-4, etc.)
+2. **Anthropic**: Supports Claude models
+3. **Google**: Supports Gemini models
+4. **Ollama**: Supports locally-run models (no API key required)
+
+**AI Analysis Focus Areas:**
+- Code readability improvements
+- Performance optimizations
+- Potential bug detection
+- Security vulnerability identification
+- Best practice recommendations
+
+**Implementation Example:**
+```python
+class AIAnalyzer:
+    def analyze_file(self, file_path: Path, language: Language) -> List[AIAnalysisResult]:
+        """Analyze a single file with all available AI providers"""
+        if not self.is_available():
+            return []
+        
+        try:
+            # Read file content
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            
+            # Create context
+            context = CodeContext(
+                file_path=file_path,
+                file_content=content,
+                language=language.value,
+                project_structure=self._get_project_structure(file_path.parent)
+            )
+            
+            # Analyze with all available providers
+            results = []
+            for provider in self.providers:
+                try:
+                    result = provider.analyze_code_quality(context)
+                    results.append(result)
+                except Exception as e:
+                    print(f"Warning: Error analyzing {file_path} with {provider.provider_name}: {e}")
+                    continue
+            
+            return results
+```
+
+### 5.5 Unused File Detection Engine
+
+The unused file detection engine uses dependency graph analysis to identify completely unused files in Python projects. It builds a dependency graph of all files in the project, identifies entry points, and performs reachability analysis to find files that are never imported by any other file.
+
+**Detection Approach:**
+1. Build a dependency graph of all Python files using import statement analysis
+2. Identify entry points (files with `__main__` guards, common entry point names)
+3. Perform reachability analysis to find files that are not reachable from entry points
+4. Assign confidence scores to findings to help distinguish between truly unused files and potential false positives
+
+**Confidence Scoring:**
+Each finding is assigned a confidence score based on:
+- Common entry point patterns (main.py, app.py, etc.)
+- Test file patterns (test_*.py, *_test.py)
+- Configuration files (setup.py, conftest.py)
+- Files with `__main__` guards
+- Import relationships with other files
+
+**Implementation Example:**
+```python
+class UnusedFileAnalyzer:
+    def analyze(self, project_path: Path, config_manager: ConfigManager) -> List[UnusedFileFinding]:
+        """Analyze a project for unused files"""
+        # Only analyze Python projects for now
+        if not self._is_python_project(project_path):
+            return []
+            
+        try:
+            # Build dependency graph
+            graph_builder = FileDependencyGraphBuilder(project_path, config_manager)
+            dependency_graph = graph_builder.build_graph()
+            
+            # Find entry points
+            entry_points = graph_builder.find_entry_points()
+            
+            # Identify unused files
+            unused_files = self._find_unused_files(dependency_graph, entry_points)
+            
+            # Convert to findings with confidence scores
+            findings = []
+            for unused_file in unused_files:
+                confidence = self._calculate_confidence(unused_file, dependency_graph)
+                reason = self._generate_reason(unused_file, dependency_graph)
+                
+                findings.append(UnusedFileFinding(
+                    path=unused_file,
+                    confidence=confidence,
+                    reason=reason
+                ))
+                
+            return findings
+        except Exception as e:
+            print(f"Warning: Could not analyze unused files for {project_path}: {e}")
+            return []
+```
 
 ```bash
 # Basic usage with uv (complexity analysis is now enabled by default)
@@ -314,6 +525,9 @@ uv run refactoroscope analyze .
 
 # Disable complexity analysis (if needed)
 uv run refactoroscope analyze . --no-complexity
+
+# Enable AI-powered suggestions
+uv run refactoroscope analyze . --ai
 
 # Export to multiple formats
 uv run refactoroscope analyze . \\
@@ -329,8 +543,20 @@ uv run refactoroscope compare \\
 # Watch mode for real-time analysis (complexity analysis is now enabled by default)
 uv run refactoroscope watch .
 
+# Enable AI-powered suggestions during watching
+uv run refactoroscope watch . --ai
+
 # Disable complexity analysis in watch mode (if needed)
 uv run refactoroscope watch . --no-complexity
+
+# Analyze for unused code
+uv run refactoroscope unused src/
+
+# Analyze with AI only
+uv run refactoroscope ai src/
+
+# Analyze with a specific AI provider
+uv run refactoroscope ai src/ --provider openai
 ```
 
 ---
@@ -659,6 +885,51 @@ jobs:
         with:
           name: code-analysis
           path: reports/
+```
+
+### D. Command-Line Interface
+
+```bash
+# Basic usage with uv (complexity analysis is now enabled by default)
+uv run refactoroscope analyze .
+
+# Disable complexity analysis (if needed)
+uv run refactoroscope analyze . --no-complexity
+
+# Enable AI-powered suggestions
+uv run refactoroscope analyze . --ai
+
+# Export to multiple formats
+uv run refactoroscope analyze . \\
+  --output terminal \\
+  --export json,html \\
+  --export-dir ./reports
+
+# Compare two analyses
+uv run refactoroscope compare \\
+  ./reports/2025-01-01.json \\
+  ./reports/2025-01-15.json
+
+# Watch mode for real-time analysis (complexity analysis is now enabled by default)
+uv run refactoroscope watch .
+
+# Enable AI-powered suggestions during watching
+uv run refactoroscope watch . --ai
+
+# Disable complexity analysis in watch mode (if needed)
+uv run refactoroscope watch . --no-complexity
+
+# Analyze for unused code
+uv run refactoroscope unused src/
+
+# Analyze for unused files
+uv run refactoroscope unused-files src/
+
+# Analyze with AI only
+uv run refactoroscope ai src/
+
+# Analyze with a specific AI provider
+uv run refactoroscope ai src/ --provider openai
 ```
 
 ---

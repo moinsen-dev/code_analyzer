@@ -56,6 +56,167 @@ analysis:
     file_too_long: 500
     function_too_complex: 20
     class_too_large: 1000
+  
+  # Duplicate code detection
+  duplicates:
+    # Minimum similarity threshold (0.0 to 1.0)
+    min_similarity: 0.8
+    
+    # Clone types to detect
+    clone_types:
+      - "exact"
+      - "renamed"
+      - "modified"
+      - "semantic"
+    
+    # Whether to include comments in comparison
+    include_comments: false
+    
+    # Whether to include docstrings in comparison
+    include_docstrings: false
+    
+    # Minimum number of lines for a clone
+    min_lines: 3
+    
+    # Maximum number of lines for a clone
+    max_lines: 100
+    
+    # Patterns to ignore
+    ignore_patterns:
+      - "*.generated.*"
+      - "*_pb2.py"
+  
+  # Unused code detection
+  unused_code:
+    # Confidence threshold for reporting (0.0 to 1.0)
+    confidence_threshold: 0.5
+    
+    # Patterns to ignore
+    ignore_patterns:
+      - "test_*.py"
+      - "*_test.py"
+  
+  # Unused file detection
+  unused_files:
+    # Confidence threshold for reporting (0.0 to 1.0)
+    confidence_threshold: 0.5
+    
+    # Explicitly specify entry points
+    entry_points:
+      - "main.py"
+      - "app.py"
+      - "scripts/"
+    
+    # Patterns to ignore (in addition to global ignore patterns)
+    ignore_patterns:
+      - "test_*.py"
+      - "*/migrations/*"
+      - "*/fixtures/*"
+    
+    # Include/exclude specific directories
+    include_dirs:
+      - "src/"
+    exclude_dirs:
+      - "tests/"
+      - "docs/"
+
+# AI configuration
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: false
+  
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+  
+  # Whether to cache AI analysis results
+  cache_results: true
+  
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+  
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "ollama"
+    - "qwen"
+  
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+      
+      # Model to use
+      model: "gpt-3.5-turbo"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    anthropic:
+      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
+      # api_key: "your-anthropic-api-key"
+      
+      # Model to use
+      model: "claude-3-haiku-20240307"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    google:
+      # API key (can also be set via GOOGLE_API_KEY environment variable)
+      # api_key: "your-google-api-key"
+      
+      # Model to use
+      model: "gemini-pro"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    ollama:
+      # Ollama doesn't require API keys
+      
+      # Model to use
+      model: "llama2"
+      
+      # Base URL for Ollama (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    qwen:
+      # Qwen doesn't require API keys when using local Ollama
+      
+      # Model to use
+      model: "qwen2"
+      
+      # Base URL for Qwen (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: false
+
+# Watch configuration
+watch:
+  # Debounce delay in seconds to prevent excessive analysis
+  debounce_delay: 1.0
+  
+  # Whether to analyze on file creation events
+  analyze_on_create: true
+  
+  # Whether to analyze on file modification events
+  analyze_on_modify: true
+  
+  # Whether to analyze on file deletion events
+  analyze_on_delete: true
+  
+  # Patterns to ignore (in addition to .gitignore)
+  ignore_patterns:
+    - "*.log"
+    - "*.tmp"
+    - ".DS_Store"
 
 output:
   # Output format

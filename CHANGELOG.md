@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2025-09-14
+
+### Added
+- Unused file detection using dependency graph analysis
+- New `unused-files` CLI command for identifying completely unused files
+- Support for detecting unused Python files through import dependency analysis
+- Confidence scoring for unused file findings
+- Comprehensive documentation for unused file detection
+- Tests for unused file detection functionality
+
+## [0.3.2] - 2025-09-14
+
+### Added
+- Unused code detection using AST-based static analysis
+- New `unused` CLI command for identifying dead code
+- Support for detecting unused functions, classes, variables, and imports
+- Confidence scoring for unused code findings
+- Comprehensive documentation for unused code detection
+- Tests for unused code detection functionality
+
 ## [0.3.1] - 2025-09-14
 
 ### Changed

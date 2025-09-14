@@ -85,6 +85,26 @@ class ComplexityMetrics:
 
 
 @dataclass
+class UnusedCodeFinding:
+    """Represents a single unused code finding"""
+
+    type: str  # function, class, variable, import, etc.
+    name: str  # Name of the unused element
+    line: int  # Line number where it's defined
+    confidence: float  # Confidence level (0.0 to 1.0)
+    reason: str  # Explanation of why it's considered unused
+
+
+@dataclass
+class UnusedFileFinding:
+    """Represents a completely unused file"""
+
+    path: Path
+    confidence: float
+    reason: str
+
+
+@dataclass
 class CodeInsights:
     """Insights for a single code file"""
 
@@ -92,6 +112,7 @@ class CodeInsights:
     complexity_metrics: Optional[ComplexityMetrics] = None
     code_smells: List[str] = field(default_factory=list)
     duplications: List[Duplication] = field(default_factory=list)
+    unused_code: List[UnusedCodeFinding] = field(default_factory=list)
 
 
 @dataclass

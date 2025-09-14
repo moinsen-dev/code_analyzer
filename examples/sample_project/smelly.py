@@ -2,9 +2,10 @@
 Test file with code smells for demonstration
 """
 
+
 class SmellyClass:
     """A class with various code smells"""
-    
+
     def __init__(self):
         self.attr1 = None
         self.attr2 = None
@@ -17,11 +18,11 @@ class SmellyClass:
         self.attr9 = None
         self.attr10 = None
         self.attr11 = None  # Large class smell
-    
+
     def method_with_too_many_params(self, a, b, c, d, e, f, g):
         """Method with too many parameters"""
         return a + b + c + d + e + f + g
-    
+
     def long_method(self):
         """A very long method with many statements"""
         x = 1
@@ -49,14 +50,40 @@ class SmellyClass:
         t = 23
         u = 24
         v = 25
-        return x + y + z + a + b + c + d + e + f + g + h + i + j + k + l_value + m + n + o + p + q + r + s + t + u + v
-    
+        return (
+            x
+            + y
+            + z
+            + a
+            + b
+            + c
+            + d
+            + e
+            + f
+            + g
+            + h
+            + i
+            + j
+            + k
+            + l_value
+            + m
+            + n
+            + o
+            + p
+            + q
+            + r
+            + s
+            + t
+            + u
+            + v
+        )
+
     def complex_conditional(self, a, b, c, d, e):
         """Method with complex conditional"""
         if a and b and c and d and e:
             return True
         return False
-    
+
     def nested_blocks(self):
         """Method with deeply nested blocks"""
         for i in range(10):
@@ -67,12 +94,14 @@ class SmellyClass:
                             if k > 1:
                                 print(i, j, k)
 
+
 def duplicate_code():
     """Function with duplicate code"""
     print("This is a duplicate line")
     print("This is a duplicate line")
     print("This is a duplicate line")
     print("This is a duplicate line")
+
 
 def another_duplicate():
     """Another function with duplicate code"""

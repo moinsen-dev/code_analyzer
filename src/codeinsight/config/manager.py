@@ -6,7 +6,7 @@ import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional
 
-from codeinsight.config.models import Config, LanguageConfig
+from codeinsight.config.models import Config, LanguageConfig, AIConfig
 
 
 class ConfigManager:
@@ -43,6 +43,16 @@ class ConfigManager:
             "typescript": LanguageConfig(max_line_length=100, complexity_threshold=15),
             "javascript": LanguageConfig(max_line_length=100, complexity_threshold=15),
         }
+
+        # Set up default AI configuration
+        config.ai = AIConfig(
+            providers={},
+            provider_preferences=["openai", "anthropic", "google", "ollama"],
+            enable_ai_suggestions=False,
+            max_file_size=50000,
+            cache_results=True,
+            cache_ttl=3600,
+        )
 
         return config
 

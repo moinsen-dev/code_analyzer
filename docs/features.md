@@ -63,6 +63,44 @@ Identifies common code smells:
 - AST-based duplicate code detection
 - Identifies duplicate functions, classes, and control structures
 - Reports duplicate counts and locations
+- Clone type classification (exact, renamed, modified, semantic)
+- Cross-file duplicate detection
+- Similarity scoring
+
+### Unused Code Detection
+- AST-based static analysis for identifying dead code
+- Detection of unused functions, classes, variables, and imports
+- Confidence scoring for findings
+- Cross-file usage tracking
+
+### Unused File Detection
+- Dependency graph analysis for identifying completely unused files
+- Entry point identification
+- Reachability analysis
+- Confidence scoring for findings
+
+## AI-Powered Analysis
+
+### Code Quality Suggestions
+- Intelligent insights on code readability
+- Performance recommendations
+- Potential bug detection
+- Security issue identification
+
+### Multi-Provider Support
+- OpenAI (GPT models)
+- Anthropic (Claude models)
+- Google (Gemini models)
+- Ollama (local models)
+- Qwen (local models)
+
+## Real-time Analysis
+
+### File Watching
+- Live monitoring of file changes
+- Incremental analysis of modified files
+- Terminal UI for real-time updates
+- Configurable debounce delays
 
 ## Performance Optimizations
 
@@ -70,6 +108,11 @@ Identifies common code smells:
 - Multi-threaded file analysis
 - Batch processing for large codebases
 - Improved performance on multi-core systems
+
+### Caching
+- AST caching for faster re-analysis
+- AI result caching
+- Incremental analysis support
 
 ## Export Capabilities
 
@@ -122,7 +165,7 @@ Tabular data export for spreadsheet analysis.
 
 ## Integration
 
-### CI/CD Integration (Planned)
+### CI/CD Integration
 - GitHub Actions support
 - GitLab CI support
 - Other CI/CD platforms

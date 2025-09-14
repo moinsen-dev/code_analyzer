@@ -3,9 +3,9 @@ layout: default
 title: Refactoroscope
 ---
 
-# Code Analyzer Documentation
+# Refactoroscope Documentation
 
-Welcome to the Code Analyzer documentation!
+Welcome to the Refactoroscope documentation!
 
 A Python-based command-line tool that provides comprehensive analysis of source code repositories. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
 
@@ -19,11 +19,16 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Beautiful terminal output using Rich
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
+- **Unused code detection using AST-based analysis**
+- **Unused file detection using dependency graph analysis**
+- **AI-powered code quality suggestions**
 - Export results to JSON/CSV/HTML
 - Configuration file support (.refactoroscope.yml)
 - Multi-language support (60+ programming languages)
 - Performance optimizations with parallel processing
 - CI/CD integration support (GitHub Actions, GitLab CI)
+- Real-time file watching for live code analysis
+- Advanced AST-based duplicate code detection with clone type classification
 
 ## Installation
 
@@ -67,3 +72,8 @@ The Refactoroscope supports 60+ programming languages:
 - [API Reference](api.md)
 - [Examples](examples.md)
 - [Contributing](contributing.md)
+- [Real-time Watching](watch.md)
+- [AI-Powered Analysis](ai.md)
+- [Duplicate Code Detection](duplicates.md)
+- [Unused Code Detection](unused_code.md)
+- [Unused File Detection](unused_file_detection.md)

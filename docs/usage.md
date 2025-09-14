@@ -12,13 +12,13 @@ title: Usage Guide
 To analyze the current directory:
 
 ```bash
-uv run code_analyzer analyze .
+uv run refactoroscope analyze .
 ```
 
 To analyze a specific directory:
 
 ```bash
-uv run code_analyzer analyze /path/to/project
+uv run refactoroscope analyze /path/to/project
 ```
 
 ### Including Complexity Analysis
@@ -26,7 +26,7 @@ uv run code_analyzer analyze /path/to/project
 To include detailed complexity metrics:
 
 ```bash
-uv run code_analyzer analyze . --complexity
+uv run refactoroscope analyze . --complexity
 ```
 
 ## Output Formats
@@ -34,7 +34,7 @@ uv run code_analyzer analyze . --complexity
 ### Terminal Output (Default)
 
 ```bash
-uv run code_analyzer analyze . --output terminal
+uv run refactoroscope analyze . --output terminal
 ```
 
 ### Exporting Results
@@ -42,13 +42,13 @@ uv run code_analyzer analyze . --output terminal
 Export to JSON:
 
 ```bash
-uv run code_analyzer analyze . --export json --export-dir ./reports
+uv run refactoroscope analyze . --export json --export-dir ./reports
 ```
 
 Export to multiple formats:
 
 ```bash
-uv run code_analyzer analyze . --export json,html --export-dir ./reports
+uv run refactoroscope analyze . --export json,html --export-dir ./reports
 ```
 
 ## Command Line Options
@@ -58,6 +58,11 @@ uv run code_analyzer analyze . --export json,html --export-dir ./reports
 - `analyze`: Analyze a codebase
 - `compare`: Compare two analysis reports
 - `init`: Initialize a configuration file
+- `watch`: Watch a codebase for changes
+- `ai`: Analyze codebase with AI-powered suggestions
+- `duplicates`: Analyze for duplicate code
+- `unused`: Analyze for unused code
+- `unused-files`: Analyze for unused files
 
 ### Analyze Options
 
@@ -71,19 +76,105 @@ uv run code_analyzer analyze . --export json,html --export-dir ./reports
 
 - `--output` or `-o`: Output format (terminal, json)
 
+### Watch Options
+
+- `--ai`: Enable AI-powered suggestions during watching
+- `--no-complexity` or `-C`: Disable complexity analysis
+
+### AI Options
+
+- `--provider`: Specify which AI provider to use (openai, anthropic, google, ollama, qwen)
+- `--no-cache`: Disable caching of AI results
+
+### Duplicates Options
+
+- `--type`: Type of duplicates to detect (exact, renamed, modified, semantic)
+- `--min-similarity`: Minimum similarity threshold (0.0 to 1.0)
+
+### Unused Code Options
+
+- `--confidence`: Confidence threshold for reporting (0.0 to 1.0)
+
+### Unused Files Options
+
+- `--confidence`: Confidence threshold for reporting (0.0 to 1.0)
+- `--entry-point`: Specify entry point files
+
 ## Examples
 
 ### Basic Analysis
 
 ```bash
 # Analyze current directory
-uv run code_analyzer analyze .
+uv run refactoroscope analyze .
 
 # Analyze with complexity metrics
-uv run code_analyzer analyze . --complexity
+uv run refactoroscope analyze . --complexity
 
 # Analyze and export to JSON
-uv run code_analyzer analyze . --export json --export-dir ./reports
+uv run refactoroscope analyze . --export json --export-dir ./reports
+```
+
+### Real-time Watching
+
+```bash
+# Watch current directory
+uv run refactoroscope watch .
+
+# Watch with AI suggestions
+uv run refactoroscope watch . --ai
+
+# Watch without complexity analysis
+uv run refactoroscope watch . --no-complexity
+```
+
+### AI-Powered Analysis
+
+```bash
+# Analyze with AI
+uv run refactoroscope ai .
+
+# Analyze with specific provider
+uv run refactoroscope ai . --provider openai
+
+# Analyze with AI during regular analysis
+uv run refactoroscope analyze . --ai
+```
+
+### Duplicate Code Detection
+
+```bash
+# Analyze for duplicates
+uv run refactoroscope duplicates .
+
+# Analyze for exact duplicates only
+uv run refactoroscope duplicates . --type exact
+
+# Analyze with custom similarity threshold
+uv run refactoroscope duplicates . --min-similarity 0.9
+```
+
+### Unused Code Detection
+
+```bash
+# Analyze for unused code
+uv run refactoroscope unused .
+
+# Analyze with custom confidence threshold
+uv run refactoroscope unused . --confidence 0.8
+```
+
+### Unused File Detection
+
+```bash
+# Analyze for unused files
+uv run refactoroscope unused-files .
+
+# Analyze with custom confidence threshold
+uv run refactoroscope unused-files . --confidence 0.8
+
+# Specify entry points
+uv run refactoroscope unused-files . --entry-point main.py --entry-point app.py
 ```
 
 ### Advanced Usage

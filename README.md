@@ -23,6 +23,9 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - Beautiful terminal output using Rich
 - Code complexity analysis (Cyclomatic, Cognitive, Halstead)
 - Duplicate code detection using AST-based analysis
+- **Unused code detection using AST-based analysis**
+- **Unused file detection using dependency graph analysis**
+- **AI-powered code quality suggestions**
 - Export results to JSON/CSV/HTML
 - Configuration file support (.refactoroscope.yml)
 - Multi-language support (60+ programming languages)
@@ -93,13 +96,120 @@ uv run refactoroscope analyze /path/to/project
 
 # Disable complexity analysis (if needed)
 uv run refactoroscope analyze . --no-complexity
+
+# Enable AI-powered suggestions
+uv run refactoroscope analyze . --ai
 ```
+
+### AI-Powered Analysis
+
+Refactoroscope provides AI-powered code quality suggestions using multiple AI providers including OpenAI, Anthropic, Google, and Ollama. The AI analysis provides intelligent insights on code readability, performance, potential bugs, and security issues.
+
+```bash
+# Analyze with AI only
+uv run refactoroscope ai /path/to/project
+
+# Analyze with a specific AI provider
+uv run refactoroscope ai /path/to/project --provider openai
+
+# Enable AI suggestions during regular analysis
+uv run refactoroscope analyze . --ai
+
+# Enable AI suggestions during watching
+uv run refactoroscope watch . --ai
+```
+
+#### AI Provider Configuration
+
+To use AI-powered features, you need to configure at least one AI provider in your `.refactoroscope.yml` configuration file:
+
+```yaml
+# AI configuration
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: true
+  
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+  
+  # Whether to cache AI analysis results
+  cache_results: true
+  
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+  
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "ollama"
+  
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+      
+      # Model to use
+      model: "gpt-3.5-turbo"
+      
+      # Whether this provider is enabled
+      enabled: true
+    
+    anthropic:
+      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
+      # api_key: "your-anthropic-api-key"
+      
+      # Model to use
+      model: "claude-3-haiku-20240307"
+      
+      # Whether this provider is enabled
+      enabled: true
+    
+    google:
+      # API key (can also be set via GOOGLE_API_KEY environment variable)
+      # api_key: "your-google-api-key"
+      
+      # Model to use
+      model: "gemini-pro"
+      
+      # Whether this provider is enabled
+      enabled: true
+    
+    ollama:
+      # Ollama doesn't require API keys
+      
+      # Model to use
+      model: "llama2"
+      
+      # Base URL for Ollama (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: true
+```
+
+#### Supported AI Providers
+
+1. **OpenAI**: Supports GPT models (GPT-3.5, GPT-4, etc.)
+2. **Anthropic**: Supports Claude models
+3. **Google**: Supports Gemini models
+4. **Ollama**: Supports locally-run models (no API key required)
+
+For cloud-based providers, you can set API keys via environment variables:
+- `OPENAI_API_KEY` for OpenAI
+- `ANTHROPIC_API_KEY` for Anthropic
+- `GOOGLE_API_KEY` for Google
 
 ### Real-time Watching
 
 ```bash
 # Watch current directory for changes (complexity analysis is now enabled by default)
 uv run refactoroscope watch .
+
+# Enable AI-powered suggestions during watching
+uv run refactoroscope watch . --ai
 
 # Disable complexity analysis (if needed)
 uv run refactoroscope watch . --no-complexity
@@ -129,7 +239,57 @@ uv run refactoroscope init
 
 # Analyze for duplicate code with advanced options
 uv run refactoroscope duplicates src/ --type exact --min-similarity 0.9
+
+# Analyze for unused code
+uv run refactoroscope unused src/
+
+# Analyze for unused files
+uv run refactoroscope unused-files src/
+
+# Analyze for unused files with confidence threshold
+uv run refactoroscope unused-files src/ --confidence 0.7
 ```
+
+### Unused Code Detection
+
+Refactoroscope can identify potentially unused code in your Python projects using AST-based static analysis. This feature helps you identify dead code that can be safely removed to reduce technical debt.
+
+The unused code detection identifies:
+- Unused functions and methods
+- Unused classes
+- Unused variables
+- Unused imports
+
+```bash
+# Analyze for unused code
+uv run refactoroscope unused src/
+
+# Get JSON output for unused code
+uv run refactoroscope unused src/ --output json
+```
+
+The analysis provides confidence scores for each finding to help you distinguish between likely unused code and potential false positives.
+
+### Unused File Detection
+
+Refactoroscope can also identify completely unused files in your Python projects using dependency graph analysis. This feature helps you identify entire files that are never imported by any other file in your project.
+
+```bash
+# Analyze for unused files
+uv run refactoroscope unused-files src/
+
+# Analyze for unused files with confidence threshold
+uv run refactoroscope unused-files src/ --confidence 0.7
+
+# Get JSON output for unused files
+uv run refactoroscope unused-files src/ --output json
+```
+
+The unused file detection uses the following approach:
+1. Builds a dependency graph of all Python files in your project
+2. Identifies entry points (files with `__main__` guards, common entry point names)
+3. Performs reachability analysis to find files that are not reachable from entry points
+4. Provides confidence scores to help distinguish between truly unused files and potential false positives
 
 ## Supported Languages
 
@@ -183,6 +343,71 @@ output:
   theme: "monokai"
   show_recommendations: true
   export_path: "./reports"
+
+# AI configuration
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: false
+  
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+  
+  # Whether to cache AI analysis results
+  cache_results: true
+  
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+  
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "ollama"
+  
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+      
+      # Model to use
+      model: "gpt-3.5-turbo"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    anthropic:
+      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
+      # api_key: "your-anthropic-api-key"
+      
+      # Model to use
+      model: "claude-3-haiku-20240307"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    google:
+      # API key (can also be set via GOOGLE_API_KEY environment variable)
+      # api_key: "your-google-api-key"
+      
+      # Model to use
+      model: "gemini-pro"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    ollama:
+      # Ollama doesn't require API keys
+      
+      # Model to use
+      model: "llama2"
+      
+      # Base URL for Ollama (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: false
 ```
 
 ## CI/CD Integration
@@ -243,6 +468,12 @@ See [CI/CD Integration Guide](docs/ci-cd-integration.md) for more detailed instr
 ## Documentation
 
 For detailed documentation, visit our [GitHub Pages site](https://moinsen-dev.github.io/code_analyzer/).
+
+- [Real-time Watching](docs/watch.md)
+- [AI-Powered Analysis](docs/ai.md)
+- [Duplicate Code Detection](docs/duplicates.md)
+- [Unused Code Detection](docs/unused_code.md)
+- [Unused File Detection](docs/unused_file_detection.md)
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
 

@@ -84,6 +84,7 @@ class CodeWatcher:
         self,
         analysis_callback: Callable[[AnalysisReport], None],
         include_complexity: bool = False,
+        enable_ai: bool = False,
         ignore_patterns: Optional[Set[str]] = None,
     ) -> None:
         """Start watching for file changes"""
@@ -110,7 +111,7 @@ class CodeWatcher:
         self.observer.start()
 
         # Run initial analysis
-        self._run_analysis(include_complexity)
+        self._run_analysis(include_complexity, enable_ai)
 
     def stop(self) -> None:
         """Stop watching for file changes"""
@@ -124,10 +125,14 @@ class CodeWatcher:
             # In a more advanced implementation, we could optimize to only re-analyze changed files
             self._run_analysis()
 
-    def _run_analysis(self, include_complexity: bool = False) -> None:
+    def _run_analysis(
+        self, include_complexity: bool = False, enable_ai: bool = False
+    ) -> None:
         """Run code analysis on the project"""
         try:
-            report = self._scanner.analyze(
+            # Create a new scanner with AI enabled if requested
+            scanner = Scanner(self.project_path, enable_ai=enable_ai)
+            report = scanner.analyze(
                 self.project_path, include_complexity=include_complexity
             )
             self._last_analysis = report

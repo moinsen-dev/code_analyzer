@@ -102,6 +102,11 @@ def analyze(
         "--duplicates/--no-duplicates",
         help="Enable/disable duplicate code detection",
     ),
+    ai: bool = typer.Option(
+        False,
+        "--ai/--no-ai",
+        help="Enable/disable AI-powered code suggestions",
+    ),
     output: str = typer.Option(
         "terminal", "--output", "-o", help="Output format (terminal, json, html, csv)"
     ),
@@ -119,7 +124,7 @@ def analyze(
     typer.echo(f"Analyzing {path}")
 
     # Initialize scanner with the project path
-    scanner = Scanner(path, enable_duplicates=duplicates)
+    scanner = Scanner(path, enable_duplicates=duplicates, enable_ai=ai)
 
     # Perform analysis
     report = scanner.analyze(path, include_complexity=complexity)
@@ -926,6 +931,11 @@ def watch(
         "-c/-C",
         help="Include complexity analysis [default: enabled]",
     ),
+    ai: bool = typer.Option(
+        False,
+        "--ai/--no-ai",
+        help="Enable/disable AI-powered code suggestions",
+    ),
     top_files: int = typer.Option(
         20, "--top-files", "-t", help="Number of top files to display [default: 20]"
     ),
@@ -951,6 +961,7 @@ def watch(
                 report, complexity, top_files
             ),
             include_complexity=complexity,
+            enable_ai=ai,
         )
 
         # Keep the process running
@@ -961,6 +972,474 @@ def watch(
     except KeyboardInterrupt:
         typer.echo("\nStopping watcher...")
         watcher.stop()
+
+
+@app.command()
+def unused_files(
+    path: Path = typer.Argument(..., help="Path to analyze for unused files"),
+    entry_points: List[Path] = typer.Option(
+        [], "--entry-point", "-e", help="Entry point files to consider"
+    ),
+    output: str = typer.Option(
+        "terminal", "--output", "-o", help="Output format (terminal, json)"
+    ),
+    confidence_threshold: float = typer.Option(
+        0.5, "--confidence", "-c", help="Confidence threshold (0.0 to 1.0)"
+    ),
+) -> None:
+    """Analyze codebase for completely unused files"""
+    typer.echo(f"Analyzing {path} for unused files...")
+
+    # Initialize scanner
+    scanner = Scanner(path, enable_duplicates=False)
+
+    # Perform analysis
+    report = scanner.analyze(path, include_complexity=False)
+
+    # Filter unused file findings based on confidence threshold
+    unused_file_findings = []
+    for recommendation in report.recommendations:
+        if "Unused file detected:" in recommendation:
+            # Extract confidence from recommendation
+            import re
+
+            match = re.search(r"confidence: (\d+)%", recommendation)
+            if match:
+                confidence = int(match.group(1)) / 100
+                if confidence >= confidence_threshold:
+                    unused_file_findings.append(recommendation)
+
+    # Display output based on format
+    if output == "terminal":
+        _display_unused_files_terminal(unused_file_findings)
+    elif output == "json":
+        _display_unused_files_json(unused_file_findings)
+
+
+def _display_unused_files_terminal(findings: List[str]) -> None:
+    """Display unused file findings in terminal"""
+    try:
+        from rich.console import Console
+        from rich.panel import Panel
+
+        console = Console()
+
+        # Display main header
+        console.print(
+            Panel(
+                "[bold]Refactoroscope - Unused File Analysis[/bold]\n"
+                "[cyan]Unused files are files that are never imported by any other file in the project.[/cyan]",
+                expand=False,
+            )
+        )
+
+        if findings:
+            console.print(
+                f"\n[bold]🔍 Unused File Findings ({len(findings)} found)[/bold]"
+            )
+            console.print("─" * 40)
+
+            for finding in findings:
+                console.print(f"• {finding}")
+        else:
+            console.print(
+                "[green]✅ No unused files found above the confidence threshold.[/green]"
+            )
+
+    except ImportError:
+        # Fallback to basic output
+        print("Refactoroscope - Unused File Analysis")
+        print(
+            "Unused files are files that are never imported by any other file in the project."
+        )
+
+        if findings:
+            print(f"\n🔍 Unused File Findings ({len(findings)} found)")
+            print("────────────────────────────────────────")
+
+            for finding in findings:
+                print(f"• {finding}")
+        else:
+            print("✅ No unused files found above the confidence threshold.")
+
+
+def _display_unused_files_json(findings: List[str]) -> None:
+    """Display unused file findings as JSON"""
+    import json
+    from datetime import datetime
+
+    output = {
+        "timestamp": datetime.now().isoformat(),
+        "unused_files_count": len(findings),
+        "findings": findings,
+    }
+
+    print(json.dumps(output, indent=2))
+
+
+def _display_unused_terminal(report: AnalysisReport) -> None:
+    """Display unused code findings in terminal"""
+    try:
+        from rich.console import Console
+        from rich.table import Table
+        from rich.panel import Panel
+
+        console = Console()
+
+        # Display main header
+        console.print(
+            Panel(
+                f"[bold]Refactoroscope - Unused Code Analysis[/bold]\n"
+                f"[cyan]Project:[/cyan] {report.project_path}",
+                expand=False,
+            )
+        )
+
+        # Collect all unused code findings
+        all_unused = []
+        for file_insight in report.top_files:
+            if file_insight.unused_code:
+                for finding in file_insight.unused_code:
+                    all_unused.append(
+                        (file_insight.file_metrics.relative_path, finding)
+                    )
+
+        if all_unused:
+            console.print(
+                f"\n[bold]🔍 Unused Code Findings ({len(all_unused)} found)[/bold]"
+            )
+            console.print("─" * 40)
+
+            unused_table = Table(show_header=True)
+            unused_table.add_column("File", style="cyan")
+            unused_table.add_column("Type", style="magenta")
+            unused_table.add_column("Name", style="yellow")
+            unused_table.add_column("Line", justify="right", style="green")
+            unused_table.add_column("Confidence", justify="right", style="blue")
+
+            for file_path, finding in all_unused[:50]:  # Show top 50
+                confidence_str = f"{finding.confidence:.0%}"
+                unused_table.add_row(
+                    file_path,
+                    finding.type.capitalize(),
+                    finding.name,
+                    str(finding.line),
+                    confidence_str,
+                )
+
+            console.print(unused_table)
+        else:
+            console.print("[green]✅ No unused code found.[/green]")
+
+    except ImportError:
+        # Fallback to basic output
+        print("Refactoroscope - Unused Code Analysis")
+        print(f"Project: {report.project_path}")
+
+        # Collect all unused code findings
+        all_unused = []
+        for file_insight in report.top_files:
+            if file_insight.unused_code:
+                for finding in file_insight.unused_code:
+                    all_unused.append(
+                        (file_insight.file_metrics.relative_path, finding)
+                    )
+
+        if all_unused:
+            print(f"\n🔍 Unused Code Findings ({len(all_unused)} found)")
+            print("────────────────────────────────────────")
+
+            for file_path, finding in all_unused[:50]:  # Show top 50
+                confidence_str = f"{finding.confidence:.0%}"
+                print(
+                    f"  {file_path}: {finding.type} '{finding.name}' "
+                    f"(line {finding.line}) [{confidence_str}]"
+                )
+        else:
+            print("✅ No unused code found.")
+
+
+@app.command()
+def ai(
+    path: Path = typer.Argument(..., help="Path to analyze with AI"),
+    output: str = typer.Option(
+        "terminal", "--output", "-o", help="Output format (terminal, json)"
+    ),
+    provider: str = typer.Option(
+        None, "--provider", "-p", help="Specific AI provider to use"
+    ),
+) -> None:
+    """Analyze codebase with AI for quality suggestions"""
+    typer.echo(f"Analyzing {path} with AI...")
+
+    # Initialize scanner
+    scanner = Scanner(path, enable_duplicates=True)
+
+    # Perform basic analysis first
+    report = scanner.analyze(path, include_complexity=True)
+
+    # Initialize AI analyzer
+    try:
+        from codeinsight.ai.analyzer import AIAnalyzer
+
+        ai_analyzer = AIAnalyzer(scanner.config_manager)
+
+        if not ai_analyzer.is_available():
+            typer.echo(
+                "Error: No AI providers are available. Please configure at least one provider."
+            )
+            raise typer.Exit(1)
+
+        # Perform AI analysis on top complex files
+        ai_results = []
+        for file_insight in report.top_files[:10]:  # Analyze top 10 complex files
+            file_path = file_insight.file_metrics.path
+            language = file_insight.file_metrics.language
+
+            # Skip very large files
+            if file_path.stat().st_size > 50000:  # 50KB limit
+                continue
+
+            result = ai_analyzer.analyze_with_preferred_provider(file_path, language)
+            if result:
+                ai_results.append(result)
+
+        # Display output based on format
+        if output == "terminal":
+            _display_ai_terminal(ai_results)
+        elif output == "json":
+            _display_ai_json(ai_results)
+
+    except ImportError as e:
+        typer.echo(f"Error: AI functionality not available. Missing dependencies: {e}")
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"Error during AI analysis: {e}")
+        raise typer.Exit(1)
+
+
+def _display_ai_terminal(ai_results: list) -> None:
+    """Display AI analysis results in terminal"""
+    try:
+        from rich.console import Console
+        from rich.panel import Panel
+
+        console = Console()
+
+        # Display main header
+        console.print(
+            Panel(
+                "[bold]Refactoroscope - AI Code Analysis[/bold]",
+                expand=False,
+            )
+        )
+
+        if not ai_results:
+            console.print("[yellow]No AI analysis results available.[/yellow]")
+            return
+
+        # Display results for each file
+        for result in ai_results:
+            console.print(
+                f"\n[bold]📁 {result.file_path}[/bold] (Provider: {result.provider})"
+            )
+            console.print("─" * 50)
+
+            if result.suggestions:
+                for i, suggestion in enumerate(result.suggestions, 1):
+                    console.print(
+                        f"[bold]{i}.[/bold] {suggestion.get('description', 'No description')}"
+                    )
+                    if "suggestion" in suggestion:
+                        console.print(
+                            f"   [cyan]Suggestion:[/cyan] {suggestion['suggestion']}"
+                        )
+                    console.print()
+            else:
+                console.print("[green]✅ No issues found by AI analysis.[/green]")
+
+        # Display performance summary
+        console.print("\n[bold]📊 Performance Summary[/bold]")
+        console.print("─" * 25)
+        total_time = sum(result.execution_time for result in ai_results)
+        avg_time = total_time / len(ai_results) if ai_results else 0
+        console.print(f"Total analysis time: {total_time:.2f}s")
+        console.print(f"Average time per file: {avg_time:.2f}s")
+
+        # Display cost summary if available
+        total_cost = sum(
+            result.cost for result in ai_results if result.cost is not None
+        )
+        if total_cost > 0:
+            console.print(f"Estimated cost: ${total_cost:.4f}")
+
+    except ImportError:
+        # Fallback to basic output
+        print("Refactoroscope - AI Code Analysis")
+        print("=" * 40)
+
+        if not ai_results:
+            print("No AI analysis results available.")
+            return
+
+        # Display results for each file
+        for result in ai_results:
+            print(f"\n📁 {result.file_path} (Provider: {result.provider})")
+            print("-" * 50)
+
+            if result.suggestions:
+                for i, suggestion in enumerate(result.suggestions, 1):
+                    print(f"{i}. {suggestion.get('description', 'No description')}")
+                    if "suggestion" in suggestion:
+                        print(f"   Suggestion: {suggestion['suggestion']}")
+                    print()
+            else:
+                print("✅ No issues found by AI analysis.")
+
+        # Display performance summary
+        print("\n📊 Performance Summary")
+        print("-" * 25)
+        total_time = sum(result.execution_time for result in ai_results)
+        avg_time = total_time / len(ai_results) if ai_results else 0
+        print(f"Total analysis time: {total_time:.2f}s")
+        print(f"Average time per file: {avg_time:.2f}s")
+
+        # Display cost summary if available
+        total_cost = sum(
+            result.cost for result in ai_results if result.cost is not None
+        )
+        if total_cost > 0:
+            print(f"Estimated cost: ${total_cost:.4f}")
+
+
+def _display_ai_json(ai_results: list) -> None:
+    """Display AI analysis results as JSON"""
+    import json
+    from datetime import datetime
+
+    # Convert results to JSON-serializable format
+    serializable_results = []
+    for result in ai_results:
+        serializable_result = {
+            "provider": result.provider,
+            "file_path": str(result.file_path),
+            "suggestions": result.suggestions,
+            "confidence": result.confidence,
+            "execution_time": result.execution_time,
+            "tokens_used": result.tokens_used,
+            "cost": result.cost,
+        }
+        serializable_results.append(serializable_result)
+
+    # Create final output
+    output = {"timestamp": datetime.now().isoformat(), "results": serializable_results}
+
+    print(json.dumps(output, indent=2))
+
+
+@app.command()
+def unused(
+    path: Path = typer.Argument(..., help="Path to analyze for unused code"),
+    output: str = typer.Option(
+        "terminal", "--output", "-o", help="Output format (terminal, json)"
+    ),
+) -> None:
+    """Analyze codebase for unused code elements"""
+    typer.echo(f"Analyzing {path} for unused code...")
+
+    # Initialize scanner with unused code detection enabled
+    scanner = Scanner(path, enable_duplicates=False)
+
+    # Perform analysis
+    report = scanner.analyze(path, include_complexity=False)
+
+    # Display output based on format
+    if output == "terminal":
+        _display_unused_terminal(report)
+    elif output == "json":
+        typer.echo(report.json())
+
+
+def _display_unused_terminal(report: AnalysisReport) -> None:
+    """Display unused code findings in terminal"""
+    try:
+        from rich.console import Console
+        from rich.table import Table
+        from rich.panel import Panel
+
+        console = Console()
+
+        # Display main header
+        console.print(
+            Panel(
+                f"[bold]Refactoroscope - Unused Code Analysis[/bold]\n"
+                f"[cyan]Project:[/cyan] {report.project_path}",
+                expand=False,
+            )
+        )
+
+        # Collect all unused code findings
+        all_unused = []
+        for file_insight in report.top_files:
+            if file_insight.unused_code:
+                for finding in file_insight.unused_code:
+                    all_unused.append(
+                        (file_insight.file_metrics.relative_path, finding)
+                    )
+
+        if all_unused:
+            console.print(
+                f"\n[bold]🔍 Unused Code Findings ({len(all_unused)} found)[/bold]"
+            )
+            console.print("─" * 40)
+
+            unused_table = Table(show_header=True)
+            unused_table.add_column("File", style="cyan")
+            unused_table.add_column("Type", style="magenta")
+            unused_table.add_column("Name", style="yellow")
+            unused_table.add_column("Line", justify="right", style="green")
+            unused_table.add_column("Confidence", justify="right", style="blue")
+
+            for file_path, finding in all_unused[:50]:  # Show top 50
+                confidence_str = f"{finding.confidence:.0%}"
+                unused_table.add_row(
+                    file_path,
+                    finding.type.capitalize(),
+                    finding.name,
+                    str(finding.line),
+                    confidence_str,
+                )
+
+            console.print(unused_table)
+        else:
+            console.print("[green]✅ No unused code found.[/green]")
+
+    except ImportError:
+        # Fallback to basic output
+        print("Refactoroscope - Unused Code Analysis")
+        print(f"Project: {report.project_path}")
+
+        # Collect all unused code findings
+        all_unused = []
+        for file_insight in report.top_files:
+            if file_insight.unused_code:
+                for finding in file_insight.unused_code:
+                    all_unused.append(
+                        (file_insight.file_metrics.relative_path, finding)
+                    )
+
+        if all_unused:
+            print(f"\n🔍 Unused Code Findings ({len(all_unused)} found)")
+            print("────────────────────────────────────────")
+
+            for file_path, finding in all_unused[:50]:  # Show top 50
+                confidence_str = f"{finding.confidence:.0%}"
+                print(
+                    f"  {file_path}: {finding.type} '{finding.name}' "
+                    f"(line {finding.line}) [{confidence_str}]"
+                )
+        else:
+            print("✅ No unused code found.")
 
 
 if __name__ == "__main__":

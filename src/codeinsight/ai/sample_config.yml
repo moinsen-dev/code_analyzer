@@ -1,0 +1,103 @@
+version: 1.0
+
+# Language-specific settings
+languages:
+  python:
+    max_line_length: 88
+    complexity_threshold: 10
+  typescript:
+    max_line_length: 100
+    complexity_threshold: 15
+  javascript:
+    max_line_length: 100
+    complexity_threshold: 15
+
+# Analysis rules
+analysis:
+  ignore_patterns:
+    - "*.generated.*"
+    - "*_pb2.py"
+    - "*.min.js"
+    - "node_modules/"
+    - ".git/"
+
+  complexity:
+    include_docstrings: false
+    count_assertions: true
+
+  thresholds:
+    file_too_long: 500
+    function_too_complex: 20
+    class_too_large: 1000
+
+# Output preferences
+output:
+  format: "terminal"  # terminal, json, html, csv
+  theme: "monokai"
+  show_recommendations: true
+  export_path: "./reports"
+
+# AI configuration
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: false
+  
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+  
+  # Whether to cache AI analysis results
+  cache_results: true
+  
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+  
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "ollama"
+  
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+      
+      # Model to use
+      model: "gpt-3.5-turbo"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    anthropic:
+      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
+      # api_key: "your-anthropic-api-key"
+      
+      # Model to use
+      model: "claude-3-haiku-20240307"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    google:
+      # API key (can also be set via GOOGLE_API_KEY environment variable)
+      # api_key: "your-google-api-key"
+      
+      # Model to use
+      model: "gemini-pro"
+      
+      # Whether this provider is enabled
+      enabled: false
+    
+    ollama:
+      # Ollama doesn't require API keys
+      
+      # Model to use
+      model: "llama2"
+      
+      # Base URL for Ollama (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: false

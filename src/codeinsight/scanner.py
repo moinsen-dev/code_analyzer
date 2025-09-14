@@ -19,6 +19,8 @@ from codeinsight.models.metrics import (
 from codeinsight.utils.gitignore import GitIgnoreMatcher
 from codeinsight.analyzers.line_counter import LineCounter
 from codeinsight.analyzers.complexity import ComplexityAnalyzer
+from codeinsight.analyzers.unused_code import UnusedCodeAnalyzer
+from codeinsight.analyzers.unused_files import UnusedFileAnalyzer
 from codeinsight.analysis.smells import CodeSmellDetector
 from codeinsight.analysis.advanced_duplicates import advanced_duplicate_detector
 from codeinsight.config.manager import ConfigManager
@@ -150,15 +152,32 @@ class Scanner:
     MAX_FILE_SIZE = 10 * 1024 * 1024
 
     def __init__(
-        self, project_path: Optional[Path] = None, enable_duplicates: bool = True
+        self,
+        project_path: Optional[Path] = None,
+        enable_duplicates: bool = True,
+        enable_ai: bool = False,
     ):
         self.project_path = project_path or Path.cwd()
         self.enable_duplicates = enable_duplicates
+        self.enable_ai = enable_ai
         self.config_manager = ConfigManager(self.project_path)
         self.gitignore_matcher = GitIgnoreMatcher()
         self.line_counter = LineCounter()
         self.complexity_analyzer = ComplexityAnalyzer()
+        self.unused_code_analyzer = UnusedCodeAnalyzer()
+        self.unused_file_analyzer = UnusedFileAnalyzer()
         self.smell_detector = CodeSmellDetector()
+
+        # Initialize AI analyzer if enabled
+        self.ai_analyzer = None
+        if self.enable_ai:
+            try:
+                from codeinsight.ai.analyzer import AIAnalyzer
+
+                self.ai_analyzer = AIAnalyzer(self.config_manager)
+            except ImportError:
+                # AI functionality not available
+                self.ai_analyzer = None
 
     # Directories that should always be ignored
     IGNORED_DIRECTORIES = {
@@ -314,6 +333,18 @@ class Scanner:
             top_files=insights,
         )
 
+        # Add unused file analysis at the project level
+        unused_files = self.unused_file_analyzer.analyze(path, self.config_manager)
+
+        # Add unused files to report recommendations
+        if unused_files:
+            report.recommendations.extend(
+                [
+                    f"Unused file detected: {finding.path} (confidence: {finding.confidence:.0%}) - {finding.reason}"
+                    for finding in unused_files
+                ]
+            )
+
         return report
 
     def _analyze_file_parallel(
@@ -365,6 +396,32 @@ class Scanner:
                 all_duplications = basic_duplications + advanced_duplications
                 if all_duplications:
                     insight.duplications = all_duplications
+
+            # Add unused code analysis
+            unused_code = self.unused_code_analyzer.analyze(
+                file_path, file_metrics.language
+            )
+            if unused_code:
+                insight.unused_code = unused_code
+
+            # Add AI analysis if enabled and available
+            if self.enable_ai and self.ai_analyzer and self.ai_analyzer.is_available():
+                # Only analyze files that are not too large
+                if file_path.stat().st_size <= 50000:  # 50KB limit
+                    try:
+                        ai_result = self.ai_analyzer.analyze_with_preferred_provider(
+                            file_path, file_metrics.language
+                        )
+                        if ai_result and ai_result.suggestions:
+                            # Convert AI suggestions to code smells for display
+                            ai_smells = [
+                                f"AI Suggestion: {suggestion.get('description', 'No description')}"
+                                for suggestion in ai_result.suggestions
+                            ]
+                            insight.code_smells.extend(ai_smells)
+                    except Exception:
+                        # Don't fail the entire analysis if AI analysis fails
+                        pass
 
             return (insight, file_metrics)
         except Exception as e:

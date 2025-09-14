@@ -63,7 +63,7 @@ The project is now in active development with most core features implemented:
 
    # Clone repository
    git clone <repository-url>
-   cd code-analyzer
+   cd code_analyzer
 
    # Install dependencies
    uv sync

@@ -8,7 +8,7 @@ Code Analyzer provides built-in GitHub Actions workflows that you can use direct
 
 ### Pre-built Workflows
 
-1. **Code Analysis Workflow** (`code-analyzer.yml`): Runs code analysis on every push and pull request
+1. **Code Analysis Workflow** (`code_analyzer.yml`): Runs code analysis on every push and pull request
 2. **CI Workflow** (`ci.yml`): Runs tests, linting, and type checking
 3. **Release Workflow** (`release.yml`): Automatically publishes to PyPI when tags are created
 4. **Documentation Workflow** (`docs.yml`): Deploys documentation to GitHub Pages
@@ -20,12 +20,12 @@ To use the built-in code analysis workflow in your project:
 1. Copy the workflow file to your repository:
    ```bash
    mkdir -p .github/workflows
-   cp .github/workflows/code-analyzer.yml .github/workflows/
+   cp .github/workflows/code_analyzer.yml .github/workflows/
    ```
 
 2. Customize the workflow according to your project needs:
    ```yaml
-   # In your .github/workflows/code-analyzer.yml
+   # In your .github/workflows/code_analyzer.yml
    - name: Run code analysis
      run: |
        code_analyzer analyze . --complexity --export json,html --export-dir ./reports

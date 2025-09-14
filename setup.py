@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -6,12 +6,12 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="refactoroscope",
     version="0.3.1",
-    author="Refactoroscope Team",
-    author_email="refactoroscope@example.com",
+    author="Moinsen Dev",
+    author_email="uli@moinsen.dev",
     description="A Python-based command-line tool that provides comprehensive analysis of source code repositories",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/moinsen-dev/code-analyzer",
+    url="https://github.com/moinsen-dev/code_analyzer",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[
@@ -35,7 +35,7 @@ setup(
         "jinja2>=3.1.6",
         "openpyxl>=3.1.5",
         "pathspec>=0.12.1",
-        "pyyaml>=6.0.2"
+        "pyyaml>=6.0.2",
     ],
     entry_points={
         "console_scripts": [

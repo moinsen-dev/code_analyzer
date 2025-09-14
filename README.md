@@ -1,17 +1,17 @@
 # Refactoroscope
 
-[![Build Status](https://github.com/moinsen-dev/code-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/moinsen-dev/code-analyzer/actions)
+[![Build Status](https://github.com/moinsen-dev/code_analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/moinsen-dev/code_analyzer/actions)
 [![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/github/license/moinsen-dev/code-analyzer)](LICENSE)
-[![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/code-analyzer)](https://codecov.io/gh/moinsen-dev/code-analyzer)
+[![License](https://img.shields.io/github/license/moinsen-dev/code_analyzer)](LICENSE)
+[![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/code_analyzer)](https://codecov.io/gh/moinsen-dev/code_analyzer)
 [![PyPI version](https://badge.fury.io/py/refactoroscope.svg)](https://badge.fury.io/py/refactoroscope)
 [![CI/CD Integration](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20%26%20GitLab%20CI-blue)](docs/ci-cd-integration.md)
 
-![Refactoroscope Icon](code-analyzer-icon.png)
+![Refactoroscope Icon](code_analyzer-icon.png)
 
 A Python-based command-line tool that provides comprehensive analysis of source code repositories. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
 
-![Refactoroscope Wallpaper](code-analyzer-wallpaper.png)
+![Refactoroscope Wallpaper](code_analyzer-wallpaper.png)
 
 ## Features
 
@@ -203,7 +203,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Code Analysis
-        uses: moinsen-dev/code-analyzer@v0.2.0
+        uses: moinsen-dev/code_analyzer@v0.2.0
         with:
           args: analyze . --complexity --export json,html
 ```
@@ -242,7 +242,7 @@ See [CI/CD Integration Guide](docs/ci-cd-integration.md) for more detailed instr
 
 ## Documentation
 
-For detailed documentation, visit our [GitHub Pages site](https://moinsen-dev.github.io/code-analyzer/).
+For detailed documentation, visit our [GitHub Pages site](https://moinsen-dev.github.io/code_analyzer/).
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
 

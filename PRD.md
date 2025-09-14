@@ -1,8 +1,8 @@
 # Product Requirement Document
 ## Refactoroscope
 
-**Version:** 1.0  
-**Date:** January 2025  
+**Version:** 1.0
+**Date:** January 2025
 **Author:** Product Team
 
 ---
@@ -128,12 +128,12 @@ dependencies:
     - pydantic: ">=2.5.0"    # Data validation
     - typer: ">=0.9.0"       # CLI framework
     - pyyaml: ">=6.0.0"      # YAML configuration
-  
+
   analysis:
     - ast: "builtin"         # Abstract Syntax Tree
     - lizard: ">=1.17.0"     # Cyclomatic complexity
     - flake8: ">=7.0.0"      # Code quality
-  
+
   export:
     - pandas: ">=2.1.0"      # Data manipulation
     - jinja2: ">=3.1.0"      # HTML templates
@@ -144,7 +144,7 @@ development:
     - pytest: ">=7.4.0"
     - pytest-cov: ">=4.1.0"
     - pytest-mock: ">=3.12.0"
-  
+
   quality:
     - ruff: ">=0.1.0"        # Linting
     - black: ">=23.0.0"      # Formatting
@@ -213,7 +213,7 @@ class CodeInsights:
     complexity_metrics: Optional[ComplexityMetrics]
     code_smells: List[str]
     duplications: List[Any]
-    
+
 @dataclass
 class AnalysisReport:
     project_path: Path
@@ -250,12 +250,12 @@ class ComplexityAnalyzer:
     def analyze_python_file(self, file_path: Path) -> ComplexityMetrics:
         # Parse AST
         tree = ast.parse(file_path.read_text())
-        
+
         # Calculate metrics
         cyclomatic = self.calculate_cyclomatic(tree)
         cognitive = self.calculate_cognitive(tree)
         halstead = self.calculate_halstead(tree)
-        
+
         return ComplexityMetrics(
             cyclomatic_complexity=cyclomatic,
             cognitive_complexity=cognitive,
@@ -288,11 +288,11 @@ analysis:
     - "*.min.js"
     - "node_modules/"
     - ".git/"
-  
+
   complexity:
     include_docstrings: false
     count_assertions: true
-  
+
   thresholds:
     file_too_long: 500
     function_too_complex: 20
@@ -347,10 +347,10 @@ uv run refactoroscope watch . --no-complexity
 
 📊 Analysis Summary
 ──────────────────
-  Total Files:                                             6  
-  Lines of Code:                                         163  
-  Total Size:                                    5,193 bytes  
-  Languages:        markdown (33%), python (33%), yaml (17%)  
+  Total Files:                                             6
+  Lines of Code:                                         163
+  Total Size:                                    5,193 bytes
+  Languages:        markdown (33%), python (33%), yaml (17%)
 
 🔥 Complexity Hotspots (Top 5)
 ────────────────────────────────────
@@ -405,7 +405,7 @@ The HTML report features:
     <title>Code Insight Report</title>
     <style>
         /* Modern, responsive design */
-        body { 
+        body {
             font-family: 'Inter', system-ui, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
@@ -460,19 +460,19 @@ import multiprocessing
 class ParallelAnalyzer:
     def __init__(self):
         self.max_workers = multiprocessing.cpu_count()
-    
+
     async def analyze_directory(self, path: Path):
         files = self.discover_files(path)
-        
+
         # Batch files for parallel processing
         batches = self.create_batches(files, batch_size=100)
-        
+
         with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
             futures = [
                 executor.submit(self.analyze_batch, batch)
                 for batch in batches
             ]
-            
+
         return self.aggregate_results(futures)
 ```
 
@@ -497,17 +497,17 @@ class TestComplexityAnalyzer:
     @pytest.fixture
     def analyzer(self):
         return ComplexityAnalyzer()
-    
+
     @pytest.mark.parametrize("code,expected_complexity", [
         ("def simple(): return 1", 1),
-        ("def complex(): 
+        ("def complex():
   if x: return 1
   else: return 2", 2),
     ])
     def test_cyclomatic_complexity(self, analyzer, code, expected_complexity):
         # Test implementation
         pass
-    
+
     def test_cognitive_complexity_with_nesting(self, analyzer):
         code = """
         def nested():
@@ -532,8 +532,8 @@ class TestComplexityAnalyzer:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone repository
-git clone https://github.com/yourorg/code-analyzer.git
-cd code-analyzer
+git clone https://github.com/moinsen-dev/code_-_analyzer.git
+cd code_analyzer
 
 # Install with uv
 uv sync
@@ -663,6 +663,6 @@ jobs:
 
 ---
 
-**Document Version**: 1.2  
-**Last Updated**: September 2025  
+**Document Version**: 1.2
+**Last Updated**: September 2025
 **Next Review**: October 2025

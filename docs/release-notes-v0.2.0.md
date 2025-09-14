@@ -8,7 +8,7 @@ In this release, we've implemented comprehensive CI/CD integration support for C
 
 ### 1. GitHub Actions Support
 - **Enhanced CI Workflow**: Extended the existing CI workflow with additional jobs for code quality checks, security audits, integration testing, and performance benchmarking
-- **Dedicated Analysis Workflow**: Created a new `code-analyzer.yml` workflow specifically for running code analysis in CI/CD pipelines
+- **Dedicated Analysis Workflow**: Created a new `code_analyzer.yml` workflow specifically for running code analysis in CI/CD pipelines
 - **Reusable GitHub Action**: Created an `action.yml` file that allows users to directly use Code Analyzer as a GitHub Action
 - **Docker Support**: Added a Dockerfile for the GitHub Action to ensure consistent execution environments
 
@@ -39,7 +39,7 @@ To use Code Analyzer in your GitHub Actions workflow, you can either:
 1. Use the direct action:
 ```yaml
 - name: Run Code Analysis
-  uses: moinsen-dev/code-analyzer@v0.2.0
+  uses: moinsen-dev/code_analyzer@v0.2.0
   with:
     args: analyze . --complexity --export json,html
 ```

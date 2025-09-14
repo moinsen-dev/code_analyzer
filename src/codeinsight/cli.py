@@ -602,7 +602,7 @@ def _display_live_terminal(
         console = Console()
 
         # Create the display components
-        def create_display():
+        def create_display() -> tuple:
             # Display main header
             header = Panel(
                 f"[bold]Code Insight Analyzer v1.0 (Live)[/bold]\n"
@@ -745,7 +745,7 @@ def watch(
     watcher = CodeWatcher(path)
 
     # Handle Ctrl+C gracefully
-    def signal_handler(sig, frame):
+    def signal_handler(sig: int, frame) -> None:  # type: ignore
         typer.echo("\nStopping watcher...")
         watcher.stop()
         sys.exit(0)

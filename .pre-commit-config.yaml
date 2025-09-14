@@ -15,6 +15,13 @@ repos:
         types: [python]
         pass_filenames: false
       
+      - id: mypy-check
+        name: mypy-check
+        entry: uv run mypy src/
+        language: system
+        types: [python]
+        pass_filenames: false
+      
       - id: run-tests
         name: run-tests
         entry: uv run pytest tests/

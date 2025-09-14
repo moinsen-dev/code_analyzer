@@ -26,22 +26,22 @@ class CodeChangeHandler(FileSystemEventHandler):
         self.ignore_patterns = ignore_patterns or set()
         self._scanner = Scanner(project_path)
         # Debouncing - to avoid multiple rapid analyses
-        self._last_event_time = 0
+        self._last_event_time = 0.0
         self._debounce_interval = 1.0  # 1 second debounce
 
     def on_modified(self, event: FileSystemEvent) -> None:
         """Handle file modification events"""
-        if not event.is_directory and self._should_analyze(event.src_path):
+        if not event.is_directory and self._should_analyze(str(event.src_path)):
             self._debounced_callback()
 
     def on_created(self, event: FileSystemEvent) -> None:
         """Handle file creation events"""
-        if not event.is_directory and self._should_analyze(event.src_path):
+        if not event.is_directory and self._should_analyze(str(event.src_path)):
             self._debounced_callback()
 
     def on_deleted(self, event: FileSystemEvent) -> None:
         """Handle file deletion events"""
-        if not event.is_directory and self._should_analyze(event.src_path):
+        if not event.is_directory and self._should_analyze(str(event.src_path)):
             self._debounced_callback()
 
     def _debounced_callback(self) -> None:

@@ -1,10 +1,7 @@
 name: Refactoroscope Analysis
 
 on:
-  push:
-    branches: [ "main", "develop" ]
-  pull_request:
-    branches: [ "main", "develop" ]
+  workflow_dispatch:
 
 jobs:
   analyze:
@@ -34,10 +31,3 @@ jobs:
         name: code-analysis-report
         path: ./reports/
         retention-days: 30
-
-    - name: Check for code smells
-      run: |
-        # Fail the build if high complexity files are found
-        # This is just an example - customize based on your project needs
-        echo "Checking for files with high complexity..."
-        # You can add custom logic here to fail builds based on analysis results

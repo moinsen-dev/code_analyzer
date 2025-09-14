@@ -38,6 +38,7 @@ jobs:
 
       - name: Run type checker
         run: |
+          uv pip install types-networkx types-requests
           uv run mypy src/
 
       - name: Upload coverage to Codecov
@@ -73,6 +74,7 @@ jobs:
 
       - name: Run linter on all files
         run: |
+          uv pip install types-networkx types-requests
           uv run ruff check src/ tests/
 
   # Integration testing

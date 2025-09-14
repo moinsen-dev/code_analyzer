@@ -34,7 +34,7 @@ jobs:
 
     - name: Run linter
       run: |
-        uv run ruff check src/
+        uv run ruff check src/ tests/
 
     - name: Run type checker
       run: |
@@ -70,6 +70,10 @@ jobs:
     - name: Check code formatting
       run: |
         uv run black --check src/ tests/
+
+    - name: Run linter on all files
+      run: |
+        uv run ruff check src/ tests/
 
     - name: Security audit
       run: |

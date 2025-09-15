@@ -59,10 +59,10 @@ uv run refactoroscope analyze . --export json,html --export-dir ./reports
 - `compare`: Compare two analysis reports
 - `init`: Initialize a configuration file
 - `watch`: Watch a codebase for changes
-- `ai`: Analyze codebase with AI-powered suggestions
 - `duplicates`: Analyze for duplicate code
 - `unused`: Analyze for unused code
 - `unused-files`: Analyze for unused files
+- `refactor-plan`: Generate an AI-based refactoring plan
 
 ### Analyze Options
 
@@ -81,10 +81,21 @@ uv run refactoroscope analyze . --export json,html --export-dir ./reports
 - `--ai`: Enable AI-powered suggestions during watching
 - `--no-complexity` or `-C`: Disable complexity analysis
 
-### AI Options
+### AI (--ai/--no-ai)
+Enable/disable AI-powered code suggestions during analysis.
 
-- `--provider`: Specify which AI provider to use (openai, anthropic, google, ollama, qwen)
-- `--no-cache`: Disable caching of AI results
+Default: `no-ai`
+
+Example:
+```bash
+uv run refactoroscope analyze . --ai
+```
+
+When enabled, this option will:
+1. Enable AI-powered code quality suggestions
+2. Analyze complex files with configured AI providers
+3. Display AI-generated suggestions in the "Code Smells Detected" section
+4. Provide intelligent insights on code readability, performance, potential bugs, and security issues
 
 ### Duplicates Options
 
@@ -100,6 +111,42 @@ uv run refactoroscope analyze . --export json,html --export-dir ./reports
 - `--confidence`: Confidence threshold for reporting (0.0 to 1.0)
 - `--entry-point`: Specify entry point files
 
+## Tech Stack Analysis and Tool Execution
+
+### Check (--check)
+Enable tech stack detection and run appropriate tools for each detected tech stack in subfolders.
+
+Default: Disabled
+
+Example:
+```bash
+uv run refactoroscope analyze . --check
+```
+
+This option will:
+1. Detect technology stacks in all subfolders
+2. Run appropriate linters, formatters, and type checkers for each detected tech stack
+3. Check for outdated packages
+4. Display results in terminal
+
+## AI-Powered Refactoring Plan Generation
+
+### Provider (-p, --provider)
+AI provider to use for refactoring plan generation.
+
+Choices: `openai`, `anthropic`, `google`, `ollama`, `qwen`
+Default: `openai`
+
+### Output (-o, --output)
+Output file for the refactoring plan.
+
+Default: `refactor_plan.md`
+
+Example:
+```bash
+uv run refactoroscope refactor-plan . --provider openai --output my_plan.md
+```
+
 ## Examples
 
 ### Basic Analysis
@@ -108,86 +155,92 @@ uv run refactoroscope analyze . --export json,html --export-dir ./reports
 # Analyze current directory
 uv run refactoroscope analyze .
 
-# Analyze with complexity metrics
-uv run refactoroscope analyze . --complexity
+# Analyze specific directory
+uv run refactoroscope analyze /path/to/project
 
-# Analyze and export to JSON
-uv run refactoroscope analyze . --export json --export-dir ./reports
+# Disable complexity analysis (if needed)
+uv run refactoroscope analyze . --no-complexity
+
+# Enable AI-powered suggestions
+uv run refactoroscope analyze . --ai
 ```
 
 ### Real-time Watching
 
 ```bash
-# Watch current directory
+# Watch current directory for changes
 uv run refactoroscope watch .
 
-# Watch with AI suggestions
+# Watch specific directory
+uv run refactoroscope watch /path/to/project
+
+# Enable AI-powered suggestions during watching
 uv run refactoroscope watch . --ai
-
-# Watch without complexity analysis
-uv run refactoroscope watch . --no-complexity
-```
-
-### AI-Powered Analysis
-
-```bash
-# Analyze with AI
-uv run refactoroscope ai .
-
-# Analyze with specific provider
-uv run refactoroscope ai . --provider openai
-
-# Analyze with AI during regular analysis
-uv run refactoroscope analyze . --ai
 ```
 
 ### Duplicate Code Detection
 
 ```bash
-# Analyze for duplicates
-uv run refactoroscope duplicates .
+# Analyze for duplicate code
+uv run refactoroscope duplicates src/
 
 # Analyze for exact duplicates only
-uv run refactoroscope duplicates . --type exact
+uv run refactoroscope duplicates src/ --type exact
 
-# Analyze with custom similarity threshold
-uv run refactoroscope duplicates . --min-similarity 0.9
+# Find similar code with minimum similarity threshold
+uv run refactoroscope duplicates src/ --min-similarity 0.8
+
+# Focus on renamed clones
+uv run refactoroscope duplicates src/ --type renamed
 ```
 
 ### Unused Code Detection
 
 ```bash
 # Analyze for unused code
-uv run refactoroscope unused .
+uv run refactoroscope unused src/
 
-# Analyze with custom confidence threshold
-uv run refactoroscope unused . --confidence 0.8
+# Get JSON output for unused code
+uv run refactoroscope unused src/ --output json
 ```
 
 ### Unused File Detection
 
 ```bash
 # Analyze for unused files
-uv run refactoroscope unused-files .
+uv run refactoroscope unused-files src/
 
-# Analyze with custom confidence threshold
-uv run refactoroscope unused-files . --confidence 0.8
+# Analyze for unused files with confidence threshold
+uv run refactoroscope unused-files src/ --confidence 0.7
 
-# Specify entry points
-uv run refactoroscope unused-files . --entry-point main.py --entry-point app.py
+# Get JSON output for unused files
+uv run refactoroscope unused-files src/ --output json
 ```
 
-### Advanced Usage
+### Tech Stack Analysis and Tool Execution
 
 ```bash
-# Export to multiple formats
-uv run refactoroscope analyze . --export json,html,css --export-dir ./reports
+# Analyze current directory and run appropriate tools for detected tech stacks
+uv run refactoroscope analyze . --check
 
-# Limit top files display
-uv run refactoroscope analyze . --top-files 50
+# This will:
+# 1. Detect technology stacks in all subfolders
+# 2. Run appropriate linters, formatters, and type checkers for each stack
+# 3. Check for outdated packages
+# 4. Display results in terminal
+```
 
-# Compare two analyses
-uv run refactoroscope compare reports/2025-01-01.json reports/2025-01-15.json
+### AI-Powered Refactoring Plan Generation
+
+```bash
+# Generate an AI-based refactoring plan for your project
+uv run refactoroscope refactor-plan .
+
+# Generate refactoring plan with specific AI provider
+uv run refactoroscope refactor-plan . --provider openai
+
+# Save refactoring plan to specific file
+uv run refactoroscope refactor-plan . --output my_plan.md
 ```
 
 ## Configuration

@@ -28,17 +28,20 @@ uv run refactoroscope init --force
 ```yaml
 version: 1.0
 
+# Language-specific settings
 languages:
-  # Language-specific settings
   python:
     max_line_length: 88
     complexity_threshold: 10
   typescript:
     max_line_length: 100
     complexity_threshold: 15
+  javascript:
+    max_line_length: 100
+    complexity_threshold: 15
 
+# Analysis rules
 analysis:
-  # File patterns to ignore
   ignore_patterns:
     - "*.generated.*"
     - "*_pb2.py"
@@ -46,84 +49,25 @@ analysis:
     - "node_modules/"
     - ".git/"
   
-  # Complexity analysis options
   complexity:
     include_docstrings: false
     count_assertions: true
   
-  # Analysis thresholds
   thresholds:
     file_too_long: 500
     function_too_complex: 20
     class_too_large: 1000
-  
-  # Duplicate code detection
-  duplicates:
-    # Minimum similarity threshold (0.0 to 1.0)
-    min_similarity: 0.8
-    
-    # Clone types to detect
-    clone_types:
-      - "exact"
-      - "renamed"
-      - "modified"
-      - "semantic"
-    
-    # Whether to include comments in comparison
-    include_comments: false
-    
-    # Whether to include docstrings in comparison
-    include_docstrings: false
-    
-    # Minimum number of lines for a clone
-    min_lines: 3
-    
-    # Maximum number of lines for a clone
-    max_lines: 100
-    
-    # Patterns to ignore
-    ignore_patterns:
-      - "*.generated.*"
-      - "*_pb2.py"
-  
-  # Unused code detection
-  unused_code:
-    # Confidence threshold for reporting (0.0 to 1.0)
-    confidence_threshold: 0.5
-    
-    # Patterns to ignore
-    ignore_patterns:
-      - "test_*.py"
-      - "*_test.py"
-  
-  # Unused file detection
-  unused_files:
-    # Confidence threshold for reporting (0.0 to 1.0)
-    confidence_threshold: 0.5
-    
-    # Explicitly specify entry points
-    entry_points:
-      - "main.py"
-      - "app.py"
-      - "scripts/"
-    
-    # Patterns to ignore (in addition to global ignore patterns)
-    ignore_patterns:
-      - "test_*.py"
-      - "*/migrations/*"
-      - "*/fixtures/*"
-    
-    # Include/exclude specific directories
-    include_dirs:
-      - "src/"
-    exclude_dirs:
-      - "tests/"
-      - "docs/"
 
 # AI configuration
+# AI providers require API keys which should be set as environment variables:
+# - OpenAI: OPENAI_API_KEY
+# - Anthropic: ANTHROPIC_API_KEY
+# - Google: GOOGLE_API_KEY
+# - Ollama: No API key required (runs locally)
+# - Qwen: No API key required (runs locally)
 ai:
   # Enable AI-powered code suggestions
-  enable_ai_suggestions: false
+  enable_ai_suggestions: true
   
   # Maximum file size to analyze with AI (in bytes)
   max_file_size: 50000
@@ -152,7 +96,7 @@ ai:
       model: "gpt-3.5-turbo"
       
       # Whether this provider is enabled
-      enabled: false
+      enabled: true
     
     anthropic:
       # API key (can also be set via ANTHROPIC_API_KEY environment variable)
@@ -162,7 +106,7 @@ ai:
       model: "claude-3-haiku-20240307"
       
       # Whether this provider is enabled
-      enabled: false
+      enabled: true
     
     google:
       # API key (can also be set via GOOGLE_API_KEY environment variable)
@@ -172,7 +116,7 @@ ai:
       model: "gemini-pro"
       
       # Whether this provider is enabled
-      enabled: false
+      enabled: true
     
     ollama:
       # Ollama doesn't require API keys
@@ -184,42 +128,22 @@ ai:
       base_url: "http://localhost:11434"
       
       # Whether this provider is enabled
-      enabled: false
+      enabled: true
     
     qwen:
-      # Qwen doesn't require API keys when using local Ollama
+      # Qwen doesn't require API keys for local installations
       
       # Model to use
-      model: "qwen2"
+      model: "qwen"
       
       # Base URL for Qwen (default is localhost)
       base_url: "http://localhost:11434"
       
       # Whether this provider is enabled
-      enabled: false
+      enabled: true
 
-# Watch configuration
-watch:
-  # Debounce delay in seconds to prevent excessive analysis
-  debounce_delay: 1.0
-  
-  # Whether to analyze on file creation events
-  analyze_on_create: true
-  
-  # Whether to analyze on file modification events
-  analyze_on_modify: true
-  
-  # Whether to analyze on file deletion events
-  analyze_on_delete: true
-  
-  # Patterns to ignore (in addition to .gitignore)
-  ignore_patterns:
-    - "*.log"
-    - "*.tmp"
-    - ".DS_Store"
-
+# Output preferences
 output:
-  # Output format
   format: "terminal"  # terminal, json, html, csv
   theme: "monokai"
   show_recommendations: true
@@ -426,9 +350,204 @@ analysis:
     function_too_complex: 18
     class_too_large: 750
 
+# AI configuration
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: true
+  
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+  
+  # Whether to cache AI analysis results
+  cache_results: true
+  
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+  
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "ollama"
+    - "qwen"
+  
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+      
+      # Model to use
+      model: "gpt-3.5-turbo"
+      
+      # Whether this provider is enabled
+      enabled: true
+    
+    anthropic:
+      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
+      # api_key: "your-anthropic-api-key"
+      
+      # Model to use
+      model: "claude-3-haiku-20240307"
+      
+      # Whether this provider is enabled
+      enabled: true
+    
+    google:
+      # API key (can also be set via GOOGLE_API_KEY environment variable)
+      # api_key: "your-google-api-key"
+      
+      # Model to use
+      model: "gemini-pro"
+      
+      # Whether this provider is enabled
+      enabled: true
+    
+    ollama:
+      # Ollama doesn't require API keys
+      
+      # Model to use
+      model: "llama2"
+      
+      # Base URL for Ollama (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: true
+    
+    qwen:
+      # Qwen doesn't require API keys for local installations
+      
+      # Model to use
+      model: "qwen"
+      
+      # Base URL for Qwen (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: true
+
+## AI Configuration
+
+The Refactoroscope includes advanced AI-powered code analysis and refactoring plan generation. The AI configuration allows you to customize how AI providers are used for code suggestions and refactoring plans.
+
+### AI Provider Setup
+
+AI providers require API keys which should be set as environment variables:
+- **OpenAI**: `OPENAI_API_KEY`
+- **Anthropic**: `ANTHROPIC_API_KEY`
+- **Google**: `GOOGLE_API_KEY`
+- **Ollama**: No API key required (runs locally)
+- **Qwen**: No API key required (runs locally)
+
+### AI Configuration Options
+
+The AI configuration section controls various aspects of AI-powered analysis:
+
+- **enable_ai_suggestions**: Enable or disable AI-powered code suggestions
+- **max_file_size**: Maximum file size to analyze with AI (in bytes)
+- **cache_results**: Whether to cache AI analysis results for performance
+- **cache_ttl**: Cache time-to-live in seconds
+- **provider_preferences**: Preference order for AI providers
+- **providers**: Detailed configuration for each AI provider
+
+### Provider-Specific Configuration
+
+Each AI provider can be configured with specific settings:
+
+#### OpenAI
+- **api_key**: Your OpenAI API key (can also be set via `OPENAI_API_KEY` environment variable)
+- **model**: The model to use (e.g., "gpt-3.5-turbo", "gpt-4")
+- **enabled**: Whether this provider is enabled
+
+#### Anthropic
+- **api_key**: Your Anthropic API key (can also be set via `ANTHROPIC_API_KEY` environment variable)
+- **model**: The model to use (e.g., "claude-3-haiku-20240307", "claude-3-sonnet-20240229")
+- **enabled**: Whether this provider is enabled
+
+#### Google
+- **api_key**: Your Google API key (can also be set via `GOOGLE_API_KEY` environment variable)
+- **model**: The model to use (e.g., "gemini-pro", "gemini-1.5-pro")
+- **enabled**: Whether this provider is enabled
+
+#### Ollama
+- **model**: The model to use (e.g., "llama2", "mistral")
+- **base_url**: Base URL for Ollama (default is "http://localhost:11434")
+- **enabled**: Whether this provider is enabled
+
+#### Qwen
+- **model**: The model to use (e.g., "qwen")
+- **base_url**: Base URL for Qwen (default is "http://localhost:11434")
+- **enabled**: Whether this provider is enabled
+
+## Example Configurations
+
+### Basic Configuration with AI
+
+```yaml
+version: 1.0
+
+languages:
+  python:
+    max_line_length: 88
+    complexity_threshold: 10
+
+analysis:
+  ignore_patterns:
+    - "*.generated.*"
+    - "*_pb2.py"
+    - "*.min.js"
+    - "node_modules/"
+    - ".git/"
+  
+  complexity:
+    include_docstrings: false
+    count_assertions: true
+  
+  thresholds:
+    file_too_long: 500
+    function_too_complex: 20
+    class_too_large: 1000
+
+# AI configuration
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: true
+  
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+  
+  # Whether to cache AI analysis results
+  cache_results: true
+  
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+  
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "ollama"
+    - "qwen"
+  
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+      
+      # Model to use
+      model: "gpt-3.5-turbo"
+      
+      # Whether this provider is enabled
+      enabled: true
+
 output:
-  format: "terminal"
-  theme: "github"
+  format: "terminal"  # terminal, json, html, csv
+  theme: "monokai"
   show_recommendations: true
-  export_path: "./analysis_reports"
+  export_path: "./reports"
+```
 ```

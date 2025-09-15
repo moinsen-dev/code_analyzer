@@ -22,6 +22,10 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - **Unused code detection using AST-based analysis**
 - **Unused file detection using dependency graph analysis**
 - **AI-powered code quality suggestions**
+- **Advanced refactoring tools with AI-powered refactoring plan generation**
+- **Tech stack detection for 10+ programming languages (Python, JavaScript/TypeScript, Flutter, Go, Rust, Ruby, PHP, Java, Kotlin)**
+- **Integrated tool execution for each detected tech stack**
+- **Outdated package detection for all supported tech stacks**
 - Export results to JSON/CSV/HTML
 - Configuration file support (.refactoroscope.yml)
 - Multi-language support (60+ programming languages)
@@ -78,3 +82,4 @@ The Refactoroscope supports 60+ programming languages:
 - [Duplicate Code Detection](duplicates.md)
 - [Unused Code Detection](unused_code.md)
 - [Unused File Detection](unused_file_detection.md)
+- [Advanced Refactoring Tools](advanced_refactoring_tools.md)

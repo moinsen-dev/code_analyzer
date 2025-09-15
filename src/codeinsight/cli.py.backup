@@ -107,90 +107,6 @@ analysis:
     function_too_complex: 20
     class_too_large: 1000
 
-# AI configuration
-# AI providers require API keys which should be set as environment variables:
-# - OpenAI: OPENAI_API_KEY
-# - Anthropic: ANTHROPIC_API_KEY
-# - Google: GOOGLE_API_KEY
-# - Ollama: No API key required (runs locally)
-# - Qwen: No API key required (runs locally)
-ai:
-  # Enable AI-powered code suggestions
-  enable_ai_suggestions: true
-  
-  # Maximum file size to analyze with AI (in bytes)
-  max_file_size: 50000
-  
-  # Whether to cache AI analysis results
-  cache_results: true
-  
-  # Cache time-to-live in seconds
-  cache_ttl: 3600
-  
-  # Preference order for AI providers
-  provider_preferences:
-    - "openai"
-    - "anthropic"
-    - "google"
-    - "ollama"
-    - "qwen"
-  
-  # Provider configurations
-  providers:
-    openai:
-      # API key (can also be set via OPENAI_API_KEY environment variable)
-      # api_key: "your-openai-api-key"
-      
-      # Model to use
-      model: "gpt-3.5-turbo"
-      
-      # Whether this provider is enabled
-      enabled: true
-    
-    anthropic:
-      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
-      # api_key: "your-anthropic-api-key"
-      
-      # Model to use
-      model: "claude-3-haiku-20240307"
-      
-      # Whether this provider is enabled
-      enabled: true
-    
-    google:
-      # API key (can also be set via GOOGLE_API_KEY environment variable)
-      # api_key: "your-google-api-key"
-      
-      # Model to use
-      model: "gemini-pro"
-      
-      # Whether this provider is enabled
-      enabled: true
-    
-    ollama:
-      # Ollama doesn't require API keys
-      
-      # Model to use
-      model: "llama2"
-      
-      # Base URL for Ollama (default is localhost)
-      base_url: "http://localhost:11434"
-      
-      # Whether this provider is enabled
-      enabled: true
-    
-    qwen:
-      # Qwen doesn't require API keys for local installations
-      
-      # Model to use
-      model: "qwen"
-      
-      # Base URL for Qwen (default is localhost)
-      base_url: "http://localhost:11434"
-      
-      # Whether this provider is enabled
-      enabled: true
-
 # Output preferences
 output:
   format: "terminal"  # terminal, json, html, csv
@@ -1291,6 +1207,184 @@ def _display_unused_files_json(findings: List[str]) -> None:
         "unused_files_count": len(findings),
         "findings": findings,
     }
+
+    print(json.dumps(output, indent=2))
+
+
+@app.command()
+def ai(
+    path: Path = typer.Argument(..., help="Path to analyze with AI"),
+    output: str = typer.Option(
+        "terminal", "--output", "-o", help="Output format (terminal, json)"
+    ),
+    provider: str = typer.Option(
+        None, "--provider", "-p", help="Specific AI provider to use"
+    ),
+) -> None:
+    """Analyze codebase with AI for quality suggestions"""
+    typer.echo(f"Analyzing {path} with AI...")
+
+    # Initialize scanner
+    scanner = Scanner(path, enable_duplicates=True)
+
+    # Perform basic analysis first
+    report = scanner.analyze(path, include_complexity=True)
+
+    # Initialize AI analyzer
+    try:
+        from codeinsight.ai.analyzer import AIAnalyzer
+
+        ai_analyzer = AIAnalyzer(scanner.config_manager)
+
+        if not ai_analyzer.is_available():
+            typer.echo(
+                "Error: No AI providers are available. Please configure at least one provider."
+            )
+            raise typer.Exit(1)
+
+        # Perform AI analysis on top complex files
+        ai_results = []
+        for file_insight in report.top_files[:10]:  # Analyze top 10 complex files
+            file_path = file_insight.file_metrics.path
+            language = file_insight.file_metrics.language
+
+            # Skip very large files
+            if file_path.stat().st_size > 50000:  # 50KB limit
+                continue
+
+            result = ai_analyzer.analyze_with_preferred_provider(file_path, language)
+            if result:
+                ai_results.append(result)
+
+        # Display output based on format
+        if output == "terminal":
+            _display_ai_terminal(ai_results)
+        elif output == "json":
+            _display_ai_json(ai_results)
+
+    except ImportError as e:
+        typer.echo(f"Error: AI functionality not available. Missing dependencies: {e}")
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"Error during AI analysis: {e}")
+        raise typer.Exit(1)
+
+
+def _display_ai_terminal(ai_results: list) -> None:
+    """Display AI analysis results in terminal"""
+    try:
+        from rich.console import Console
+        from rich.panel import Panel
+
+        console = Console()
+
+        # Display main header
+        console.print(
+            Panel(
+                "[bold]Refactoroscope - AI Code Analysis[/bold]",
+                expand=False,
+            )
+        )
+
+        if not ai_results:
+            console.print("[yellow]No AI analysis results available.[/yellow]")
+            return
+
+        # Display results for each file
+        for result in ai_results:
+            console.print(
+                f"\n[bold]📁 {result.file_path}[/bold] (Provider: {result.provider})"
+            )
+            console.print("─" * 50)
+
+            if result.suggestions:
+                for i, suggestion in enumerate(result.suggestions, 1):
+                    console.print(
+                        f"[bold]{i}.[/bold] {suggestion.get('description', 'No description')}"
+                    )
+                    if "suggestion" in suggestion:
+                        console.print(
+                            f"   [cyan]Suggestion:[/cyan] {suggestion['suggestion']}"
+                        )
+                    console.print()
+            else:
+                console.print("[green]✅ No issues found by AI analysis.[/green]")
+
+        # Display performance summary
+        console.print("\n[bold]📊 Performance Summary[/bold]")
+        console.print("─" * 25)
+        total_time = sum(result.execution_time for result in ai_results)
+        avg_time = total_time / len(ai_results) if ai_results else 0
+        console.print(f"Total analysis time: {total_time:.2f}s")
+        console.print(f"Average time per file: {avg_time:.2f}s")
+
+        # Display cost summary if available
+        total_cost = sum(
+            result.cost for result in ai_results if result.cost is not None
+        )
+        if total_cost > 0:
+            console.print(f"Estimated cost: ${total_cost:.4f}")
+
+    except ImportError:
+        # Fallback to basic output
+        print("Refactoroscope - AI Code Analysis")
+        print("=" * 40)
+
+        if not ai_results:
+            print("No AI analysis results available.")
+            return
+
+        # Display results for each file
+        for result in ai_results:
+            print(f"\n📁 {result.file_path} (Provider: {result.provider})")
+            print("-" * 50)
+
+            if result.suggestions:
+                for i, suggestion in enumerate(result.suggestions, 1):
+                    print(f"{i}. {suggestion.get('description', 'No description')}")
+                    if "suggestion" in suggestion:
+                        print(f"   Suggestion: {suggestion['suggestion']}")
+                    print()
+            else:
+                print("✅ No issues found by AI analysis.")
+
+        # Display performance summary
+        print("\n📊 Performance Summary")
+        print("-" * 25)
+        total_time = sum(result.execution_time for result in ai_results)
+        avg_time = total_time / len(ai_results) if ai_results else 0
+        print(f"Total analysis time: {total_time:.2f}s")
+        print(f"Average time per file: {avg_time:.2f}s")
+
+        # Display cost summary if available
+        total_cost = sum(
+            result.cost for result in ai_results if result.cost is not None
+        )
+        if total_cost > 0:
+            print(f"Estimated cost: ${total_cost:.4f}")
+
+
+def _display_ai_json(ai_results: list) -> None:
+    """Display AI analysis results as JSON"""
+    import json
+    from datetime import datetime
+
+    # Convert results to JSON-serializable format
+    serializable_results = []
+    for result in ai_results:
+        serializable_result = {
+            "provider": result.provider,
+            "file_path": str(result.file_path),
+            "suggestions": result.suggestions,
+            "confidence": result.confidence,
+            "execution_time": result.execution_time,
+            "tokens_used": result.tokens_used,
+            "cost": result.cost,
+        }
+        serializable_results.append(serializable_result)
+
+    # Create final output
+    output = {"timestamp": datetime.now().isoformat(), "results": serializable_results}
 
     print(json.dumps(output, indent=2))
 

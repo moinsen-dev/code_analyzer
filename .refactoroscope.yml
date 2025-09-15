@@ -8,6 +8,9 @@ languages:
   typescript:
     max_line_length: 100
     complexity_threshold: 15
+  javascript:
+    max_line_length: 100
+    complexity_threshold: 15
 
 # Analysis rules
 analysis:
@@ -17,11 +20,11 @@ analysis:
     - "*.min.js"
     - "node_modules/"
     - ".git/"
-
+  
   complexity:
     include_docstrings: false
     count_assertions: true
-
+  
   thresholds:
     file_too_long: 500
     function_too_complex: 20

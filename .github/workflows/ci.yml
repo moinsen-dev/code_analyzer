@@ -24,8 +24,9 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies
+      - name: Install dependencies and type stubs
         run: |
+          uv pip install types-networkx types-requests
           uv sync
 
       - name: Run tests with coverage
@@ -38,7 +39,6 @@ jobs:
 
       - name: Run type checker
         run: |
-          uv pip install types-networkx types-requests
           uv run mypy src/
 
       - name: Upload coverage to Codecov
@@ -64,8 +64,9 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies
+      - name: Install dependencies and type stubs
         run: |
+          uv pip install types-networkx types-requests
           uv sync
 
       - name: Check code formatting
@@ -74,7 +75,6 @@ jobs:
 
       - name: Run linter on all files
         run: |
-          uv pip install types-networkx types-requests
           uv run ruff check src/ tests/
 
   # Integration testing
@@ -92,8 +92,9 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies
+      - name: Install dependencies and type stubs
         run: |
+          uv pip install types-networkx types-requests
           uv sync
 
       - name: Run integration tests
@@ -115,8 +116,9 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies
+      - name: Install dependencies and type stubs
         run: |
+          uv pip install types-networkx types-requests
           uv sync
 
       - name: Run performance benchmarks

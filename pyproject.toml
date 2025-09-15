@@ -70,6 +70,8 @@ dev-dependencies = [
     "vulture>=2.13",
     "isort>=5.13.2",
     "pip-audit>=0.8.0",
+    "types-networkx>=1.0.0",
+    "types-requests>=2.0.0",
 ]
 
 [tool.pytest.ini_options]

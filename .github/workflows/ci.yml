@@ -24,9 +24,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies and type stubs
+      - name: Install dependencies
         run: |
-          uv pip install types-networkx types-requests
           uv sync
 
       - name: Run tests with coverage
@@ -64,9 +63,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies and type stubs
+      - name: Install dependencies
         run: |
-          uv pip install types-networkx types-requests
           uv sync
 
       - name: Check code formatting
@@ -92,9 +90,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies and type stubs
+      - name: Install dependencies
         run: |
-          uv pip install types-networkx types-requests
           uv sync
 
       - name: Run integration tests
@@ -116,9 +113,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies and type stubs
+      - name: Install dependencies
         run: |
-          uv pip install types-networkx types-requests
           uv sync
 
       - name: Run performance benchmarks

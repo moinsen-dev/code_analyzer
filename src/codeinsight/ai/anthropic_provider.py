@@ -69,7 +69,10 @@ class AnthropicProvider(AIProvider):
                 )
 
             # Process response
-            suggestions = self._parse_response(response.content[0].text)
+            response_text = ""
+            if response.content and len(response.content) > 0 and hasattr(response.content[0], "text"):
+                response_text = response.content[0].text
+            suggestions = self._parse_response(response_text)
 
             execution_time = time.time() - start_time
 

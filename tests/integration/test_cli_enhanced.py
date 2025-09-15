@@ -93,11 +93,11 @@ print(used_value)
         ], f"Command failed with stderr: {result.stderr}"
 
 
-def test_ai_command_help():
-    """Test that the AI command shows help"""
-    # Run the ai command with --help
+def test_analyze_ai_help():
+    """Test that the analyze command shows help for AI options"""
+    # Run the analyze command with --help
     result = subprocess.run(
-        ["python", "-m", "codeinsight.cli", "ai", "--help"],
+        ["python", "-m", "codeinsight.cli", "analyze", "--help"],
         capture_output=True,
         text=True,
     )

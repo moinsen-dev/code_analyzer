@@ -72,14 +72,15 @@ class OpenAIProvider(AIProvider):
                 )
 
             # Process response
-            suggestions = self._parse_response(response.choices[0].message.content)
+            response_content = response.choices[0].message.content if response.choices[0].message.content else ""
+            suggestions = self._parse_response(response_content)
 
             execution_time = time.time() - start_time
 
             # Get token usage if available
             tokens_used = None
             cost = None
-            if hasattr(response, "usage"):
+            if hasattr(response, "usage") and response.usage is not None:
                 tokens_used = response.usage.total_tokens
                 # Rough cost calculation (prices vary by model)
                 if "gpt-4" in self.model:

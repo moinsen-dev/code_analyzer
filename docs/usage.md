@@ -181,13 +181,13 @@ uv run refactoroscope unused-files . --entry-point main.py --entry-point app.py
 
 ```bash
 # Export to multiple formats
-uv run code_analyzer analyze . --export json,html,css --export-dir ./reports
+uv run refactoroscope analyze . --export json,html,css --export-dir ./reports
 
 # Limit top files display
-uv run code_analyzer analyze . --top-files 50
+uv run refactoroscope analyze . --top-files 50
 
 # Compare two analyses
-uv run code_analyzer compare reports/2025-01-01.json reports/2025-01-15.json
+uv run refactoroscope compare reports/2025-01-01.json reports/2025-01-15.json
 ```
 
 ## Configuration

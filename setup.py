@@ -11,7 +11,7 @@ setup(
     description="A Python-based command-line tool that provides comprehensive analysis of source code repositories",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/moinsen-dev/code_analyzer",
+    url="https://github.com/moinsen-dev/refactoroscope",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[

@@ -10,7 +10,7 @@ title: Examples
 ### Simple Project Analysis
 
 ```bash
-uv run code_analyzer analyze .
+uv run refactoroscope analyze .
 ```
 
 Output:
@@ -46,7 +46,7 @@ Output:
 ### With Complexity Metrics
 
 ```bash
-uv run code_analyzer analyze . --complexity
+uv run refactoroscope analyze . --complexity
 ```
 
 Output:
@@ -79,7 +79,7 @@ Output:
 ### JSON Export
 
 ```bash
-uv run code_analyzer analyze . --export json --export-dir ./reports
+uv run refactoroscope analyze . --export json --export-dir ./reports
 ```
 
 Generated JSON structure:
@@ -129,7 +129,7 @@ Generated JSON structure:
 ### HTML Export
 
 ```bash
-uv run code_analyzer analyze . --export html --export-dir ./reports
+uv run refactoroscope analyze . --export html --export-dir ./reports
 ```
 
 Generates a comprehensive HTML report with:
@@ -143,7 +143,7 @@ Generates a comprehensive HTML report with:
 ### Comparing Two Analyses
 
 ```bash
-uv run code_analyzer compare reports/2025-01-01.json reports/2025-01-15.json
+uv run refactoroscope compare reports/2025-01-01.json reports/2025-01-15.json
 ```
 
 Output:

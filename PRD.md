@@ -758,14 +758,14 @@ class TestComplexityAnalyzer:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone repository
-git clone https://github.com/moinsen-dev/code_-_analyzer.git
-cd code_analyzer
+git clone https://github.com/moinsen-dev/refactoroscope.git
+cd refactoroscope
 
 # Install with uv
 uv sync
 
 # Run the analyzer
-uv run code_analyzer analyze .
+uv run refactoroscope analyze .
 ```
 
 ### 9.2 Docker Support (Planned)

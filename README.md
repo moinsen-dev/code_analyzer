@@ -1,17 +1,17 @@
 # Refactoroscope
 
-[![Build Status](https://github.com/moinsen-dev/code_analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/moinsen-dev/code_analyzer/actions)
+[![Build Status](https://github.com/moinsen-dev/refactoroscope/actions/workflows/ci.yml/badge.svg)](https://github.com/moinsen-dev/refactoroscope/actions)
 [![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/github/license/moinsen-dev/code_analyzer)](LICENSE)
-[![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/code_analyzer)](https://codecov.io/gh/moinsen-dev/code_analyzer)
+[![License](https://img.shields.io/github/license/moinsen-dev/refactoroscope)](LICENSE)
+[![Code Coverage](https://img.shields.io/codecov/c/github/moinsen-dev/refactoroscope)](https://codecov.io/gh/moinsen-dev/refactoroscope)
 [![PyPI version](https://badge.fury.io/py/refactoroscope.svg)](https://badge.fury.io/py/refactoroscope)
 [![CI/CD Integration](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20%26%20GitLab%20CI-blue)](docs/ci-cd-integration.md)
 
-![Refactoroscope Icon](code_analyzer-icon.png)
+![Refactoroscope Icon](code-analyzer-icon.png)
 
 A Python-based command-line tool that provides comprehensive analysis of source code repositories. Think of it as an **MRI scanner for your codebase** - it doesn't just show you what's there, but reveals the health and complexity of your code structure.
 
-![Refactoroscope Wallpaper](code_analyzer-wallpaper.png)
+![Refactoroscope Wallpaper](code-analyzer-wallpaper.png)
 
 ## Features
 
@@ -36,7 +36,7 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 
 ## Duplicate Code Detection
 
-The Code Analyzer provides advanced AST-based duplicate code detection with the following features:
+The Refactoroscope provides advanced AST-based duplicate code detection with the following features:
 
 - **Clone Type Classification**: Identifies different types of code clones:
   - **Exact Clones** (Type-1): Identical code except for comments and whitespace
@@ -65,23 +65,47 @@ uv run refactoroscope duplicates src/ --type renamed
 
 ### Installation
 
+Refactoroscope can be installed in several ways depending on your needs:
+
+#### Method 1: Install from PyPI (Recommended for most users)
+
+```bash
+pip install refactoroscope
+```
+
+This installs Refactoroscope globally on your system and makes it available as a command-line tool.
+
+#### Method 2: Install with uv (Recommended for developers)
+
 First, install [uv](https://github.com/astral-sh/uv) if you haven't already:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Then install the dependencies:
+Then install Refactoroscope globally:
 
 ```bash
-uv sync
+uv tool install refactoroscope
 ```
 
-Or install directly from PyPI:
+#### Method 3: Install from source (Recommended for contributors)
 
-```bash
-pip install refactoroscope
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/moinsen-dev/refactoroscope.git
+   cd refactoroscope
+   ```
+
+2. Install dependencies:
+   ```bash
+   uv sync
+   ```
+
+3. Install in development mode:
+   ```bash
+   pip install -e .
+   ```
 
 ## Usage
 
@@ -293,7 +317,7 @@ The unused file detection uses the following approach:
 
 ## Supported Languages
 
-The Code Analyzer supports 60+ programming languages:
+The Refactoroscope supports 60+ programming languages:
 
 - **Primary**: Python, JavaScript/TypeScript, Java, C#, C++/C, Go, Rust
 - **Mobile**: Dart/Flutter, Swift, Kotlin
@@ -412,7 +436,7 @@ ai:
 
 ## CI/CD Integration
 
-Code Analyzer provides built-in support for popular CI/CD platforms:
+Refactoroscope provides built-in support for popular CI/CD platforms:
 
 ### GitHub Actions
 
@@ -428,7 +452,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Code Analysis
-        uses: moinsen-dev/code_analyzer@v0.2.0
+        uses: moinsen-dev/refactoroscope@v0.2.0
         with:
           args: analyze . --complexity --export json,html
 ```
@@ -467,7 +491,7 @@ See [CI/CD Integration Guide](docs/ci-cd-integration.md) for more detailed instr
 
 ## Documentation
 
-For detailed documentation, visit our [GitHub Pages site](https://moinsen-dev.github.io/code_analyzer/).
+For detailed documentation, visit our [GitHub Pages site](https://moinsen-dev.github.io/refactoroscope/).
 
 - [Real-time Watching](docs/watch.md)
 - [AI-Powered Analysis](docs/ai.md)

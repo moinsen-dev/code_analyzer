@@ -1,14 +1,14 @@
 # CI/CD Integration Guide
 
-This guide explains how to integrate Code Analyzer into your CI/CD pipelines for automated code analysis.
+This guide explains how to integrate Refactoroscope into your CI/CD pipelines for automated code analysis.
 
 ## GitHub Actions
 
-Code Analyzer provides built-in GitHub Actions workflows that you can use directly in your projects.
+Refactoroscope provides built-in GitHub Actions workflows that you can use directly in your projects.
 
 ### Pre-built Workflows
 
-1. **Code Analysis Workflow** (`code_analyzer.yml`): Runs code analysis on every push and pull request
+1. **Code Analysis Workflow** (`refactoroscope.yml`): Runs code analysis on every push and pull request
 2. **CI Workflow** (`ci.yml`): Runs tests, linting, and type checking
 3. **Release Workflow** (`release.yml`): Automatically publishes to PyPI when tags are created
 4. **Documentation Workflow** (`docs.yml`): Deploys documentation to GitHub Pages
@@ -20,20 +20,20 @@ To use the built-in code analysis workflow in your project:
 1. Copy the workflow file to your repository:
    ```bash
    mkdir -p .github/workflows
-   cp .github/workflows/code_analyzer.yml .github/workflows/
+   cp .github/workflows/refactoroscope.yml .github/workflows/
    ```
 
 2. Customize the workflow according to your project needs:
    ```yaml
-   # In your .github/workflows/code_analyzer.yml
+   # In your .github/workflows/refactoroscope.yml
    - name: Run code analysis
      run: |
-       code_analyzer analyze . --complexity --export json,html --export-dir ./reports
+       refactoroscope analyze . --complexity --export json,html --export-dir ./reports
    ```
 
 ### Example Integration
 
-Here's a complete example of integrating Code Analyzer into your GitHub Actions workflow:
+Here's a complete example of integrating Refactoroscope into your GitHub Actions workflow:
 
 ```yaml
 name: Code Analysis
@@ -58,13 +58,13 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v3
 
-    - name: Install code_analyzer
+    - name: Install refactoroscope
       run: |
-        uv pip install code_analyzer
+        uv pip install refactoroscope
 
     - name: Run code analysis
       run: |
-        code_analyzer analyze . --complexity --export json,html --export-dir ./reports
+        refactoroscope analyze . --complexity --export json,html --export-dir ./reports
 
     - name: Upload analysis reports
       uses: actions/upload-artifact@v4
@@ -95,8 +95,8 @@ analyze:
   stage: analyze
   image: python:3.13
   script:
-    - pip install code_analyzer
-    - code_analyzer analyze . --complexity --export json,html --export-dir ./reports
+    - pip install refactoroscope
+    - refactoroscope analyze . --complexity --export json,html --export-dir ./reports
   artifacts:
     paths:
       - reports/
@@ -105,7 +105,7 @@ analyze:
 
 ## Configuration Options
 
-When integrating Code Analyzer into your CI/CD pipeline, you can customize the analysis with various options:
+When integrating Refactoroscope into your CI/CD pipeline, you can customize the analysis with various options:
 
 - `--complexity`: Include complexity analysis
 - `--export json,html`: Export results in multiple formats
@@ -114,7 +114,7 @@ When integrating Code Analyzer into your CI/CD pipeline, you can customize the a
 
 Example with custom configuration:
 ```bash
-code_analyzer analyze . \
+refactoroscope analyze . \
   --complexity \
   --export json,html,csv \
   --export-dir ./reports \
@@ -127,7 +127,7 @@ You can configure your CI/CD pipeline to fail builds based on analysis results:
 
 ```bash
 # Example: Fail if any file has >1000 lines
-code_analyzer analyze . --export json --export-dir ./reports
+refactoroscope analyze . --export json --export-dir ./reports
 python -c "
 import json
 with open('./reports/report.json') as f:

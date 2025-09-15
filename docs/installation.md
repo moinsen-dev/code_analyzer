@@ -5,7 +5,7 @@ title: Installation Guide
 
 # Installation
 
-Code Analyzer can be installed in several ways:
+Refactoroscope can be installed in several ways:
 
 - Python 3.13 or higher
 - [uv](https://github.com/astral-sh/uv) package manager
@@ -24,8 +24,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourorg/code-insight-analyzer.git
-   cd code-insight-analyzer
+   git clone https://github.com/moinsen-dev/refactoroscope.git
+   cd refactoroscope
    ```
 
 2. Install dependencies:
@@ -33,10 +33,10 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
    uv sync
    ```
 
-### Using pip (when available)
+### Using pip (Recommended for most users)
 
 ```bash
-pip install code_analyzer
+pip install refactoroscope
 ```
 
 ## Verifying Installation
@@ -44,10 +44,16 @@ pip install code_analyzer
 To verify that the installation was successful, run:
 
 ```bash
-uv run code_analyzer --help
+refactoroscope --help
 ```
 
 You should see the help output showing available commands.
+
+If you installed from source using uv, you can run:
+
+```bash
+uv run refactoroscope --help
+```
 
 ## System Requirements
 
@@ -72,5 +78,5 @@ RUN uv sync --frozen
 
 COPY . .
 
-ENTRYPOINT ["uv", "run", "code_analyzer"]
+ENTRYPOINT ["uv", "run", "refactoroscope"]
 ```

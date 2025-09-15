@@ -38,7 +38,7 @@ repos:
       
       - id: vulture-check
         name: vulture-check
-        entry: uv run vulture src/
+        entry: uv run vulture src/ vulture_whitelist.py
         language: system
         types: [python]
         pass_filenames: false

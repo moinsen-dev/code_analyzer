@@ -47,9 +47,9 @@ uv sync
 ## Quick Start
 
 ```bash
-uv run code_analyzer analyze .
-uv run code_analyzer analyze . --complexity
-uv run code_analyzer analyze . --export json,html --export-dir ./reports
+uv run refactoroscope analyze .
+uv run refactoroscope analyze . --complexity
+uv run refactoroscope analyze . --export json,html --export-dir ./reports
 ```
 
 ## Supported Languages
@@ -71,6 +71,7 @@ The Refactoroscope supports 60+ programming languages:
 - [Configuration](configuration.md)
 - [API Reference](api.md)
 - [Examples](examples.md)
+- [Use Cases](use-cases.md)
 - [Contributing](contributing.md)
 - [Real-time Watching](watch.md)
 - [AI-Powered Analysis](ai.md)

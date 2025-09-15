@@ -20,7 +20,7 @@ This will create a `.refactoroscope.yml` file with default settings.
 To overwrite an existing configuration file:
 
 ```bash
-uv run code_analyzer init --force
+uv run refactoroscope init --force
 ```
 
 ## Configuration File Structure
@@ -320,9 +320,9 @@ output:
 
 The following environment variables can be used to configure the analyzer:
 
-- `CODEANALYZER_CONFIG_PATH`: Path to configuration file
-- `CODEANALYZER_EXPORT_PATH`: Default export directory
-- `CODEANALYZER_THEME`: Default terminal theme
+- `REFACTOROSCOPE_CONFIG_PATH`: Path to configuration file
+- `REFACTOROSCOPE_EXPORT_PATH`: Default export directory
+- `REFACTOROSCOPE_THEME`: Default terminal theme
 
 ## Example Configurations
 

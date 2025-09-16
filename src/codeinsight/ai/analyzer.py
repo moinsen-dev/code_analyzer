@@ -95,15 +95,48 @@ class AIAnalyzer:
 
         return structure
 
-    def get_provider_preferences(self) -> List[str]:
-        """Get provider preferences from configuration"""
-        # Get configuration
-        if hasattr(self.config_manager.config, "ai"):
-            ai_config = self.config_manager.config.ai
-            if ai_config is not None:
-                return ai_config.provider_preferences
-        # Default preference order
-        return ["openai", "anthropic", "google", "ollama"]
+    def analyze(self, prompt: str) -> Optional[str]:
+        """
+        Analyze a general prompt and return the AI's response as a string.
+
+        Args:
+            prompt: The prompt to analyze
+
+        Returns:
+            The AI's response as a string or None if no provider is available
+        """
+        if not self.is_available():
+            return None
+
+        try:
+            # Try providers in preference order
+            preferences = self.get_provider_preferences()
+            for provider_name in preferences:
+                try:
+                    # Find the provider
+                    provider = None
+                    for p in self.providers:
+                        if p.provider_name == provider_name:
+                            provider = p
+                            break
+
+                    if provider and provider.is_available():
+                        result = provider.analyze(prompt)
+                        return result
+                except Exception:
+                    # Try next provider
+                    continue  # This is acceptable as we're trying multiple providers
+
+            # If no preferred provider worked, use the first available
+            for provider in self.providers:
+                if provider.is_available():
+                    result = provider.analyze(prompt)
+                    return result
+
+        except Exception as e:
+            print(f"Warning: Could not analyze prompt with AI: {e}")
+
+        return None
 
     def analyze_with_preferred_provider(
         self, file_path: Path, language: Language
@@ -153,3 +186,13 @@ class AIAnalyzer:
             print(f"Warning: Could not analyze {file_path} with AI: {e}")
 
         return None
+
+    def get_provider_preferences(self) -> List[str]:
+        """Get provider preferences from configuration"""
+        # Get configuration
+        if hasattr(self.config_manager.config, "ai"):
+            ai_config = self.config_manager.config.ai
+            if ai_config is not None:
+                return ai_config.provider_preferences
+        # Default preference order
+        return ["openai", "anthropic", "google", "ollama"]

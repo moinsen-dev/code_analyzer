@@ -77,24 +77,94 @@ class TechStackDetector:
         """
         results = {}
 
-        # Walk through directories
-        for folder_path in self._get_folders(path):
-            tech_stacks = self._detect_stacks_in_folder(folder_path)
+        # First, find all project roots
+        project_roots = self._find_project_roots(path)
+
+        # For each project root, detect its tech stack
+        for project_root in project_roots:
+            relative_path = str(project_root.relative_to(path))
+            tech_stacks = self._detect_stacks_in_folder(project_root)
             if tech_stacks:
-                results[str(folder_path.relative_to(path))] = tech_stacks
+                results[relative_path] = tech_stacks
 
         return results
 
-    def _get_folders(self, path: Path) -> List[Path]:
-        """Get all folders in the path recursively"""
-        folders = [path]
+    def _find_project_roots(self, path: Path) -> List[Path]:
+        """
+        Find project roots by looking for indicator files
+
+        Args:
+            path: Root path to search in
+
+        Returns:
+            List of project root paths
+        """
+        project_roots = []
+
+        # Always include the root path as a potential project root
+        project_roots.append(path)
+
+        # Walk through directories to find project roots
         try:
             for item in path.rglob("*"):
                 if item.is_dir() and not self._is_ignored(item):
-                    folders.append(item)
+                    # Check if this directory is a project root
+                    if self._is_project_root(item):
+                        # Only add if it's not already included or a subdirectory of an existing root
+                        is_subdir = False
+                        for existing_root in project_roots:
+                            if (
+                                item.is_relative_to(existing_root)
+                                and item != existing_root
+                            ):
+                                is_subdir = True
+                                break
+                        if not is_subdir:
+                            project_roots.append(item)
         except PermissionError:
             pass
-        return folders
+
+        return project_roots
+
+    def _is_project_root(self, folder_path: Path) -> bool:
+        """
+        Check if a folder is a project root by looking for indicator files
+
+        Args:
+            folder_path: Path to check
+
+        Returns:
+            True if the folder is a project root
+        """
+        try:
+            # Get all files in the folder
+            file_names = {item.name for item in folder_path.iterdir() if item.is_file()}
+
+            # Check for project indicator files
+            project_indicators = {
+                "package.json",  # Node.js/JavaScript/TypeScript
+                "pyproject.toml",
+                "requirements.txt",
+                "setup.py",
+                "Pipfile",  # Python
+                "pom.xml",
+                "build.gradle",
+                "build.gradle.kts",  # Java/Kotlin
+                "pubspec.yaml",
+                "pubspec.lock",  # Flutter/Dart
+                "go.mod",
+                "go.sum",  # Go
+                "Cargo.toml",
+                "Cargo.lock",  # Rust
+                "Gemfile",
+                "Gemfile.lock",  # Ruby
+                "composer.json",
+                "composer.lock",  # PHP
+            }
+
+            return bool(file_names & project_indicators)
+        except PermissionError:
+            return False
 
     def _is_ignored(self, path: Path) -> bool:
         """Check if path should be ignored"""
@@ -110,7 +180,19 @@ class TechStackDetector:
             "dist",
             "target",
             "vendor",
+            ".eggs",
+            ".tox",
+            ".coverage",
         }
+
+        # Ignore any path that contains site-packages (virtual environment packages)
+        if "site-packages" in str(path):
+            return True
+
+        # Ignore any path that contains .venv or venv
+        if any(venv_name in str(path) for venv_name in [".venv", "venv"]):
+            return True
+
         return path.name in ignored_names
 
     def _detect_stacks_in_folder(self, folder_path: Path) -> List[str]:

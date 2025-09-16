@@ -6,7 +6,7 @@ Runs appropriate tools for detected technology stacks
 import json
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 class TechStackRunner:
@@ -46,7 +46,7 @@ class TechStackRunner:
         }
 
     def run_tools_for_stacks(
-        self, root_path: Path, tech_stacks: Dict[str, List[str]]
+        self, root_path: Path, tech_stacks: Dict[str, List[str]], verbose: bool = False
     ) -> Dict[str, Any]:
         """
         Run appropriate tools for detected tech stacks
@@ -54,6 +54,7 @@ class TechStackRunner:
         Args:
             root_path: Root path of the project
             tech_stacks: Dict mapping folder paths to lists of detected tech stacks
+            verbose: Whether to show verbose output
 
         Returns:
             Dict with results for each folder
@@ -61,27 +62,193 @@ class TechStackRunner:
         results: Dict[str, Any] = {}
 
         for folder, stacks in tech_stacks.items():
+            if verbose:
+                print(f"  → Analyzing folder: {folder}")
+                print(f"    Detected tech stacks: {', '.join(stacks)}")
+
             folder_path = root_path / folder
             folder_results: Dict[str, Any] = {
                 "tech_stacks": stacks,
                 "tool_results": {},
                 "outdated_packages": {},
+                "ai_summary": None,
             }
 
             # Run tools for each detected stack
             for stack in stacks:
                 if stack in self.tools:
+                    if verbose:
+                        print(f"    Running tools for {stack}...")
                     tool_results = self._run_tools_for_stack(folder_path, stack)
                     folder_results["tool_results"].update(tool_results)
 
             # Check for outdated packages
+            if verbose:
+                print("    Checking for outdated packages...")
             folder_results["outdated_packages"] = self._check_outdated_packages(
+                folder_path, stacks
+            )
+
+            # Generate AI summary for the project
+            if verbose:
+                print("    Generating AI summary...")
+            folder_results["ai_summary"] = self._generate_ai_summary(
                 folder_path, stacks
             )
 
             results[folder] = folder_results
 
         return results
+
+    def _generate_ai_summary(
+        self, folder_path: Path, tech_stacks: List[str]
+    ) -> Optional[Dict[str, str]]:
+        """
+        Generate AI-powered summaries for the project based on project files
+
+        Args:
+            folder_path: Path to the project folder
+            tech_stacks: List of detected tech stacks
+
+        Returns:
+            Dict with AI-generated summaries or None if not available
+        """
+        try:
+            # Try to import AI analyzer
+            from codeinsight.ai.analyzer import AIAnalyzer
+            from codeinsight.config.manager import ConfigManager
+
+            # Initialize AI analyzer
+            config_manager = ConfigManager()
+            ai_analyzer = AIAnalyzer(config_manager)
+
+            if not ai_analyzer.is_available():
+                return None
+
+            summaries = {}
+
+            # Generate README summary
+            readme_summary = self._generate_readme_summary(folder_path, ai_analyzer)
+            if readme_summary:
+                summaries["project_overview"] = readme_summary
+
+            # Generate tech stack specific summaries
+            for stack in tech_stacks:
+                stack_summary = self._generate_tech_stack_summary(
+                    folder_path, stack, ai_analyzer
+                )
+                if stack_summary:
+                    summaries[f"{stack}_summary"] = stack_summary
+
+            return summaries if summaries else None
+
+        except Exception:
+            # If AI is not available or fails, return None
+            return None
+
+    def _generate_readme_summary(
+        self, folder_path: Path, ai_analyzer: Any
+    ) -> Optional[str]:
+        """
+        Generate AI summary from README file
+
+        Args:
+            folder_path: Path to the project folder
+            ai_analyzer: AI analyzer instance
+
+        Returns:
+            AI-generated summary or None
+        """
+        try:
+            # Look for README files
+            readme_files = ["README.md", "README.txt", "README"]
+            for readme_file in readme_files:
+                readme_path = folder_path / readme_file
+                if readme_path.exists():
+                    # Read README content
+                    with open(readme_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+
+                    # Limit content to reasonable size for AI processing
+                    if len(content) > 5000:
+                        content = content[:5000] + "... (content truncated)"
+
+                    # Generate AI summary prompt
+                    prompt = f"""Summarize the following project README in 100 words or less. 
+Focus on the project's purpose, main features, and key benefits:
+
+{content}"""
+
+                    # Get AI response
+                    ai_response = ai_analyzer.analyze(prompt)
+                    return ai_response.strip() if ai_response else None
+
+            return None
+        except Exception:
+            return None
+
+    def _generate_tech_stack_summary(
+        self, folder_path: Path, tech_stack: str, ai_analyzer: Any
+    ) -> Optional[str]:
+        """
+        Generate AI summary for a specific tech stack based on project configuration files
+
+        Args:
+            folder_path: Path to the project folder
+            tech_stack: Tech stack name
+            ai_analyzer: AI analyzer instance
+
+        Returns:
+            AI-generated summary or None
+        """
+        try:
+            config_content = None
+            config_file = None
+
+            # Determine which config file to use based on tech stack
+            if tech_stack == "python":
+                config_files = ["pyproject.toml", "requirements.txt", "setup.py"]
+            elif tech_stack == "javascript" or tech_stack == "typescript":
+                config_files = ["package.json"]
+            elif tech_stack == "flutter":
+                config_files = ["pubspec.yaml"]
+            elif tech_stack == "go":
+                config_files = ["go.mod"]
+            elif tech_stack == "rust":
+                config_files = ["Cargo.toml"]
+            elif tech_stack == "java":
+                config_files = ["pom.xml", "build.gradle"]
+            else:
+                return None
+
+            # Find the first available config file
+            for config_file_name in config_files:
+                config_path = folder_path / config_file_name
+                if config_path.exists():
+                    config_file = config_file_name
+                    with open(config_path, "r", encoding="utf-8") as f:
+                        config_content = f.read()
+                    break
+
+            if not config_content:
+                return None
+
+            # Limit content to reasonable size for AI processing
+            if len(config_content) > 3000:
+                config_content = config_content[:3000] + "... (content truncated)"
+
+            # Generate AI summary prompt
+            prompt = f"""Analyze the following {tech_stack} project configuration file ({config_file}) 
+and provide a 50-word summary of the project's purpose, main dependencies, and key features:
+
+{config_content}"""
+
+            # Get AI response
+            ai_response = ai_analyzer.analyze(prompt)
+            return ai_response.strip() if ai_response else None
+
+        except Exception:
+            return None
 
     def _run_tools_for_stack(self, folder_path: Path, stack: str) -> Dict[str, Any]:
         """Run tools for a specific tech stack in a folder"""
@@ -186,17 +353,45 @@ class TechStackRunner:
             except Exception:
                 pass
 
-        # Check pyproject.toml
-        pyproject_file = folder_path / "pyproject.toml"
-        if pyproject_file.exists():
+        # Check for pyproject.toml in the folder or parent directories (for uv projects)
+        pyproject_path = self._find_pyproject_toml(folder_path)
+        if pyproject_path:
             try:
-                # For uv projects, we could check with 'uv lock --dry-run'
-                # But for now, we'll just check with pip
-                pass
+                # Try using uv to check for outdated packages
+                # Run from the folder where pyproject.toml is located
+                result = subprocess.run(
+                    ["uv", "pip", "list", "--outdated"],
+                    cwd=pyproject_path.parent,
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
+                if result.returncode == 0 and result.stdout:
+                    # Parse uv pip list output
+                    lines = result.stdout.strip().split("\n")
+                    for line in lines[2:]:  # Skip header lines
+                        if line.strip():
+                            parts = line.split()
+                            if len(parts) >= 3:
+                                package, current, latest = parts[0], parts[1], parts[2]
+                                outdated[package] = {
+                                    "current": current,
+                                    "latest": latest,
+                                }
             except Exception:
                 pass
 
         return outdated
+
+    def _find_pyproject_toml(self, folder_path: Path) -> Optional[Path]:
+        """Find pyproject.toml in the folder or parent directories"""
+        current_path = folder_path
+        while current_path != current_path.parent:  # Stop at root
+            pyproject_file = current_path / "pyproject.toml"
+            if pyproject_file.exists():
+                return pyproject_file
+            current_path = current_path.parent
+        return None
 
     def _check_npm_outdated(self, folder_path: Path) -> Dict[str, Any]:
         """Check for outdated npm packages"""

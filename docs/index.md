@@ -83,3 +83,5 @@ The Refactoroscope supports 60+ programming languages:
 - [Unused Code Detection](unused_code.md)
 - [Unused File Detection](unused_file_detection.md)
 - [Advanced Refactoring Tools](advanced_refactoring_tools.md)
+- [Release Notes v0.4.1](release-notes-v0.4.1.md)
+- [Release Notes v0.2.0](release-notes-v0.2.0.md)

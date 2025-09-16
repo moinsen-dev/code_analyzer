@@ -20,15 +20,99 @@ analysis:
     - "*.min.js"
     - "node_modules/"
     - ".git/"
-  
+
   complexity:
     include_docstrings: false
     count_assertions: true
-  
+
   thresholds:
     file_too_long: 500
     function_too_complex: 20
     class_too_large: 1000
+
+# AI configuration
+# AI providers require API keys which should be set as environment variables:
+# - OpenAI: OPENAI_API_KEY
+# - Anthropic: ANTHROPIC_API_KEY
+# - Google: GOOGLE_API_KEY
+# - Ollama: No API key required (runs locally)
+# - Qwen: No API key required (runs locally)
+ai:
+  # Enable AI-powered code suggestions
+  enable_ai_suggestions: true
+
+  # Maximum file size to analyze with AI (in bytes)
+  max_file_size: 50000
+
+  # Whether to cache AI analysis results
+  cache_results: true
+
+  # Cache time-to-live in seconds
+  cache_ttl: 3600
+
+  # Preference order for AI providers
+  provider_preferences:
+    - "openai"
+    - "anthropic"
+    - "google"
+    - "qwen"
+    - "ollama"
+
+  # Provider configurations
+  providers:
+    openai:
+      # API key (can also be set via OPENAI_API_KEY environment variable)
+      # api_key: "your-openai-api-key"
+
+      # Model to use
+      model: "gpt-5"
+
+      # Whether this provider is enabled
+      enabled: true
+
+    anthropic:
+      # API key (can also be set via ANTHROPIC_API_KEY environment variable)
+      # api_key: "your-anthropic-api-key"
+
+      # Model to use
+      model: "claude-sonnet-4-20250514"
+
+      # Whether this provider is enabled
+      enabled: true
+
+    google:
+      # API key (can also be set via GOOGLE_API_KEY environment variable)
+      # api_key: "your-google-api-key"
+
+      # Model to use
+      model: "gemini-2.5-flash"
+
+      # Whether this provider is enabled
+      enabled: true
+
+    ollama:
+      # Ollama doesn't require API keys
+
+      # Model to use
+      model: "qwen3-coder"
+
+      # Base URL for Ollama (default is localhost)
+      base_url: "http://localhost:11434"
+
+      # Whether this provider is enabled
+      enabled: true
+
+    qwen:
+      # Qwen doesn't require API keys for local installations
+
+      # Model to use
+      model: "qwen"
+
+      # Base URL for Qwen (default is localhost)
+      base_url: "http://localhost:11434"
+
+      # Whether this provider is enabled
+      enabled: true
 
 # Output preferences
 output:

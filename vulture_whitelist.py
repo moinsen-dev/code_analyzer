@@ -1,16 +1,13 @@
-# Vulture whitelist file to ignore false positives
+# Whitelist for vulture to ignore false positives
+# These functions are used by Typer CLI decorators
 
-# Signal handler parameters - used in function signature
-sig
-frame
+main  # Used as @app.callback()
+refactor_plan  # Used as @app.command()
+watch  # Used as @app.command()
+unused  # Used as @app.command()
+init  # Used as @app.command()
 
-# CLI functions that may be used by subcommands or future features
-init
-watch
-unused
-
-# AI module variables and methods
-analyze_file
+# These are part of data models and configuration classes
 line_start
 line_end
 related_files
@@ -20,26 +17,29 @@ enable_ai_suggestions
 max_file_size
 cache_results
 cache_ttl
+max_line_length
+complexity_threshold
+version
 
-# Duplicate detection
-CloneType
+# These are part of enum definitions
 EXACT
 RENAMED
 MODIFIED
 SEMANTIC
+
+# These are callback parameters
+frame
+sig
+
+# These are methods that are part of interfaces or may be used dynamically
+analyze_file
+CloneType
 calculate_similarity
 _cleanup_expired_cache
 _detect_duplicate_code
-
-# Config module
 get_language_config
 get_analysis_thresholds
 get_output_config
-version
-max_line_length
-complexity_threshold
-
-# Watcher module
 on_modified
 on_created
 on_deleted

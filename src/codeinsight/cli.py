@@ -35,13 +35,6 @@ app = typer.Typer(
 )
 
 
-app = typer.Typer(
-    name="refactoroscope",
-    help="A comprehensive code analysis tool",
-    add_completion=False,
-)
-
-
 @app.callback()
 def main(
     version: bool = typer.Option(
@@ -142,7 +135,7 @@ ai:
       # api_key: "your-openai-api-key"
       
       # Model to use
-      model: "gpt-3.5-turbo"
+      model: "gpt-5-mini"
       
       # Whether this provider is enabled
       enabled: true
@@ -152,7 +145,7 @@ ai:
       # api_key: "your-anthropic-api-key"
       
       # Model to use
-      model: "claude-3-haiku-20240307"
+      model: "claude-sonnet-4-20250514"
       
       # Whether this provider is enabled
       enabled: true
@@ -162,7 +155,7 @@ ai:
       # api_key: "your-google-api-key"
       
       # Model to use
-      model: "gemini-pro"
+      model: "gemini-2.5-flash"
       
       # Whether this provider is enabled
       enabled: true
@@ -171,7 +164,7 @@ ai:
       # Ollama doesn't require API keys
       
       # Model to use
-      model: "llama2"
+      model: "qwen3-coder"
       
       # Base URL for Ollama (default is localhost)
       base_url: "http://localhost:11434"
@@ -232,6 +225,12 @@ def analyze(
         "--check",
         help="Check tech stacks and run appropriate tools for each subfolder",
     ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show verbose output during tech stack analysis",
+    ),
     output: str = typer.Option(
         "terminal", "--output", "-o", help="Output format (terminal, json, html, csv)"
     ),
@@ -250,7 +249,7 @@ def analyze(
 
     # If check option is enabled, run tech stack detection and tools
     if check:
-        _run_tech_stack_check(path)
+        _run_tech_stack_check(path, verbose)
         return
 
     # Initialize scanner with the project path
@@ -445,10 +444,36 @@ def _display_terminal(
             console.print("\n[bold]💡 Recommendations[/bold]")
             console.print("─" * 18)
 
-            for recommendation in report.recommendations[
-                :5
-            ]:  # Show top 5 recommendations
-                console.print(f"  • {recommendation}")
+            # Create a table for recommendations
+            from rich import box
+
+            rec_table = Table(
+                box=box.ROUNDED, show_header=True, show_edge=True, padding=(0, 1)
+            )
+            rec_table.add_column("#", style="dim", width=3)
+            rec_table.add_column("Issue", overflow="fold")
+            rec_table.add_column("Details", overflow="fold")
+
+            # Add top recommendations to the table
+            for i, recommendation in enumerate(
+                report.recommendations[:10], 1
+            ):  # Show top 10 recommendations
+                # Parse recommendation to extract file and details
+                if (
+                    "Unused file detected:" in recommendation
+                    and " - File is never imported" in recommendation
+                ):
+                    # Split into file path and details
+                    parts = recommendation.split(" - File is never imported")
+                    file_info = parts[0].replace("Unused file detected: ", "").strip()
+                    details = "File is never imported by any other file in the project"
+                    if len(parts) > 1:
+                        details += parts[1].strip()
+                    rec_table.add_row(str(i), file_info, details)
+                else:
+                    rec_table.add_row(str(i), recommendation, "")
+
+            console.print(rec_table)
 
     except ImportError:
         # Fallback to basic output
@@ -572,13 +597,14 @@ def _display_terminal(
         if report.recommendations:
             print("\n💡 Recommendations")
             print("─────────────────")
-            for recommendation in report.recommendations[
-                :5
-            ]:  # Show top 5 recommendations
-                print(f"  • {recommendation}")
+            for i, recommendation in enumerate(
+                report.recommendations[:10], 1
+            ):  # Show top 10 recommendations
+                # Simple cleaner display
+                print(f"{i}. {recommendation}")
 
 
-def _run_tech_stack_check(path: Path) -> None:
+def _run_tech_stack_check(path: Path, verbose: bool = False) -> None:
     """Run tech stack detection and appropriate tools for each subfolder."""
     typer.echo(f"Checking tech stacks in {path}")
 
@@ -587,12 +613,16 @@ def _run_tech_stack_check(path: Path) -> None:
     from codeinsight.analysis.tech_stack_runner import TechStackRunner
 
     # Detect tech stacks
+    if verbose:
+        typer.echo("  → Detecting tech stacks...")
     detector = TechStackDetector()
     tech_stacks = detector.detect_stacks(path)
 
     # Run appropriate tools for each detected tech stack
+    if verbose:
+        typer.echo("  → Running tools for detected tech stacks...")
     runner = TechStackRunner()
-    results = runner.run_tools_for_stacks(path, tech_stacks)
+    results = runner.run_tools_for_stacks(path, tech_stacks, verbose)
 
     # Display results
     _display_tech_stack_results(results)
@@ -601,8 +631,12 @@ def _run_tech_stack_check(path: Path) -> None:
 def _display_tech_stack_results(results: Dict) -> None:
     """Display tech stack check results in terminal."""
     try:
+        from pathlib import Path
+
+        from rich import box
         from rich.console import Console
         from rich.panel import Panel
+        from rich.table import Table
 
         console = Console()
 
@@ -611,36 +645,97 @@ def _display_tech_stack_results(results: Dict) -> None:
 
         # Display results for each folder
         for folder, folder_results in results.items():
-            console.print(f"\n[bold]Folder:[/bold] {folder}")
+            # Expand relative paths to full paths
+            full_path = Path(folder).resolve() if folder == "." else Path.cwd() / folder
 
-            # Display detected tech stacks
-            if "tech_stacks" in folder_results:
-                console.print("[bold]Detected Tech Stacks:[/bold]")
+            # Create project information table
+            info_table = Table(box=box.ROUNDED, show_header=False)
+            info_table.add_column("Property", style="bold")
+            info_table.add_column("Value")
+            info_table.add_row("📁 Folder", str(full_path))
+
+            # Try to get project name from folder or pyproject.toml
+            project_name = _get_project_name(full_path)
+            if project_name:
+                info_table.add_row("📦 Project", project_name)
+
+            # Add AI summary if available (prioritize over basic README summary)
+            ai_summary_added = False
+            if "ai_summary" in folder_results and folder_results["ai_summary"]:
+                ai_summary = folder_results["ai_summary"]
+                if "project_overview" in ai_summary and ai_summary["project_overview"]:
+                    info_table.add_row("📝 Description", ai_summary["project_overview"])
+                    ai_summary_added = True
+                # Add tech stack specific summaries
+                for key, summary in ai_summary.items():
+                    if key != "project_overview" and summary:
+                        stack_name = key.replace("_summary", "").title()
+                        info_table.add_row(f"🧠 {stack_name} AI", summary)
+
+            # Fallback to basic README summary if no AI summary
+            if not ai_summary_added:
+                readme_content = _get_readme_summary(full_path)
+                if readme_content:
+                    info_table.add_row("📝 Description", readme_content)
+
+            console.print(info_table)
+
+            # Display detected tech stacks in a table
+            if "tech_stacks" in folder_results and folder_results["tech_stacks"]:
+                stacks_table = Table(show_header=False, box=box.SIMPLE, show_edge=False)
+                stacks_table.add_column("Stack", style="cyan")
                 for stack in folder_results["tech_stacks"]:
-                    console.print(f"  • {stack}")
+                    stacks_table.add_row(f"• {stack}")
+                console.print("[bold]🎯 Detected Tech Stacks:[/bold]")
+                console.print(stacks_table)
 
-            # Display tool results
-            if "tool_results" in folder_results:
-                console.print("[bold]Tool Results:[/bold]")
+            # Display tool results in a table
+            if "tool_results" in folder_results and folder_results["tool_results"]:
+                tools_table = Table(box=box.ROUNDED)
+                tools_table.add_column("Tool", style="bold")
+                tools_table.add_column("Status", style="bold")
+                tools_table.add_column("Details", overflow="fold")
+
                 for tool, result in folder_results["tool_results"].items():
                     status = (
                         "[green]✓ Passed[/green]"
                         if result.get("success", False)
                         else "[red]✗ Failed[/red]"
                     )
-                    console.print(f"  • {tool}: {status}")
-                    if "output" in result:
-                        console.print(f"    {result['output'][:100]}...")
+                    details = (
+                        result.get("output", "")[:200] + "..."
+                        if len(result.get("output", "")) > 200
+                        else result.get("output", "")
+                    )
+                    tools_table.add_row(tool, status, details)
 
-            # Display outdated packages
-            if "outdated_packages" in folder_results:
-                console.print("[bold]Outdated Packages:[/bold]")
+                console.print("[bold]🔧 Tool Results:[/bold]")
+                console.print(tools_table)
+
+            # Display outdated packages in a table
+            if (
+                "outdated_packages" in folder_results
+                and folder_results["outdated_packages"]
+            ):
+                packages_table = Table(box=box.ROUNDED)
+                packages_table.add_column("Package", style="bold")
+                packages_table.add_column("Current", style="yellow")
+                packages_table.add_column("Latest", style="green")
+                packages_table.add_column("Update Available", style="bold")
+
                 for package, version_info in folder_results[
                     "outdated_packages"
                 ].items():
-                    console.print(
-                        f"  • {package}: {version_info['current']} -> {version_info['latest']}"
+                    current = version_info.get("current", "Unknown")
+                    latest = version_info.get("latest", "Unknown")
+                    packages_table.add_row(
+                        package, current, latest, f"[red]{current} → {latest}[/red]"
                     )
+
+                console.print("[bold]📦 Outdated Packages:[/bold]")
+                console.print(packages_table)
+
+            console.print("")  # Add spacing between folders
 
     except ImportError:
         # Fallback to basic print if Rich is not available
@@ -664,6 +759,57 @@ def _display_tech_stack_results(results: Dict) -> None:
                     print(
                         f"  • {package}: {version_info['current']} -> {version_info['latest']}"
                     )
+
+
+def _get_readme_summary(folder_path: Path) -> str:
+    """Get a summary from README.md file"""
+    readme_files = ["README.md", "README.txt", "README"]
+    for readme_file in readme_files:
+        readme_path = folder_path / readme_file
+        if readme_path.exists():
+            try:
+                with open(readme_path, "r", encoding="utf-8") as f:
+                    content = f.read().strip()
+                    # Extract first meaningful lines (skip empty lines and headers)
+                    lines = [
+                        line.strip()
+                        for line in content.split("\n")
+                        if line.strip() and not line.strip().startswith("#")
+                    ]
+                    if lines:
+                        # Get first 100 characters of the first meaningful line
+                        summary = lines[0][:100]
+                        if len(lines[0]) > 100:
+                            summary += "..."
+                        return summary
+            except Exception:
+                pass
+    return ""
+
+
+def _get_project_name(folder_path: Path) -> str:
+    """Get project name from pyproject.toml or folder name"""
+    # Try to get from pyproject.toml
+    pyproject_path = folder_path / "pyproject.toml"
+    if pyproject_path.exists():
+        try:
+            with open(pyproject_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                # Simple parsing for project name
+                if "name" in content:
+                    lines = content.split("\n")
+                    for line in lines:
+                        if "name" in line and "=" in line:
+                            # Extract name value (simple approach)
+                            parts = line.split("=")
+                            if len(parts) >= 2:
+                                name = parts[1].strip().strip('"').strip("'")
+                                return name
+        except Exception:
+            pass
+
+    # Fallback to folder name
+    return folder_path.name if folder_path.name else folder_path.parent.name
 
 
 def _export_results(
@@ -1417,11 +1563,23 @@ def refactor_plan(
         "-o",
         help="Output file for the refactoring plan",
     ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show verbose output including AI prompts and responses",
+    ),
 ) -> None:
     """Generate an AI-based refactoring plan for the codebase."""
     # Import required modules
     from codeinsight.ai.factory import AIProviderFactory
     from codeinsight.analysis.refactor_plan_generator import RefactorPlanGenerator
+    from codeinsight.config.manager import ConfigManager
+
+    typer.echo("🔍 Initializing AI provider...")
+
+    # Load configuration
+    config_manager = ConfigManager()
 
     # Check if AI provider is available
     try:
@@ -1436,7 +1594,9 @@ def refactor_plan(
             )
             raise typer.Exit(1)
 
-        ai_provider = AIProviderFactory.create_provider(provider_enum)
+        ai_provider = AIProviderFactory.get_provider_instance(
+            provider_enum, config_manager
+        )
         if not ai_provider.is_available():
             typer.echo(
                 f"Error: AI provider '{provider}' is not available or not configured properly."
@@ -1447,15 +1607,20 @@ def refactor_plan(
         typer.echo(f"Error: Could not initialize AI provider '{provider}': {e}")
         raise typer.Exit(1)
 
+    typer.echo("✅ AI provider initialized successfully")
+    typer.echo("📊 Analyzing codebase... (this may take a moment)")
+
     # Generate refactoring plan
     generator = RefactorPlanGenerator(ai_provider)
-    plan = generator.generate_plan(path)
+    plan = generator.generate_plan(path, verbose=verbose)
+
+    typer.echo("🤖 Generating refactoring plan with AI...")
 
     # Save plan to file
     try:
         with open(output, "w") as f:
             f.write(plan)
-        typer.echo(f"Refactoring plan saved to {output}")
+        typer.echo(f"✅ Refactoring plan saved to {output}")
     except Exception as e:
         typer.echo(f"Error saving refactoring plan: {e}")
         raise typer.Exit(1)

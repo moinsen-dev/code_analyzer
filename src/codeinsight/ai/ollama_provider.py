@@ -22,7 +22,7 @@ class OllamaProvider(AIProvider):
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "llama2",
+        model: str = "qwen3-coder",
         base_url: str = "http://localhost:11434",
         **kwargs: Any,
     ) -> None:
@@ -143,6 +143,49 @@ Keep suggestions concise but detailed enough to be actionable.
             suggestions.append(current_suggestion)
 
         return suggestions
+
+    def analyze(self, prompt: str) -> str:
+        """
+        Analyze a prompt and return the AI's response as a string.
+
+        Args:
+            prompt: The prompt to analyze
+
+        Returns:
+            The AI's response as a string
+        """
+        if not self.is_available():
+            raise RuntimeError("Ollama provider is not available")
+
+        try:
+            # Call Ollama API using requests
+            response = requests.post(
+                f"{self.base_url}/api/chat",
+                json={
+                    "model": self.model,
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": prompt,
+                        }
+                    ],
+                    "options": {
+                        "temperature": 0.1,  # Low temperature for more deterministic responses
+                    },
+                    "stream": False,
+                },
+                timeout=300,  # 5 minute timeout for complex analyses
+            )
+
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["message"]["content"]
+            else:
+                raise RuntimeError(
+                    f"Ollama API returned status code {response.status_code}"
+                )
+        except Exception as e:
+            raise RuntimeError(f"Error analyzing with Ollama: {e}")
 
     @property
     def provider_name(self) -> str:

@@ -2,6 +2,7 @@
 Factory for creating and managing AI providers in Refactoroscope
 """
 
+import importlib
 import os
 from typing import Any, Dict, Optional, Type
 
@@ -14,6 +15,30 @@ class AIProviderFactory:
 
     _providers: Dict[AIProviderType, Type[AIProvider]] = {}
     _instances: Dict[AIProviderType, AIProvider] = {}
+    _providers_imported = False
+
+    @classmethod
+    def _import_all_providers(cls) -> None:
+        """Dynamically import all provider modules to trigger registration"""
+        if cls._providers_imported:
+            return
+
+        provider_modules = [
+            "codeinsight.ai.openai_provider",
+            "codeinsight.ai.anthropic_provider",
+            "codeinsight.ai.google_provider",
+            "codeinsight.ai.ollama_provider",
+            "codeinsight.ai.qwen_provider",
+        ]
+
+        for module_name in provider_modules:
+            try:
+                importlib.import_module(module_name)
+            except ImportError:
+                # Provider not available (missing dependencies)
+                pass
+
+        cls._providers_imported = True
 
     @classmethod
     def register_provider(
@@ -27,6 +52,9 @@ class AIProviderFactory:
         cls, provider_type: AIProviderType, **kwargs: Any
     ) -> AIProvider:
         """Create an instance of an AI provider"""
+        # Import all providers to ensure they're registered
+        cls._import_all_providers()
+
         if provider_type not in cls._providers:
             raise ValueError(f"Provider {provider_type} is not registered")
 
@@ -40,6 +68,9 @@ class AIProviderFactory:
         config_manager: Optional[ConfigManager] = None,
     ) -> AIProvider:
         """Get a singleton instance of an AI provider"""
+        # Import all providers to ensure they're registered
+        cls._import_all_providers()
+
         if provider_type in cls._instances:
             return cls._instances[provider_type]
 
@@ -71,6 +102,10 @@ class AIProviderFactory:
         # Get model from config or use default
         model = provider_config.get("model")
 
+        # Remove api_key and model from provider_config to avoid duplicate keyword arguments
+        provider_config.pop("api_key", None)
+        provider_config.pop("model", None)
+
         # Create provider instance
         provider = cls.create_provider(
             provider_type, api_key=api_key, model=model, **provider_config
@@ -84,6 +119,9 @@ class AIProviderFactory:
         cls, config_manager: Optional[ConfigManager] = None
     ) -> list:
         """Get list of available providers that are properly configured"""
+        # Import all providers to ensure they're registered
+        cls._import_all_providers()
+
         available = []
         for provider_type in cls._providers:
             try:

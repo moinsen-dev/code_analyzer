@@ -16,19 +16,24 @@ class RefactorPlanGenerator:
     def __init__(self, ai_provider: Any) -> None:
         self.ai_provider = ai_provider
 
-    def generate_plan(self, path: Path) -> str:
+    def generate_plan(self, path: Path, verbose: bool = False) -> str:
         """
         Generate a refactoring plan for the given path
 
         Args:
             path: Path to analyze
+            verbose: Whether to show verbose output
 
         Returns:
             Markdown formatted refactoring plan
         """
-        # Run initial analysis
-        scanner = Scanner(path, enable_duplicates=True, enable_ai=True)
+        # Run initial analysis without AI to avoid analyzing individual files
+        if verbose:
+            print("   → Collecting code metrics...")
+        scanner = Scanner(path, enable_duplicates=True, enable_ai=False)
         report = scanner.analyze(path, include_complexity=True)
+        if verbose:
+            print("   → Code analysis complete")
 
         # Run duplicate code analysis
         # Duplicate analysis is now part of the regular analysis process
@@ -46,11 +51,38 @@ class RefactorPlanGenerator:
             "duplicates": [d.__dict__ for d in all_duplications],
         }
 
+        if verbose:
+            print("   → Sending analysis data to AI for plan generation...")
         # Create prompt for AI
         prompt = self._create_plan_prompt(plan_data)
 
+        if verbose:
+            print("   → AI Prompt:")
+            print("   ------------------------")
+            print(prompt[:1000] + "..." if len(prompt) > 1000 else prompt)
+            print("   ------------------------")
+
         # Get AI response
-        ai_response = self.ai_provider.analyze(prompt)
+        try:
+            ai_response = self.ai_provider.analyze(prompt)
+            if verbose:
+                print("   → AI Response:")
+                print("   ------------------------")
+                print(
+                    ai_response[:1000] + "..."
+                    if len(ai_response) > 1000
+                    else ai_response
+                )
+                print("   ------------------------")
+
+            if not ai_response or ai_response.strip() == "":
+                ai_response = "# Refactoring Plan\n\nUnable to generate a detailed plan. Please try again or check your AI provider configuration."
+        except Exception as e:
+            if verbose:
+                print(f"   → AI Error: {e}")
+            ai_response = f"# Refactoring Plan\n\nError generating plan: {str(e)}\n\nPlease check your AI provider configuration and try again."
+        if verbose:
+            print("   → AI plan generation complete")
 
         # Extract duplicates from the report
         all_duplications = []
@@ -64,9 +96,15 @@ class RefactorPlanGenerator:
 
     def _create_plan_prompt(self, plan_data: Dict[str, Any]) -> str:
         """Create prompt for AI to generate refactoring plan"""
-        prompt = f"""
-You are an expert software architect and refactoring specialist. Based on the provided code analysis, 
-generate a comprehensive refactoring plan in markdown format with the following structure:
+
+        # Send the exact analysis data as JSON to the AI without any filtering
+        prompt = f"""You are an expert software architect and refactoring specialist. Based on the following code analysis JSON data, generate a comprehensive refactoring plan.
+
+## Code Analysis Data
+{json.dumps(plan_data, indent=2)}
+
+## Instructions
+Analyze the above JSON code analysis data and generate a detailed refactoring plan with the following structure:
 
 # Refactoring Plan
 
@@ -108,11 +146,8 @@ Potential risks and mitigation strategies.
 ## Success Metrics
 How to measure the success of the refactoring efforts.
 
-Here is the analysis data:
-{json.dumps(plan_data, indent=2)}
+Provide specific, actionable recommendations with concrete examples from the analysis data. Reference specific files, line numbers, and metrics where applicable. Be concise but thorough. Use markdown format."""
 
-Please provide a detailed, actionable refactoring plan following the structure above.
-"""
         return prompt
 
     def _format_plan_as_markdown(

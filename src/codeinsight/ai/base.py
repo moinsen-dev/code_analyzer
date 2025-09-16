@@ -61,6 +61,19 @@ class AIProvider(ABC):
         pass
 
     @abstractmethod
+    def analyze(self, prompt: str) -> str:
+        """
+        Analyze a prompt and return the AI's response as a string.
+
+        Args:
+            prompt: The prompt to analyze
+
+        Returns:
+            The AI's response as a string
+        """
+        pass
+
+    @abstractmethod
     def is_available(self) -> bool:
         """Check if the provider is properly configured and available"""
         pass

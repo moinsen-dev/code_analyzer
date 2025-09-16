@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-09-16
+
+### Fixed
+- Fixed missing `analyze` abstract method implementation in AI provider classes (Qwen, Anthropic, Google, Ollama)
+- Fixed Ollama provider to use requests directly instead of undefined client attribute
+- Fixed Anthropic provider to properly handle different content block types in API responses
+- Removed duplicate app initialization in CLI preventing startup issues
+- Resolved type checking issues with AI provider factory registration
+- Fixed duplicate method definition in AI analyzer class
+
 ## [0.4.0] - 2025-09-15
 
 ### Added

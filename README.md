@@ -26,6 +26,10 @@ A Python-based command-line tool that provides comprehensive analysis of source 
 - **Unused code detection using AST-based analysis**
 - **Unused file detection using dependency graph analysis**
 - **AI-powered code quality suggestions**
+- **Advanced refactoring tools with AI-powered refactoring plan generation**
+- **Tech stack detection for 10+ programming languages (Python, JavaScript/TypeScript, Flutter, Go, Rust, Ruby, PHP, Java, Kotlin)**
+- **Integrated tool execution for each detected tech stack**
+- **Outdated package detection for all supported tech stacks**
 - Export results to JSON/CSV/HTML
 - Configuration file support (.refactoroscope.yml)
 - Multi-language support (60+ programming languages)
@@ -65,7 +69,7 @@ uv run refactoroscope duplicates src/ --type renamed
 
 ### Installation
 
-Refactoroscope can be installed in several ways depending on your needs:
+Refactoroscope can be installed in several ways depending on your needs. **Note: AI providers (OpenAI, Anthropic, Google) are now required dependencies.**
 
 #### Method 1: Install from PyPI (Recommended for most users)
 
@@ -73,7 +77,7 @@ Refactoroscope can be installed in several ways depending on your needs:
 pip install refactoroscope
 ```
 
-This installs Refactoroscope globally on your system and makes it available as a command-line tool.
+This installs Refactoroscope globally on your system and makes it available as a command-line tool. **AI providers are now included by default.**
 
 #### Method 2: Install with uv (Recommended for developers)
 
@@ -127,20 +131,20 @@ uv run refactoroscope analyze . --ai
 
 ### AI-Powered Analysis
 
-Refactoroscope provides AI-powered code quality suggestions using multiple AI providers including OpenAI, Anthropic, Google, and Ollama. The AI analysis provides intelligent insights on code readability, performance, potential bugs, and security issues.
+Refactoroscope provides AI-powered code quality suggestions integrated directly into the main analysis command. The AI analysis provides intelligent insights on code readability, performance, potential bugs, and security issues.
 
 ```bash
-# Analyze with AI only
-uv run refactoroscope ai /path/to/project
-
-# Analyze with a specific AI provider
-uv run refactoroscope ai /path/to/project --provider openai
-
-# Enable AI suggestions during regular analysis
+# Analyze with AI-powered suggestions
 uv run refactoroscope analyze . --ai
 
 # Enable AI suggestions during watching
 uv run refactoroscope watch . --ai
+
+# Check tech stacks and run appropriate tools for each subfolder
+uv run refactoroscope analyze . --check
+
+# Generate an AI-based refactoring plan for the codebase
+uv run refactoroscope refactor-plan .
 ```
 
 #### AI Provider Configuration
@@ -168,6 +172,7 @@ ai:
     - "anthropic"
     - "google"
     - "ollama"
+    - "qwen"
   
   # Provider configurations
   providers:
@@ -212,6 +217,64 @@ ai:
       
       # Whether this provider is enabled
       enabled: true
+    
+    qwen:
+      # Qwen doesn't require API keys for local installations
+      
+      # Model to use
+      model: "qwen"
+      
+      # Base URL for Qwen (default is localhost)
+      base_url: "http://localhost:11434"
+      
+      # Whether this provider is enabled
+      enabled: true
+```
+
+### Tech Stack Analysis and Tool Execution
+
+Refactoroscope can automatically detect technology stacks in your project and run the appropriate tools for each stack:
+
+```bash
+# Analyze current directory and run appropriate tools for detected tech stacks
+uv run refactoroscope analyze . --check
+
+# This will:
+# 1. Detect technology stacks (Python, JavaScript, Flutter, Go, Rust, etc.)
+# 2. Run appropriate linters, formatters, and type checkers for each stack
+# 3. Check for outdated packages
+# 4. Display results in terminal
+
+# Example output for a Python project:
+# Folder: src/
+# Detected Tech Stacks: python
+# Tool Results:
+#   • lint_ruff: ✓ Passed
+#   • format_black: ✗ Failed (would reformat src/main.py)
+#   • type_mypy: ✓ Passed
+# Outdated Packages:
+#   • requests: 2.31.0 -> 2.32.3
+```
+
+### AI-Powered Refactoring Plan Generation
+
+Generate comprehensive, AI-based refactoring plans for your codebase:
+
+```bash
+# Generate an AI-based refactoring plan for your project
+uv run refactoroscope refactor-plan .
+
+# Generate refactoring plan with specific AI provider
+uv run refactoroscope refactor-plan . --provider openai
+
+# Save refactoring plan to specific file
+uv run refactoroscope refactor-plan . --output my_refactoring_plan.md
+
+# This will:
+# 1. Analyze your codebase
+# 2. Detect complexity hotspots, duplicate code, code smells
+# 3. Generate a phased refactoring plan with implementation timeline
+# 4. Provide risk assessment and success metrics
 ```
 
 #### Supported AI Providers

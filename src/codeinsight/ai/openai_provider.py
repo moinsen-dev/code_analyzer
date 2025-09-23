@@ -26,7 +26,7 @@ class OpenAIProvider(AIProvider):
     """OpenAI provider implementation"""
 
     def __init__(
-        self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo", **kwargs: Any
+        self, api_key: Optional[str] = None, model: str = "gpt-5-mini", **kwargs: Any
     ) -> None:
         if not OPENAI_AVAILABLE:
             raise ImportError(
@@ -45,6 +45,66 @@ class OpenAIProvider(AIProvider):
         """Check if OpenAI is properly configured and available"""
         return self.client is not None and self.api_key is not None
 
+    def analyze(self, prompt: str) -> str:
+        """
+        Analyze a prompt and return the AI's response as a string.
+
+        Args:
+            prompt: The prompt to analyze
+
+        Returns:
+            The AI's response as a string
+        """
+        if not self.is_available():
+            raise RuntimeError("OpenAI provider is not properly configured")
+
+        try:
+            # Call OpenAI API
+            if self.client is not None:
+                # Determine which parameter to use based on model name
+                # Newer models (gpt-5-mini, etc.) use max_completion_tokens
+                # Older models (gpt-3.5-turbo, etc.) use max_tokens
+                # Newer models may not support temperature=0.1, so we use 1.0 for them
+                temperature = self._get_appropriate_temperature()
+                if "gpt-5" in self.model or "gpt-4o" in self.model:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "You are an expert software architect and refactoring specialist.",
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=temperature,
+                        max_completion_tokens=4000,  # Increased token limit for refactoring plans
+                    )
+                else:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "You are an expert software architect and refactoring specialist.",
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=temperature,
+                        max_tokens=4000,  # Increased token limit for refactoring plans
+                    )
+
+            # Process response
+            response_content = (
+                response.choices[0].message.content
+                if response.choices[0].message.content
+                else ""
+            )
+
+            return response_content
+
+        except Exception as e:
+            raise RuntimeError(f"Error analyzing prompt with OpenAI: {str(e)}")
+
     def analyze_code_quality(self, context: CodeContext) -> AIAnalysisResult:
         """Analyze code quality using OpenAI"""
         if not self.is_available():
@@ -58,28 +118,53 @@ class OpenAIProvider(AIProvider):
         try:
             # Call OpenAI API
             if self.client is not None:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are an expert code reviewer providing actionable suggestions for code quality improvements.",
-                        },
-                        {"role": "user", "content": prompt},
-                    ],
-                    temperature=0.1,
-                    max_tokens=1000,
-                )
+                # Get appropriate temperature based on model
+                temperature = self._get_appropriate_temperature()
+
+                # Determine which parameter to use based on model name
+                # Newer models (gpt-5-mini, etc.) use max_completion_tokens
+                # Older models (gpt-3.5-turbo, etc.) use max_tokens
+                if "gpt-5" in self.model or "gpt-4o" in self.model:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "You are an expert code reviewer providing actionable suggestions for code quality improvements.",
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=temperature,
+                        max_completion_tokens=2000,
+                    )
+                else:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "You are an expert code reviewer providing actionable suggestions for code quality improvements.",
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=temperature,
+                        max_tokens=2000,
+                    )
 
             # Process response
-            suggestions = self._parse_response(response.choices[0].message.content)
+            response_content = (
+                response.choices[0].message.content
+                if response.choices[0].message.content
+                else ""
+            )
+            suggestions = self._parse_response(response_content)
 
             execution_time = time.time() - start_time
 
             # Get token usage if available
             tokens_used = None
             cost = None
-            if hasattr(response, "usage"):
+            if hasattr(response, "usage") and response.usage is not None:
                 tokens_used = response.usage.total_tokens
                 # Rough cost calculation (prices vary by model)
                 if "gpt-4" in self.model:
@@ -154,6 +239,26 @@ Keep suggestions concise but detailed enough to be actionable.
             suggestions.append(current_suggestion)
 
         return suggestions
+
+    def _get_appropriate_temperature(self) -> float:
+        """Get appropriate temperature value based on model capabilities"""
+        # Models that don't support temperature=0.1 should use 1.0
+        models_requiring_higher_temp = [
+            "gpt-5",
+            "gpt-4o",
+            "gpt-4-turbo",
+            "gpt-4-1106",
+            "gpt-4-0125",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo-1106",
+        ]
+
+        for model_prefix in models_requiring_higher_temp:
+            if model_prefix in self.model:
+                return 1.0
+
+        # Default to 0.1 for other models
+        return 0.1
 
     @property
     def provider_name(self) -> str:

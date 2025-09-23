@@ -5,15 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.3] - 2025-09-14
+## [0.4.1] - 2025-09-16
+
+### Fixed
+- Fixed missing `analyze` abstract method implementation in AI provider classes (Qwen, Anthropic, Google, Ollama)
+- Fixed Ollama provider to use requests directly instead of undefined client attribute
+- Fixed Anthropic provider to properly handle different content block types in API responses
+- Removed duplicate app initialization in CLI preventing startup issues
+- Resolved type checking issues with AI provider factory registration
+- Fixed duplicate method definition in AI analyzer class
+
+## [0.4.0] - 2025-09-15
 
 ### Added
-- Unused file detection using dependency graph analysis
-- New `unused-files` CLI command for identifying completely unused files
-- Support for detecting unused Python files through import dependency analysis
-- Confidence scoring for unused file findings
-- Comprehensive documentation for unused file detection
-- Tests for unused file detection functionality
+- Advanced refactoring tools with AI-powered refactoring plan generation
+- Tech stack detection for Python, JavaScript/TypeScript, Flutter, Go, Rust, Ruby, PHP, Java, Kotlin
+- Integrated tool execution for each detected tech stack (ruff, black, mypy, eslint, prettier, flutter analyze, etc.)
+- Outdated package detection for all supported tech stacks
+- New `--check` option for analyze command to run appropriate tools for detected tech stacks
+- New `refactor-plan` command that generates AI-based refactoring plans with phased approach
+- Made AI providers (OpenAI, Anthropic, Google) required dependencies
+- Integrated AI functionality directly into the main `analyze` command (removed separate `ai` command)
+
+### Changed
+- Updated version to 0.4.0
+- Moved AI dependencies from optional to required
+- Improved subprocess security with proper shell=True annotations
+- Enhanced code quality with comprehensive type hints and docstrings
+- Consolidated AI functionality into main analysis flow
+
+### Fixed
+- CLI version option positioning and callback
+- Tech stack detection accuracy for various project types
+- Tool execution compatibility with different tech stacks
 
 ## [0.3.2] - 2025-09-14
 

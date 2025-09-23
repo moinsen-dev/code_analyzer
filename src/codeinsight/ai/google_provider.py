@@ -26,7 +26,10 @@ class GoogleProvider(AIProvider):
     """Google Gemini provider implementation"""
 
     def __init__(
-        self, api_key: Optional[str] = None, model: str = "gemini-pro", **kwargs: Any
+        self,
+        api_key: Optional[str] = None,
+        model: str = "gemini-2.5-flash",
+        **kwargs: Any,
     ) -> None:
         if not GOOGLE_AVAILABLE:
             raise ImportError(
@@ -146,6 +149,36 @@ Keep suggestions concise but detailed enough to be actionable.
             suggestions.append(current_suggestion)
 
         return suggestions
+
+    def analyze(self, prompt: str) -> str:
+        """
+        Analyze a prompt and return the AI's response as a string.
+
+        Args:
+            prompt: The prompt to analyze
+
+        Returns:
+            The AI's response as a string
+        """
+        if not self.is_available():
+            raise RuntimeError("Google provider is not available")
+
+        try:
+            # Call Google API
+            if self.client is not None:
+                # For general analysis, we'll use a simpler approach
+                response = self.client.generate_content(
+                    prompt,
+                    generation_config={
+                        "max_output_tokens": 4000,  # Increased token limit for detailed responses
+                        "temperature": 0.1,  # Low temperature for more deterministic responses
+                    },
+                )
+                return response.text
+            else:
+                raise RuntimeError("Google client is not initialized")
+        except Exception as e:
+            raise RuntimeError(f"Error analyzing with Google: {e}")
 
     @property
     def provider_name(self) -> str:

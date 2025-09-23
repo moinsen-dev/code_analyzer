@@ -28,7 +28,7 @@ class AnthropicProvider(AIProvider):
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "claude-3-haiku-20240307",
+        model: str = "claude-sonnet-4-20250514",
         **kwargs: Any,
     ) -> None:
         if not ANTHROPIC_AVAILABLE:
@@ -69,7 +69,14 @@ class AnthropicProvider(AIProvider):
                 )
 
             # Process response
-            suggestions = self._parse_response(response.content[0].text)
+            response_text = ""
+            if (
+                response.content
+                and len(response.content) > 0
+                and hasattr(response.content[0], "text")
+            ):
+                response_text = response.content[0].text
+            suggestions = self._parse_response(response_text)
 
             execution_time = time.time() - start_time
 
@@ -159,6 +166,49 @@ Assistant:
             suggestions.append(current_suggestion)
 
         return suggestions
+
+    def analyze(self, prompt: str) -> str:
+        """
+        Analyze a prompt and return the AI's response as a string.
+
+        Args:
+            prompt: The prompt to analyze
+
+        Returns:
+            The AI's response as a string
+        """
+        if not self.is_available():
+            raise RuntimeError("Anthropic provider is not available")
+
+        try:
+            # Call Anthropic API
+            if self.client is not None:
+                # For general analysis, we'll use a simpler approach
+                message = self.client.messages.create(
+                    model=self.model,
+                    max_tokens=4000,  # Increased token limit for detailed responses
+                    temperature=0.1,  # Low temperature for more deterministic responses
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt,
+                        }
+                    ],
+                )
+                # Handle different content types properly
+                if message.content and len(message.content) > 0:
+                    content_block = message.content[0]
+                    if hasattr(content_block, "text"):
+                        return content_block.text
+                    else:
+                        # For other content types, convert to string
+                        return str(content_block)
+                else:
+                    return ""
+            else:
+                raise RuntimeError("Anthropic client is not initialized")
+        except Exception as e:
+            raise RuntimeError(f"Error analyzing with Anthropic: {e}")
 
     @property
     def provider_name(self) -> str:

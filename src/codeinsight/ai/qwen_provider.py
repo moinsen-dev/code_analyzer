@@ -18,7 +18,7 @@ class QwenProvider(AIProvider):
     """Qwen provider implementation (placeholder)"""
 
     def __init__(
-        self, api_key: Optional[str] = None, model: str = "qwen-max", **kwargs: Any
+        self, api_key: Optional[str] = None, model: str = "qwen", **kwargs: Any
     ) -> None:
         self.model = model
         self.api_key = api_key
@@ -54,6 +54,22 @@ class QwenProvider(AIProvider):
             confidence=0.0,  # Not actually analyzing
             execution_time=execution_time,
         )
+
+    def analyze(self, prompt: str) -> str:
+        """
+        Analyze a prompt and return the AI's response as a string.
+
+        Args:
+            prompt: The prompt to analyze
+
+        Returns:
+            The AI's response as a string
+        """
+        if not self.is_available():
+            raise RuntimeError("Qwen provider is not available")
+
+        # Placeholder implementation
+        return "Qwen analysis not implemented. Please use another provider for AI analysis."
 
     @property
     def provider_name(self) -> str:

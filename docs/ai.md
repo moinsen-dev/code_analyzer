@@ -5,11 +5,11 @@ title: AI-Powered Analysis
 
 # AI-Powered Analysis
 
-Refactoroscope includes AI-powered code quality suggestions that provide intelligent insights on code readability, performance, potential bugs, and security issues.
+Refactoroscope includes AI-powered code quality suggestions that provide intelligent insights on code readability, performance, potential bugs, and security issues. **Note: AI functionality is now integrated directly into the main `analyze` command rather than being a separate command.**
 
 ## How It Works
 
-The AI analysis feature uses multiple AI providers to analyze your code and provide suggestions for improvement. The analysis is performed on a file-by-file basis, with each file being analyzed separately by the AI model.
+The AI analysis feature uses multiple AI providers to analyze your code and provide suggestions for improvement. The analysis is performed on a file-by-file basis, with each file being analyzed separately by the AI model. AI-generated suggestions are integrated into the existing code smell detection system.
 
 ## Supported AI Providers
 
@@ -26,8 +26,18 @@ Refactoroscope supports multiple AI providers:
 To analyze your project with AI:
 
 ```bash
-uv run refactoroscope ai /path/to/your/project
+# Enable AI suggestions during regular analysis
+uv run refactoroscope analyze /path/to/your/project --ai
+
+# Enable AI suggestions during watching
+uv run refactoroscope watch /path/to/your/project --ai
 ```
+
+AI-generated suggestions will appear in the "Code Smells Detected" section of the analysis output.
+
+## Configuration
+
+AI functionality is configured in the `.refactoroscope.yml` configuration file. See the [Configuration Guide](configuration.md) for details.
 
 To analyze with a specific AI provider:
 
